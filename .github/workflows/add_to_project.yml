@@ -37,16 +37,11 @@ jobs:
             function pick(keys){
               for (let i=0;i<lines.length;i++){
                 const l = norm(lines[i]);
-                // 行がキーで始まっているか確認（部分一致だと誤爆するので、ある程度厳密に）
+                // 行がキーで始まっているか確認
                 const matched = keys.some(k => l.startsWith(k));
                 if (matched){
-                  // 同一行に ":" があればその後を値とする
-                  const parts = lines[i].split(/[:：]/);
-                  if (parts.length > 1) {
-                    const val = parts.slice(1).join(':').trim();
-                    if (val) return val;
-                  }
-                  // なければ次の「空行ではない」行を探す
+                  // Issue Formsの出力形式では、見出し行に値は含まれず、必ず次の行に値が来る
+                  // ただし、入力がない場合は "_No response_" 等が来る
                   let j=i+1; 
                   while(j<lines.length && lines[j].trim().length===0) j++;
                   if (j<lines.length) return lines[j].trim();
