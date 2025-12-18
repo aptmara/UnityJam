@@ -1,0 +1,163 @@
+name: Auto Add Issue to Project
+
+on:
+  issues:
+    types: [opened, edited]
+
+jobs:
+  add-to-project:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo (for shared scripts)
+        uses: actions/checkout@v4
+
+      - name: Add to Project (best-effort)
+        uses: actions/add-to-project@v0.5.0
+        id: add-project
+        with:
+          project-url: https://github.com/users/aptmara/projects/3
+          github-token: ${{ secrets.PROJECT_TOKEN }}
+
+      - name: Extract Issue Fields
+        id: extract
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const raw = context.payload.issue.body || '';
+            const lines = raw.replace(/\r\n/g, '\n').split('\n');
+
+            // ラベルの別名定義
+            const aliases = {
+              priority: ['優先度', 'priority'],
+              due_date: ['期日', 'end date', 'due date']
+            };
+
+            function norm(s){ return (s||'').trim().toLowerCase().replace(/^#+\s*/, ''); }
+
+            function pick(keys){
+              for (let i=0;i<lines.length;i++){
+                const l = norm(lines[i]);
+                for (const k of keys){
+                  if (l.startsWith(k)){
+                    const parts = lines[i].split(/[:：]/);
+                    if (parts.length > 1) {
+                      const val = parts.slice(1).join(':').trim();
+                      if (val) return val;
+                    }
+                    // 次の行を見る
+                    let j=i+1; while(j<lines.length && lines[j].trim().length===0) j++;
+                    if (j<lines.length) return lines[j].trim();
+                    return '';
+                  }
+                }
+              }
+              return '';
+            }
+
+            const priority = pick(aliases.priority);
+            const dueDate = pick(aliases.due_date);
+            // Start DateはIssue作成日を使用
+            const startDate = context.payload.issue.created_at.split('T')[0];
+
+            console.log('Extracted:', { priority, dueDate, startDate });
+            core.setOutput('priority', priority);
+            core.setOutput('due_date', dueDate);
+            core.setOutput('start_date', startDate);
+
+      - name: Get Project Data
+        uses: actions/github-script@v7
+        id: project-data
+        env:
+          ITEM_ID_HINT: ${{ steps.add-project.outputs.itemId }}
+        with:
+          github-token: ${{ secrets.PROJECT_TOKEN }}
+          script: |
+            const issue = context.payload.issue;
+            const user = 'aptmara';
+            const projectNumber = 3;
+            const itemIdHint = process.env.ITEM_ID_HINT;
+
+            // User Project 用クエリ
+            const projQuery = `
+              query($login: String!, $number: Int!) {
+                user(login: $login) {
+                  projectV2(number: $number) {
+                    id
+                    fields(first: 50) {
+                      nodes {
+                        ... on ProjectV2Field { id name dataType }
+                        ... on ProjectV2SingleSelectField { id name dataType options { id name } }
+                        ... on ProjectV2DateField { id name dataType }
+                      }
+                    }
+                  }
+                }
+              }
+            `;
+
+            const addMutation = `
+              mutation($projectId: ID!, $contentId: ID!) {
+                addProjectV2ItemById(input: { projectId: $projectId, contentId: $contentId }) { item { id } }
+              }
+            `;
+
+            const res = await github.graphql(projQuery, { login: user, number: projectNumber });
+            const project = res.user.projectV2;
+            const projectId = project.id;
+
+            let itemId = itemIdHint;
+            if (!itemId) {
+              try {
+                const addRes = await github.graphql(addMutation, { projectId, contentId: issue.node_id });
+                itemId = addRes.addProjectV2ItemById.item.id;
+              } catch (e) {
+                console.log('Item might already exist:', e.message);
+              }
+            }
+
+            // itemIdが特定できない場合は検索（省略）またはエラー
+            // add-to-projectアクションが成功していればitemIdHintがあるはず
+            if (!itemId) {
+               console.log('Could not determine itemId. Skipping field update.');
+               return; 
+            }
+
+            core.setOutput('item_id', itemId);
+            core.setOutput('project_id', projectId);
+
+            const fields = {}; 
+            const fieldOptions = {};
+            for (const f of project.fields.nodes) {
+              fields[f.name] = f.id;
+              if (f.options) {
+                const map = {}; 
+                for (const o of f.options) map[o.name] = o.id; 
+                fieldOptions[f.name] = map;
+              }
+            }
+            core.setOutput('fields', JSON.stringify(fields));
+            core.setOutput('field_options', JSON.stringify(fieldOptions));
+
+      - name: Set Project Fields
+        uses: actions/github-script@v7
+        if: steps.project-data.outputs.project_id != ''
+        env:
+          PROJECT_ID: ${{ steps.project-data.outputs.project_id }}
+          ITEM_ID: ${{ steps.project-data.outputs.item_id }}
+          FIELDS: ${{ steps.project-data.outputs.fields }}
+          FIELD_OPTIONS: ${{ steps.project-data.outputs.field_options }}
+          PRIORITY: ${{ steps.extract.outputs.priority }}
+          DUE_DATE: ${{ steps.extract.outputs.due_date }}
+          START_DATE: ${{ steps.extract.outputs.start_date }}
+        with:
+          github-token: ${{ secrets.PROJECT_TOKEN }}
+          script: |
+            const path = require('path');
+            const fs = require('fs');
+            const scriptPath = path.join(process.env.GITHUB_WORKSPACE, '.github/workflows/scripts/set-project-fields.js');
+            if (!fs.existsSync(scriptPath)) {
+              core.setFailed(`Script not found: ${scriptPath}`);
+              return;
+            }
+            const run = require(scriptPath);
+            await run({ core, github, process });
