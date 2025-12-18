@@ -7,14 +7,14 @@ body:
     id: description
     attributes:
       label: 説明
-      placeholder: タスクの内容、背景、具体的な作業内容などを記載してください
+      placeholder: "タスクの内容、背景、具体的な作業内容などを記載してください"
     validations:
       required: true
 
   - type: dropdown
     id: priority
     attributes:
-      label: 優先度 (0:最優先 - 10:低)
+      label: "優先度 (0:最優先 - 10:低)"
       options:
         - "0"
         - "1"
@@ -34,7 +34,7 @@ body:
     id: ref_url
     attributes:
       label: 参考URL
-      placeholder: https://github.com/...
+      placeholder: "https://github.com/..."
     validations:
       required: false
 
@@ -42,6 +42,6 @@ body:
     id: due_date
     attributes:
       label: 期日
-      placeholder: YYYY-MM-DD (例: 2025-12-31)
+      placeholder: "YYYY-MM-DD (例: 2025-12-31)"
     validations:
       required: false
