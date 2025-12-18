@@ -1,13 +1,13 @@
 name: 🐛 Bug
 description: 不具合報告
-title: "[BUG] <タイトル>"
+title: "[BUG] "
 labels: ["bug"]
 body:
   - type: textarea
     id: description
     attributes:
       label: 事象概要
-      placeholder: 何が起こっているか / 期待動作
+      placeholder: 何が起こっているか、本来どうなってほしいかを簡潔に記載してください
     validations:
       required: true
 
@@ -16,9 +16,9 @@ body:
     attributes:
       label: 再現手順
       placeholder: |
-        1)
-        2)
-        3)
+        1. 〇〇画面を開く
+        2. ××ボタンを押す
+        3. 
     validations:
       required: false
 
@@ -54,3 +54,5 @@ body:
     attributes:
       label: 参考URL
       placeholder: https://...
+    validations:
+      required: false

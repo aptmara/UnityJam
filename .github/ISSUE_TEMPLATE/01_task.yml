@@ -1,12 +1,13 @@
 name: 📝 Task
 description: 一般タスク
-title: "[TASK] <タイトル>"
+title: "[TASK] "
 labels: ["task"]
 body:
   - type: textarea
     id: description
     attributes:
       label: 説明
+      placeholder: タスクの内容、背景、具体的な作業内容などを記載してください
     validations:
       required: true
 
@@ -33,10 +34,14 @@ body:
     id: ref_url
     attributes:
       label: 参考URL
-      placeholder: https://...
+      placeholder: https://github.com/...
+    validations:
+      required: false
 
   - type: input
     id: due_date
     attributes:
       label: 期日
-      placeholder: YYYY-MM-DD
+      placeholder: YYYY-MM-DD (例: 2025-12-31)
+    validations:
+      required: false
