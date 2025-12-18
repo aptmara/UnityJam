@@ -34,6 +34,8 @@ module.exports = async function run({ core, github, process }) {
     ]),
   );
 
+  const SKIP_VALUES = new Set(['_no response_', 'no response', 'none']);
+
   function getFieldId(fieldName) {
     const id = fieldIdByName.get(fieldName.trim().toLowerCase());
     if (!id) console.log(`Field not found: ${fieldName}`);
@@ -46,8 +48,23 @@ module.exports = async function run({ core, github, process }) {
     return opts.get(value.trim().toLowerCase());
   }
 
+  // Value Mapping Logic
+  function mapValue(fieldName, value) {
+    const f = fieldName.toLowerCase();
+    const v = String(value).trim();
+    
+    // Priority Mapping: "0" -> "P0", "1" -> "P1" ...
+    if (f === 'priority') {
+      // If input is just a number (0-10), prepend 'P'
+      if (/^\d+$/.test(v)) {
+        return `P${v}`;
+      }
+    }
+    return v;
+  }
+
   async function updateField(fieldId, valueObj) {
-     // valueObj example: { singleSelectOptionId: "..." } or { date: "..." } or { number: 123 } or { text: "..." }
+     // ... mutation ...
      const mutation = `
        mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $value: ProjectV2FieldValue!) {
          updateProjectV2ItemFieldValue(input: {
@@ -61,50 +78,53 @@ module.exports = async function run({ core, github, process }) {
      await github.graphql(mutation, { projectId, itemId, fieldId, value: valueObj });
   }
 
-  async function setAny(fieldName, value) {
-    if (!value) return;
-    const valStr = String(value).trim();
-    if (!valStr) return;
+  async function setAny(fieldName, rawValue) {
+    if (!rawValue) return;
+    if (SKIP_VALUES.has(String(rawValue).toLowerCase())) {
+        console.log(`Skipping ${fieldName} because value is '${rawValue}'`);
+        return;
+    }
 
+    const value = mapValue(fieldName, rawValue);
     const fieldId = getFieldId(fieldName);
     if (!fieldId) return;
 
-    console.log(`Setting ${fieldName} = ${valStr}`);
+    console.log(`Setting ${fieldName} = ${value} (raw: ${rawValue})`);
 
     // Try Single Select first
     const opts = optionIdByFieldName.get(fieldName.trim().toLowerCase());
     if (opts) {
-      const optId = getOptionId(fieldName, valStr);
+      const optId = getOptionId(fieldName, value);
       if (optId) {
         await updateField(fieldId, { singleSelectOptionId: optId });
         return;
       }
-      console.log(`Option '${valStr}' not found in ${fieldName}. Available:`, Array.from(opts.keys()));
+      console.log(`Option '${value}' not found in ${fieldName}. Available:`, Array.from(opts.keys()));
       // Fallback: don't try to set text/number if it's strictly a single select field, it will fail.
       return;
     }
 
     // Date check (simple YYYY-MM-DD)
-    if (/^\d{4}-\d{2}-\d{2}$/.test(valStr)) {
+    if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
         // Assume it is a Date field
         try {
-            await updateField(fieldId, { date: valStr });
+            await updateField(fieldId, { date: value });
             return;
         } catch(e) { /* ignore, maybe it's text */ }
     }
 
     // Number check
-    if (!isNaN(parseFloat(valStr))) {
+    if (!isNaN(parseFloat(value))) {
         // Try as number
         try {
-            await updateField(fieldId, { number: parseFloat(valStr) });
+            await updateField(fieldId, { number: parseFloat(value) });
             return;
         } catch(e) { /* ignore */ }
     }
 
     // Fallback to text
     try {
-        await updateField(fieldId, { text: valStr });
+        await updateField(fieldId, { text: value });
     } catch(e) {
         console.log(`Failed to set ${fieldName} as text: ${e.message}`);
     }

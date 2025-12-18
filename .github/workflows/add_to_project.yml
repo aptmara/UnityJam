@@ -37,18 +37,20 @@ jobs:
             function pick(keys){
               for (let i=0;i<lines.length;i++){
                 const l = norm(lines[i]);
-                for (const k of keys){
-                  if (l.startsWith(k)){
-                    const parts = lines[i].split(/[:：]/);
-                    if (parts.length > 1) {
-                      const val = parts.slice(1).join(':').trim();
-                      if (val) return val;
-                    }
-                    // 次の行を見る
-                    let j=i+1; while(j<lines.length && lines[j].trim().length===0) j++;
-                    if (j<lines.length) return lines[j].trim();
-                    return '';
+                // 行がキーで始まっているか確認（部分一致だと誤爆するので、ある程度厳密に）
+                const matched = keys.some(k => l.startsWith(k));
+                if (matched){
+                  // 同一行に ":" があればその後を値とする
+                  const parts = lines[i].split(/[:：]/);
+                  if (parts.length > 1) {
+                    const val = parts.slice(1).join(':').trim();
+                    if (val) return val;
                   }
+                  // なければ次の「空行ではない」行を探す
+                  let j=i+1; 
+                  while(j<lines.length && lines[j].trim().length===0) j++;
+                  if (j<lines.length) return lines[j].trim();
+                  return '';
                 }
               }
               return '';
