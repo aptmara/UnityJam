@@ -1,0 +1,56 @@
+name: 🐛 Bug
+description: 不具合報告
+title: "[BUG] <タイトル>"
+labels: ["bug"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: 事象概要
+      placeholder: 何が起こっているか / 期待動作
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: 再現手順
+      placeholder: |
+        1)
+        2)
+        3)
+    validations:
+      required: false
+
+  - type: input
+    id: env
+    attributes:
+      label: 環境情報
+      placeholder: OS / GPU / ビルド番号など
+    validations:
+      required: false
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: 優先度 (0:最優先 - 10:低)
+      options:
+        - "0"
+        - "1"
+        - "2"
+        - "3"
+        - "4"
+        - "5"
+        - "6"
+        - "7"
+        - "8"
+        - "9"
+        - "10"
+    validations:
+      required: true
+
+  - type: input
+    id: ref_url
+    attributes:
+      label: 参考URL
+      placeholder: https://...

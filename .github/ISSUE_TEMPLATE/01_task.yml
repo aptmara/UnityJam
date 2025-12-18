@@ -1,0 +1,42 @@
+name: 📝 Task
+description: 一般タスク
+title: "[TASK] <タイトル>"
+labels: ["task"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: 説明
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: 優先度 (0:最優先 - 10:低)
+      options:
+        - "0"
+        - "1"
+        - "2"
+        - "3"
+        - "4"
+        - "5"
+        - "6"
+        - "7"
+        - "8"
+        - "9"
+        - "10"
+    validations:
+      required: true
+
+  - type: input
+    id: ref_url
+    attributes:
+      label: 参考URL
+      placeholder: https://...
+
+  - type: input
+    id: due_date
+    attributes:
+      label: 期日
+      placeholder: YYYY-MM-DD
