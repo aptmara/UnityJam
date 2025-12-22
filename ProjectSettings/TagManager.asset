@@ -11,6 +11,8 @@ TagManager:
   - Projectile
   - Water
   - UI
+  - Ground
+  - Wall
   - Player
   - 
   - 
