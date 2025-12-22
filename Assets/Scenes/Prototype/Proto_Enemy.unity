@@ -920,17 +920,9 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1795888418314984916, guid: 3840b98280314694da5d61876ecf7684, type: 3}
-      propertyPath: moveSpeed
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 1795888418314984916, guid: 3840b98280314694da5d61876ecf7684, type: 3}
-      propertyPath: obstacleMask.m_Bits
-      value: 192
-      objectReference: {fileID: 0}
-    - target: {fileID: 2722087197966923598, guid: 3840b98280314694da5d61876ecf7684, type: 3}
-      propertyPath: m_Enabled
-      value: 0
+    - target: {fileID: 366079651454924619, guid: 3840b98280314694da5d61876ecf7684, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.32
       objectReference: {fileID: 0}
     - target: {fileID: 3539478714299389257, guid: 3840b98280314694da5d61876ecf7684, type: 3}
       propertyPath: m_LocalPosition.x
@@ -942,7 +934,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3539478714299389257, guid: 3840b98280314694da5d61876ecf7684, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -8.54
+      value: -8.77
       objectReference: {fileID: 0}
     - target: {fileID: 3539478714299389257, guid: 3840b98280314694da5d61876ecf7684, type: 3}
       propertyPath: m_LocalRotation.w
