@@ -28,9 +28,9 @@ namespace UnityJam.Interaction
         /// プレイヤーから毎フレーム呼ばれる関数
         /// 呼ばれている間だけ秒数を進めます。
         /// </summary>
-        public void AddInteractTime()
+        public bool AddInteractTime()
         {
-            if (isCompleted) return;
+            if (isCompleted) return false;
 
             // 最終インタラクトフレームを更新
             lastInteractFrame = Time.frameCount;
@@ -46,7 +46,11 @@ namespace UnityJam.Interaction
 
                 // 子クラスごとの処理を実行
                 OnInteractCompleted();
+
+                return true;
             }
+
+            return false;
         }
 
 

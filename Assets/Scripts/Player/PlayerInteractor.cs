@@ -18,6 +18,10 @@ namespace UnityJam.Player
         [Tooltip("レイを飛ばす起点（カメラなど。空なら自分の位置）")]
         [SerializeField] private Transform rayOrigin;
 
+        // 後付けでAnimatorを直接いじってるけど後で全部Playerが結果受け取って動かす by越智
+        [Tooltip("俺が勝手にAnimatorをいじるために受け取ってるけど後でPlayer側にやらせたいby越智")]
+        [SerializeField] private Animator playerAnimator;
+
         [Header("--- デバッグ ---")]
         [SerializeField] private InteractableBase currentTarget; // 今見ている対象
 
@@ -31,8 +35,14 @@ namespace UnityJam.Player
             {
                 if (Input.GetKey(interactKey))
                 {
+
                     // ここで時間を進める関数を呼ぶ！
-                    currentTarget.AddInteractTime();
+                    bool isInteract = currentTarget.AddInteractTime();
+                    
+                    if(isInteract)
+                    {
+                        playerAnimator.SetTrigger("Interact");
+                    }
 
                     // ログで進行度確認（完成したら消してOK）
                     // Debug.Log($"Opening... {currentTarget.Progress:P0}");

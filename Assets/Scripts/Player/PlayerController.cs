@@ -13,6 +13,7 @@ namespace UnityJam
         [SerializeField] Transform playerTransform;
         [SerializeField] Rigidbody playerRigidbody;
         [SerializeField] bool isCameraChase;
+        [SerializeField] Animator animator;
 
         [Header("Camera")]
         [SerializeField] CameraRigController rig;
@@ -122,9 +123,15 @@ namespace UnityJam
             if (moveVector.sqrMagnitude > 0.0f)
             {
                 moveVector.Normalize();
+
+                animator.SetInteger("MoveState", 1);
+            }
+            else
+            {
+                animator.SetInteger("MoveState", 0);
             }
 
-            return moveVector;
+                return moveVector;
 
         }
 

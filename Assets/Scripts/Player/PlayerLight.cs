@@ -137,11 +137,11 @@ public class PlayerLight : MonoBehaviour
             {
                 // バッテリー量 = 継続時間に伴ってライトが減るように変更しました！問題が出てたら教えてください！ by越智
 
-                int powerLevel = (int)(LightBattery * 2.95f);
+                //int powerLevel = (int)(LightBattery * 2.95f);
      
-                float currentLightPower = lightPowers[powerLevel];
-                light.intensity = currentLightPower;
-                //light.intensity = LightPower * LightBattery; //ライトの強度設定
+                //float currentLightPower = lightPowers[powerLevel];
+                //light.intensity = currentLightPower;
+                light.intensity = LightPower * LightBattery; //ライトの強度設定
             }
         }
         else
