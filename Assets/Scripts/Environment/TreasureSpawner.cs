@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityJam.Effects;
 
 namespace UnityJam.Environment
 {
@@ -34,6 +35,10 @@ namespace UnityJam.Environment
         [Header("Placement")]
         [Tooltip("Prefabのずれ")]
         [SerializeField] private Vector3 positionOffset = new Vector3(0f, 0f, 0f);
+
+        [Header("Post FX Injection (Optional)")]
+        [Tooltip("宝箱開封時にBloomブーストさせたい場合、@PostFX_Global の BloomBurstController を設定")]
+        [SerializeField] private BloomBurstController bloomBurst;
 
         [Header("Debug")]
         [Tooltip("ランダムを“完全ランダム”にするか“毎回同じ結果になるランダム”にするかを切り替える")]
@@ -164,7 +169,18 @@ namespace UnityJam.Environment
 
             GameObject go = Instantiate(prefab, pos, rot);
             spawnedObjects.Add(go);
+
+            // BloomBurst を自動注入（受け取れる側だけ）
+            if (bloomBurst != null)
+            {
+                IBloomBurstReceiver receiver = go.GetComponent<IBloomBurstReceiver>();
+                if (receiver != null)
+                {
+                    receiver.SetBloomBurst(bloomBurst);
+                }
+            }
         }
+
 
         /// <summary>
         /// リストをFisher-Yatesでインプレースシャッフル（LINQ不使用、GC抑制）。
