@@ -79,11 +79,11 @@ Light:
   serializedVersion: 10
   m_Type: 0
   m_Shape: 0
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 0.9975195, b: 0.87358487, a: 1}
   m_Intensity: 1
-  m_Range: 20
-  m_SpotAngle: 45
-  m_InnerSpotAngle: 21.80208
+  m_Range: 25
+  m_SpotAngle: 60
+  m_InnerSpotAngle: 1
   m_CookieSize: 10
   m_Shadows:
     m_Type: 0
@@ -147,9 +147,12 @@ MonoBehaviour:
   AdditionBatteryLife: {fileID: 0}
   BatteryPiecesText: {fileID: 0}
   AdditionPiecesText: {fileID: 0}
+  highPowerLight: 5
+  middlePowerLight: 3
+  lowPowerLight: 1
   BatteryPieces: 0
-  LightPower: 1
-  LightAngle: 45
+  LightPower: 5
+  LightAngle: 20
   light: {fileID: 6222400595053046183}
   LifeTime: 30
   LifeDampingAcceleration: 5
@@ -167,6 +170,7 @@ GameObject:
   - component: {fileID: 8416167883679119593}
   - component: {fileID: 7782769784789318992}
   - component: {fileID: 8231288596192292355}
+  - component: {fileID: 8311340490151219588}
   - component: {fileID: 8289449604193237131}
   m_Layer: 0
   m_Name: Player
@@ -197,7 +201,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2594492354261743119}
-  m_Mesh: {fileID: -5300115004599201601, guid: 8129126b452f5504d80f054ac9fc4396, type: 3}
+  m_Mesh: {fileID: 6890466800292392854, guid: ebb174fba08d1b74996757d73d85874d, type: 3}
 --- !u!23 &8416167883679119593
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -218,7 +222,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a8fb8cc9e91e0c346aba5aae1df7cefa, type: 2}
+  - {fileID: 2100000, guid: 958e8488b2610924f9f5288a76d010d0, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -262,7 +266,7 @@ CapsuleCollider:
   m_Radius: 0.9
   m_Height: 2.6
   m_Direction: 1
-  m_Center: {x: 0, y: -0.1, z: 0}
+  m_Center: {x: 0, y: 0.6, z: 0}
 --- !u!54 &8231288596192292355
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -290,6 +294,19 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
+--- !u!114 &8311340490151219588
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2594492354261743119}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b5295cc2b2a5e144952559d12976615, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rb: {fileID: 8231288596192292355}
 --- !u!114 &8289449604193237131
 MonoBehaviour:
   m_ObjectHideFlags: 0

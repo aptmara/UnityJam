@@ -1066,6 +1066,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: PF_Player_PlayerLoot
       objectReference: {fileID: 0}
+    - target: {fileID: 2067313849506698217, guid: 02021e2ee4397ff4ab4881449f848753, type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 6890466800292392854, guid: ebb174fba08d1b74996757d73d85874d, type: 3}
     - target: {fileID: 3184120901640446817, guid: 02021e2ee4397ff4ab4881449f848753, type: 3}
       propertyPath: rig
       value: 
@@ -1115,9 +1119,29 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1497489671}
     - target: {fileID: 5656762806977218720, guid: 02021e2ee4397ff4ab4881449f848753, type: 3}
+      propertyPath: LightAngle
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 5656762806977218720, guid: 02021e2ee4397ff4ab4881449f848753, type: 3}
+      propertyPath: LightPower
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5656762806977218720, guid: 02021e2ee4397ff4ab4881449f848753, type: 3}
       propertyPath: BatteryLife
       value: 
       objectReference: {fileID: 2110042911}
+    - target: {fileID: 5656762806977218720, guid: 02021e2ee4397ff4ab4881449f848753, type: 3}
+      propertyPath: lowPowerLight
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5656762806977218720, guid: 02021e2ee4397ff4ab4881449f848753, type: 3}
+      propertyPath: highPowerLight
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5656762806977218720, guid: 02021e2ee4397ff4ab4881449f848753, type: 3}
+      propertyPath: middlePowerLight
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 5656762806977218720, guid: 02021e2ee4397ff4ab4881449f848753, type: 3}
       propertyPath: BatteryPiecesText
       value: 
@@ -1130,6 +1154,34 @@ PrefabInstance:
       propertyPath: AdditionBatteryLife
       value: 
       objectReference: {fileID: 1950348371}
+    - target: {fileID: 6222400595053046183, guid: 02021e2ee4397ff4ab4881449f848753, type: 3}
+      propertyPath: m_Range
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 6222400595053046183, guid: 02021e2ee4397ff4ab4881449f848753, type: 3}
+      propertyPath: m_Color.b
+      value: 0.87358487
+      objectReference: {fileID: 0}
+    - target: {fileID: 6222400595053046183, guid: 02021e2ee4397ff4ab4881449f848753, type: 3}
+      propertyPath: m_Color.g
+      value: 0.9975195
+      objectReference: {fileID: 0}
+    - target: {fileID: 6222400595053046183, guid: 02021e2ee4397ff4ab4881449f848753, type: 3}
+      propertyPath: m_SpotAngle
+      value: 60
+      objectReference: {fileID: 0}
+    - target: {fileID: 6222400595053046183, guid: 02021e2ee4397ff4ab4881449f848753, type: 3}
+      propertyPath: m_InnerSpotAngle
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7782769784789318992, guid: 02021e2ee4397ff4ab4881449f848753, type: 3}
+      propertyPath: m_Center.y
+      value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8416167883679119593, guid: 02021e2ee4397ff4ab4881449f848753, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 958e8488b2610924f9f5288a76d010d0, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
