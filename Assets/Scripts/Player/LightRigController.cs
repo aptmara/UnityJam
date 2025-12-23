@@ -28,7 +28,9 @@ namespace UnityJam
             Vector3 rotation = new Vector3(cameraRig.pitch, targetTransform.rotation.eulerAngles.y, 0.0f);
 
             lightTransform.rotation = Quaternion.Euler(rotation);
-            lightTransform.position = targetTransform.position + lightOffset;
+
+            Vector3 worldOffset = targetTransform.rotation * lightOffset;
+            lightTransform.position = targetTransform.position + worldOffset;
         }
     }
 }
