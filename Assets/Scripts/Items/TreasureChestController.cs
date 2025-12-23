@@ -21,6 +21,10 @@ namespace UnityJam.Gimmicks
         [Tooltip("閉まっている状態のモデル（これを開封時に消します）")]
         [SerializeField] private GameObject closedModel;
 
+        [Header("--- エフェクト設定 ---")]
+        [Tooltip("宝箱を開けた瞬間のエフェクト（VFX）")]
+        [SerializeField] private GameObject openVfxPrefab;
+
         [Tooltip("アイテム取得時の飛び出すエフェクト (Prefab)")]
         [SerializeField] private GameObject popupEffectPrefab;
 
@@ -54,7 +58,14 @@ namespace UnityJam.Gimmicks
             if (closedModel != null) closedModel.SetActive(false);
             if (openedModel != null) openedModel.SetActive(true);
 
-            // D. アイテム飛び出し演出
+            // D. エフェクトの再生
+            if(openVfxPrefab != null)
+            {
+                // 宝の位置にエフェクト生成
+                Instantiate(openVfxPrefab, transform.position, Quaternion.identity);
+            }
+
+            // E. アイテム飛び出し演出
             if (popupEffectPrefab != null)
             {
                 // 1. 生成して、そのGameObjectを変数に入れる
