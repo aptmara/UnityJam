@@ -55,7 +55,9 @@ namespace UnityJam
             Quaternion rotation = Quaternion.Euler(pitch, yaw, 0f);
             useCamera.rotation = rotation;
 
-            Vector3 targetPos = player.position + offset;
+            Vector3 worldOffset = rotation * offset;
+
+            Vector3 targetPos = player.position + worldOffset;
 
             Vector3 desiredCameraPos = targetPos - rotation * Vector3.forward * distance;
 
