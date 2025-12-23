@@ -1,8 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using Unity.VisualScripting;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -22,6 +20,14 @@ public class PlayerLight : MonoBehaviour
     TMPro.TMP_Text BatteryPiecesText;
     [SerializeField,Tooltip("追加バッテリーのテキスト")]
     TMPro.TMP_Text AdditionPiecesText;
+
+    [Header("LightPower")]
+    [SerializeField, Tooltip("光量が多い時のライト")]
+    float highPowerLight;
+    [SerializeField, Tooltip("光量が中ぐらいの時のライト")]
+    float middlePowerLight;
+    [SerializeField, Tooltip("光量が少ない時のライト")]
+    float lowPowerLight;
 
     private Image BatteryImage;//初期バッテリーの画像
     private Image AdditionBatteryImage;//追加バッテリーの画像
@@ -58,7 +64,7 @@ public class PlayerLight : MonoBehaviour
     float DmpAccelTime = 2.0f;
     float DmpAccelNowTime;//減衰加速の残り時間
 
-
+    float[] lightPowers;
 
     int LightBlinkingInterval = 180;//ライト点滅のインターバル
     bool isLighting = true;
@@ -71,7 +77,12 @@ public class PlayerLight : MonoBehaviour
         light = GetComponent<Light>();
         BatteryImage = BatteryLife.GetComponent<Image>();
         AdditionBatteryImage = AdditionBatteryLife.GetComponent<Image>();
-        
+
+        lightPowers = new float[3];
+        lightPowers[0] = lowPowerLight;
+        lightPowers[1] = middlePowerLight;
+        lightPowers[2] = highPowerLight;
+
         BatteryAdditionPieces = 2;
         BatteryPieces = 2;
         LightBattery = 1.0f;
@@ -95,7 +106,7 @@ public class PlayerLight : MonoBehaviour
         if (isLighting)
         {
             light.innerSpotAngle = LightAngle;//角度設定
-            light.intensity = LightPower;//ライトの強度設定
+            light.intensity = LightPower;
             if(isCollect)//偽アイテムをとっているフラグが立ってたら
                 LightBattery -= 1.0f / (LifeTime * 60.0f) * LifeDampingAcceleration;//加速減衰
             else//偽アイテムとっていなかったら
@@ -119,6 +130,16 @@ public class PlayerLight : MonoBehaviour
                 LightBlinkingInterval -= 3;
                 if (LightBlinkingInterval <= 0)
                     LightBlinkingInterval = 180;
+            }
+            else
+            {
+                // バッテリー量 = 継続時間に伴ってライトが減るように変更しました！問題が出てたら教えてください！ by越智
+
+                //int powerLevel = (int)(LightBattery * 2.95f);
+     
+                //float currentLightPower = lightPowers[powerLevel];
+                //light.intensity = currentLightPower;
+                light.intensity = LightPower * LightBattery; //ライトの強度設定
             }
         }
         else
