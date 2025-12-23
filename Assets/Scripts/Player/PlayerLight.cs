@@ -77,7 +77,7 @@ public class PlayerLight : MonoBehaviour
         BatteryImage = BatteryLife.GetComponent<Image>();
         AdditionBatteryImage = AdditionBatteryLife.GetComponent<Image>();
 
-        BatteryAdditionPieces = 1;
+        BatteryAdditionPieces = 0;
 
         LightBattery = 1.0f;
     }
@@ -119,7 +119,7 @@ public class PlayerLight : MonoBehaviour
                else
                 LightBattery -= 1.0f / (LifeTime * 60.0f);//加速減衰
 
-            float NormalizeLightBlinkingPercentage = LightBlinkingPercentage * 100.0f;
+            float NormalizeLightBlinkingPercentage = LightBlinkingPercentage / 100.0f;
             if (LightBattery <= 0.0f)
             {
                 if(BatteryAdditionPieces > 0)
@@ -147,6 +147,7 @@ public class PlayerLight : MonoBehaviour
             else if (LightBattery <= NormalizeLightBlinkingPercentage && BatteryAdditionPieces == 0)
             {//点滅の処理
 
+                Debug.Log(NormalizeLightBlinkingPercentage);
 
                 float BlinkungDecrease = LightBlinkingMax - LightBlinkingLowest;
 
