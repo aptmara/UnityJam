@@ -87,11 +87,16 @@ public class UIManager : MonoBehaviour
 
         if (prefabsToInstantiate != null)
         {
+            // アクティブなCanvasを探して親にする
+            Canvas canvas = FindFirstObjectByType<Canvas>();
+            Transform parentTransform = canvas != null ? canvas.transform : transform;
+
             foreach (var prefab in prefabsToInstantiate)
             {
                 if (prefab != null)
                 {
-                    GameObject uiObj = Instantiate(prefab, transform);
+                    // falseを指定してプレハブのローカル設定（位置・スケール）を維持
+                    GameObject uiObj = Instantiate(prefab, parentTransform, false);
                     currentUIInstances.Add(uiObj);
                 }
             }
