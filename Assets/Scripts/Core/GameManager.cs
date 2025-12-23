@@ -59,16 +59,13 @@ public class GameManager : MonoBehaviour
         switch (state)
         {
             case GameState.Title:
-                // Titleシーンへ
-                LoadSceneSafe("TitleScene");
+                // Titleシーンへ (Single Scene: Title UI handling is done by UIManager)
                 break;
             case GameState.Select:
                 // セレクト画面・拠点へ
-                LoadSceneSafe("SelectScene");
                 break;
             case GameState.StageIntro:
-                // ステージ開始演出。MainGameシーンへ移動してから演出開始
-                LoadSceneSafe("MainGameScene");
+                // ステージ開始演出。ステージ生成などはStageManagerが検知して行う
                 break;
             case GameState.Gameplay:
                 // プレイ開始処理（入力許可など）
@@ -91,13 +88,10 @@ public class GameManager : MonoBehaviour
     {
         // PlayerDataManagerを使ってスコア計算
         Debug.Log("Calculating Score...");
-    }
-
-    private void LoadSceneSafe(string sceneName)
-    {
-        if (SceneManager.GetActiveScene().name != sceneName)
+        if (PlayerDataManager.Instance != null)
         {
-            SceneManager.LoadScene(sceneName);
+            PlayerDataManager.Instance.AdvanceStage();
+            Debug.Log($"Stage Advanced to: {PlayerDataManager.Instance.CurrentStageIndex}");
         }
     }
 }

@@ -273,9 +273,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 262397fb08e4f4749b578a12072d28a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerPrefabs: []
-  stagePrefabs: []
-  systemPrefabs: []
+  playerPrefabs:
+  - {fileID: 1680120916174406217, guid: 02021e2ee4397ff4ab4881449f848753, type: 3}
+  stagePrefabs:
+  - {fileID: 387512457568872783, guid: a32e0aae6facb2b43a9ca6f91ae6bcdd, type: 3}
+  systemPrefabs:
+  - {fileID: 0}
   stageTimeLimit: 300
 --- !u!114 &1076204835
 MonoBehaviour:
