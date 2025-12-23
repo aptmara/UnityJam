@@ -2,9 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-#if UNITY_RENDER_PIPELINES_UNIVERSAL
 using UnityEngine.Rendering.Universal;
-#endif
 
 namespace UnityJam.Effects
 {
@@ -27,11 +25,9 @@ namespace UnityJam.Effects
 
         private Coroutine burstCoroutine;
 
-#if UNITY_RENDER_PIPELINES_UNIVERSAL
         private Bloom bloom;
         private float originalIntensity;
         private bool hasOriginal;
-#endif
 
         private void Awake()
         {
@@ -41,7 +37,6 @@ namespace UnityJam.Effects
                 targetVolume = GetComponent<Volume>();
             }
 
-#if UNITY_RENDER_PIPELINES_UNIVERSAL
             if (targetVolume == null)
             {
                 Debug.LogWarning("BloomBurstController: Volume が見つかりません（同一GameObjectに Volume を付けてください）。", this);
@@ -62,12 +57,10 @@ namespace UnityJam.Effects
 
             originalIntensity = bloom.intensity.value;
             hasOriginal = true;
-#endif
         }
 
         public void PlayBurst()
         {
-#if UNITY_RENDER_PIPELINES_UNIVERSAL
             if (bloom == null || !hasOriginal)
             {
                 Debug.LogWarning("BloomBurstController: Bloom が初期化できていません（Volume/Bloom設定を確認）。", this);
@@ -80,12 +73,9 @@ namespace UnityJam.Effects
             }
 
             burstCoroutine = StartCoroutine(BurstRoutine());
-#else
-            Debug.LogWarning("BloomBurstController: URPが有効ではありません（URP以外は別実装が必要）。", this);
-#endif
+
         }
 
-#if UNITY_RENDER_PIPELINES_UNIVERSAL
         private IEnumerator BurstRoutine()
         {
             float t = 0f;
@@ -122,6 +112,5 @@ namespace UnityJam.Effects
             bloom.intensity.value = originalIntensity;
             burstCoroutine = null;
         }
-#endif
     }
 }
