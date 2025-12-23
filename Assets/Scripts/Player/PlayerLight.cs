@@ -21,13 +21,6 @@ public class PlayerLight : MonoBehaviour
     [SerializeField,Tooltip("追加バッテリーのテキスト")]
     TMPro.TMP_Text AdditionPiecesText;
 
-    [Header("LightPower")]
-    [SerializeField, Tooltip("光量が多い時のライト")]
-    float highPowerLight;
-    [SerializeField, Tooltip("光量が中ぐらいの時のライト")]
-    float middlePowerLight;
-    [SerializeField, Tooltip("光量が少ない時のライト")]
-    float lowPowerLight;
 
     private Image BatteryImage;//初期バッテリーの画像
     private Image AdditionBatteryImage;//追加バッテリーの画像
@@ -53,18 +46,25 @@ public class PlayerLight : MonoBehaviour
     float LightAngle = 45.0f;
 
     [SerializeField,Tooltip("ライト")]
-    Light light;
+    Light[] light;
     
     [Header("LightDecrease")]
-    [SerializeField,Tooltip("ライトの持続時間")]
-    float LifeTime = 30.0f;
+    [SerializeField,Tooltip("強化ライトの持続時間")]
+    float PowerLifeTime = 30.0f;
+    [SerializeField, Tooltip("通常ライトの持続時間")]
+    float LifeTime = 60.0f;
     [SerializeField,Tooltip("減衰加速の値")]
     float LifeDampingAcceleration = 1.1f;
     [SerializeField, Tooltip("減衰加速の最大時間")]
     float DmpAccelTime = 2.0f;
+    [SerializeField, Tooltip("点滅時の光減衰最低％")]
+    float LightBlinkingLowest = 10.0f;
+    [SerializeField, Tooltip("点滅時の光減衰最大％")]
+    float LightBlinkingMax = 100.0f;
+    [SerializeField, Tooltip("ライト点滅開始の残バッテリー量％")]
+    float LightBlinkingPercentage;
     float DmpAccelNowTime;//減衰加速の残り時間
 
-    float[] lightPowers;
 
     int LightBlinkingInterval = 180;//ライト点滅のインターバル
     bool isLighting = true;
@@ -74,17 +74,11 @@ public class PlayerLight : MonoBehaviour
     void Start()
     {
         //コンポーネントの取得
-        light = GetComponent<Light>();
         BatteryImage = BatteryLife.GetComponent<Image>();
         AdditionBatteryImage = AdditionBatteryLife.GetComponent<Image>();
 
-        lightPowers = new float[3];
-        lightPowers[0] = lowPowerLight;
-        lightPowers[1] = middlePowerLight;
-        lightPowers[2] = highPowerLight;
+        BatteryAdditionPieces = 1;
 
-        BatteryAdditionPieces = 2;
-        BatteryPieces = 2;
         LightBattery = 1.0f;
     }
 
@@ -105,13 +99,28 @@ public class PlayerLight : MonoBehaviour
         //光ってる状態にするか否か
         if (isLighting)
         {
-            light.innerSpotAngle = LightAngle;//角度設定
-            light.intensity = LightPower;
-            if(isCollect)//偽アイテムをとっているフラグが立ってたら
-                LightBattery -= 1.0f / (LifeTime * 60.0f) * LifeDampingAcceleration;//加速減衰
+            foreach(Light itLight in light)
+            {
+                itLight.innerSpotAngle = LightAngle;//角度設定
+                itLight.intensity = LightPower;
+            }
+
+
+
+            if (isCollect)//偽アイテムをとっているフラグが立ってたら
+                if (BatteryAdditionPieces > 0)
+                    LightBattery -= 1.0f / (PowerLifeTime * 60.0f) * LifeDampingAcceleration;//加速減衰
+                else
+                    LightBattery -= 1.0f / (LifeTime * 60.0f) * LifeDampingAcceleration;//加速減衰
+
             else//偽アイテムとっていなかったら
-                LightBattery -= 1.0f / (LifeTime * 60.0f);//通常減衰
-            if(LightBattery <= 0.0f)
+               if (BatteryAdditionPieces > 0)
+                LightBattery -= 1.0f / (PowerLifeTime * 60.0f);
+               else
+                LightBattery -= 1.0f / (LifeTime * 60.0f);//加速減衰
+
+            float NormalizeLightBlinkingPercentage = LightBlinkingPercentage * 100.0f;
+            if (LightBattery <= 0.0f)
             {
                 if(BatteryAdditionPieces > 0)
                 {
@@ -121,30 +130,48 @@ public class PlayerLight : MonoBehaviour
                 {
                     --BatteryPieces;
                 }
-                LightBattery = 1.0f;
-                if(BatteryPieces <= 0)  isLighting = false;
+
+                if (BatteryPieces <= 0)
+                {
+                    isLighting = false;
+
+                    //ライトを点灯させないための処理
+                    foreach (Light itLight in light)
+                    {
+                        itLight.intensity = 0.0f;
+                    }
+
+                }
+                else LightBattery = 1.0f;
             }
-            else if (LightBattery <= 0.2f)
+            else if (LightBattery <= NormalizeLightBlinkingPercentage && BatteryAdditionPieces == 0)
             {//点滅の処理
-                light.intensity = Mathf.Sin(LightBlinkingInterval * (Mathf.PI / 180));
+
+
+                float BlinkungDecrease = LightBlinkingMax - LightBlinkingLowest;
+
+                
+                float NormalizeBlinkungDecrease = BlinkungDecrease / 100.0f;
+                float NormalizeBlinkungLowest = LightBlinkingLowest / 100.0f;
+                float DecreaseRate = LightBattery / NormalizeLightBlinkingPercentage;
+
+                Debug.Log(DecreaseRate);
+                foreach (Light itLight in light)
+                {
+                    itLight.intensity = Mathf.Sin(LightBlinkingInterval * (Mathf.PI / 180)) * LightPower * (NormalizeBlinkungDecrease * DecreaseRate + NormalizeBlinkungLowest);
+                }
+                
                 LightBlinkingInterval -= 3;
                 if (LightBlinkingInterval <= 0)
                     LightBlinkingInterval = 180;
             }
-            else
-            {
-                // バッテリー量 = 継続時間に伴ってライトが減るように変更しました！問題が出てたら教えてください！ by越智
-
-                //int powerLevel = (int)(LightBattery * 2.95f);
-     
-                //float currentLightPower = lightPowers[powerLevel];
-                //light.intensity = currentLightPower;
-                light.intensity = LightPower * LightBattery; //ライトの強度設定
-            }
         }
         else
         {//ライトを点灯させないための処理
-            light.intensity = 0;
+            foreach (Light itLight in light)
+            {
+                itLight.intensity = 0.0f;
+            }
             LightBattery = 0.0f;
         }
         Vector3 scale = new Vector3(1.0f, LightBattery, 1.0f);//ゲージ計算用
