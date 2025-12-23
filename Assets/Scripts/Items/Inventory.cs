@@ -2,62 +2,58 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityJam.Items;
 
-public class Inventory : MonoBehaviour
+namespace UnityJam.Core
 {
-    public static Inventory Instance { get; private set; }
-    private readonly Dictionary<ItemMaster, int> _consts = new();
-    public event Action<ItemMaster, int> OnItemCountChanged;
+    public class Inventory : MonoBehaviour
+    {
+        // シングルトン（どこからでもアクセス可能にする）
+        public static Inventory Instance { get; private set; }
 
-    // シングルトンの初期化
-    private void Awake()
-    {
-        if (Instance != null && Instance != this)
+        // アイテムの保管場所（辞書形式: データ, 個数）
+        private readonly Dictionary<ItemMaster, int> _items = new();
+
+        // 変更通知イベント
+        public event Action OnInventoryUnlocked;                    // 初めて拾った時
+        public event Action<ItemMaster, int> OnItemCountChanged;    // 数が変わった時
+
+        // 状態：インベントリが解放されているか（最初のアイテム取得でtrue）
+        public bool isUnlocked { get; private set; } = false;
+
+        // シングルトンの初期化
+        private void Awake()
         {
-            Destroy(this.gameObject);
-            return;
+            if (Instance != null && Instance != this)
+            {
+                Destroy(this.gameObject);
+                return;
+            }
+            Instance = this;
+            DontDestroyOnLoad(this.gameObject);
         }
-        Instance = this;
-        DontDestroyOnLoad(this.gameObject);
-    }
-    // アイテムの所持数を取得する
-    public int GetItemCount(ItemMaster item)
-    {
-        if (_consts.TryGetValue(item, out int count))
+
+        // アイテムを追加する
+        public void AddItem(ItemMaster item, int count = 1)
         {
-            return count;
+            // 初回取得ならアンロック通知
+            if(!isUnlocked)
+            {
+                isUnlocked = true;
+                OnInventoryUnlocked.Invoke();
+            }
+
+            if (_items.ContainsKey(item))
+                _items[item] += count;
+            else
+                _items[item] = count;
+
+            Debug.Log($"[Inventory] Get: {item.itemName} (Total: {_items[item]})");
+            OnItemCountChanged?.Invoke(item, _items[item]);
         }
-        return 0;
+
+        // 全アイテムを取得（表示用）
+        public Dictionary<ItemMaster, int> GetAllItems() => _items;
     }
-    // アイテムを追加する
-    public void AddItem(ItemMaster item, int count = 1)
-    {
-        if (_consts.ContainsKey(item))
-        {
-            _consts[item] += count;
-        }
-        else
-        {
-            _consts[item] = count;
-        }
-        OnItemCountChanged?.Invoke(item, _consts[item]);
-    }
-    // アイテムを消費する。成功したらtrue、在庫不足で失敗したらfalseを返す。
-    public bool TryConsumeItem(ItemMaster item, int count = 1)
-    {
-        if (GetItemCount(item) >= count)
-        {
-            _consts[item] -= count;
-            OnItemCountChanged?.Invoke(item, _consts[item]);
-            return true;
-        }
-        return false;
-    }
-    // アイテムを完全に削除する
-    public void RemoveItem(ItemMaster item) {
-        if (_consts.ContainsKey(item)) {
-            _consts.Remove(item);
-            OnItemCountChanged?.Invoke(item, 0);
-        }
-    }
+
 }

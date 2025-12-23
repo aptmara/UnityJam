@@ -108,7 +108,7 @@ GameObject:
   - component: {fileID: 6478457179755381829}
   - component: {fileID: 1795888418314984916}
   m_Layer: 0
-  m_Name: Enemy_Sentinel_01
+  m_Name: PF_Enemy_Sentinel_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

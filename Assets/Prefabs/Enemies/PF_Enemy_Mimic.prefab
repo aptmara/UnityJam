@@ -12,9 +12,9 @@ GameObject:
   - component: {fileID: 6283930876468528867}
   - component: {fileID: 7397857496595208377}
   - component: {fileID: 7512004380014813403}
-  - component: {fileID: 6352537005911090259}
+  - component: {fileID: 252984022929395988}
   m_Layer: 0
-  m_Name: Enemy_Mimic_01
+  m_Name: PF_Enemy_Mimic
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -29,7 +29,7 @@ Transform:
   m_GameObject: {fileID: 7582272997733639709}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.22, y: 1, z: 3.76}
+  m_LocalPosition: {x: -1.17, y: 0.98, z: -2.09}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -63,7 +63,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 076e1bcfb62df5e49903b385057653f1, type: 2}
+  - {fileID: 2100000, guid: 35b687ceaa18fd04aa8a18d7b9aef898, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -106,7 +106,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &6352537005911090259
+--- !u!114 &252984022929395988
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -115,23 +115,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 7582272997733639709}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8b0cdf6c1e91849408960b1f8189aab6, type: 3}
+  m_Script: {fileID: 11500000, guid: 6d00a6b55b27c0841bb3c12b3eb69249, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetTag: Player
-  viewLight: {fileID: 0}
-  obstacleMask:
-    serializedVersion: 2
-    m_Bits: 0
-  movementType: 0
-  moveSpeed: 3
-  waitTime: 1
-  waypoints: []
-  linearDistance: 5
-  linearDirection: {x: 0, y: 0, z: 1}
-  circleRadius: 5
-  clockwise: 1
-  wanderRadius: 7
-  viewRadius: 1.2
-  viewAngle: 360
-  eyeHeight: 0.1
+  requiredHoldTime: 1
+  monsterModel: {fileID: 0}
+  boxModel: {fileID: 7582272997733639709}
