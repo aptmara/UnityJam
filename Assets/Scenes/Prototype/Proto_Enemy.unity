@@ -652,7 +652,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 1658017307}
   useCamera: {fileID: 684342109}
-  sensitivity: 180
+  sensitivity: 720
   minPitch: -30
   maxPitch: 60
   distance: 3
@@ -1035,7 +1035,7 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 802194866}
-  - {fileID: 2293995511631424964}
   - {fileID: 1770524274}
   - {fileID: 1299682958}
+  - {fileID: 2293995511631424964}
   - {fileID: 6736413698251634132}
