@@ -123,6 +123,39 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &169558743 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6179191636723619028, guid: 02021e2ee4397ff4ab4881449f848753, type: 3}
+  m_PrefabInstance: {fileID: 592306867}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &169558745
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 169558743}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Version: 3
+  m_UsePipelineSettings: 1
+  m_AdditionalLightsShadowResolutionTier: 2
+  m_LightLayerMask: 1
+  m_RenderingLayers: 1
+  m_CustomShadowLayers: 0
+  m_ShadowLayerMask: 1
+  m_ShadowRenderingLayers: 1
+  m_LightCookieSize: {x: 1, y: 1}
+  m_LightCookieOffset: {x: 0, y: 0}
+  m_SoftShadowQuality: 0
+--- !u!108 &169558746 stripped
+Light:
+  m_CorrespondingSourceObject: {fileID: 2748252130132098980, guid: 02021e2ee4397ff4ab4881449f848753, type: 3}
+  m_PrefabInstance: {fileID: 592306867}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &362385785
 GameObject:
   m_ObjectHideFlags: 0
@@ -275,6 +308,10 @@ PrefabInstance:
       propertyPath: AdditionBatteryLife
       value: 
       objectReference: {fileID: 1328218295}
+    - target: {fileID: 5656762806977218720, guid: 02021e2ee4397ff4ab4881449f848753, type: 3}
+      propertyPath: light.Array.data[0]
+      value: 
+      objectReference: {fileID: 169558746}
     - target: {fileID: 8231288596192292355, guid: 02021e2ee4397ff4ab4881449f848753, type: 3}
       propertyPath: m_IsKinematic
       value: 0
@@ -287,6 +324,9 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6179191636723619028, guid: 02021e2ee4397ff4ab4881449f848753, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 169558745}
     - targetCorrespondingSourceObject: {fileID: 2529832653885901290, guid: 02021e2ee4397ff4ab4881449f848753, type: 3}
       insertIndex: -1
       addedObject: {fileID: 592306869}
