@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 using System.Threading;
 using UnityEngine.Experimental.Rendering;
 
@@ -69,6 +70,36 @@ namespace UnityJam.Enemies
         [Tooltip("目の高さ（地面すれすれではなく、少し高い位置から見る）")]
         [SerializeField, Range(0.1f, 2.0f)] private float eyeHeight = 1.0f;
 
+        [Header("--- Settings: Attack ---")]
+        [Tooltip("襲撃時の急接近スピード")]
+        [SerializeField] private float rushSpeed = 10.0f;
+
+        [Tooltip("口を開くアニメーションのTrigger名")]
+        [SerializeField] private string attackTriggerName = "OnAttack";
+
+        [Tooltip("プレイヤーを食べるまでのため時間（口を開く時間）")]
+        [SerializeField] private float roarDuration = 1.5f;
+
+        [Header("--- Models ---")]
+        [Tooltip("普段の歩行用モデル")]
+        [SerializeField] private GameObject walkModel;
+
+        [Tooltip("襲撃時の口開きモデル")]
+        [SerializeField] private GameObject attackModel;
+
+        [Header("--- Animation ---")]
+        [SerializeField] private Animator animator;
+
+        [Header("--- Settings: Horror Effect ---")]
+        [Tooltip("襲撃時に停止させたいスクリプト名（例: FirstPersonController, LookController 等）")]
+        [SerializeField] private List<string> scriptsToDisable = new List<string>();
+
+        [Tooltip("襲撃時の巨大化倍率（1.5倍など）")]
+        [SerializeField] private float attackScaleMultiplier = 1.5f;
+
+        [Tooltip("FPS視点にする時の目の高さ")]
+        [SerializeField] private float playerEyeHeight = 1.0f;
+
         // 内部変数
         // ============================================================
 
@@ -80,6 +111,10 @@ namespace UnityJam.Enemies
         // Waypoint用
         private int     currentWaypointIndex = 0;
         private bool    isMovingForward = true; // PingPong用
+
+        // 攻撃中かどうか
+        private bool isAttacking = false;
+        private Vector3 lastPosition;       // アニメーション速度計算用
 
         // 移動タイプの定義
         public enum MovementType
@@ -98,22 +133,33 @@ namespace UnityJam.Enemies
         void Start()
         {
             initialPosition = transform.position;
+            lastPosition = transform.position;
             SetNewRandomTarget();
 
             // ライトの初期設定同期
             SyncLightSettings();
 
-            // Waypointの初期ターゲット設定
-            if (waypoints != null && waypoints.Length > 0 )
-            {
-                targetPosition = waypoints[0].position;
-            }
+            if (animator == null) animator = GetComponent<Animator>();
+            if (viewLight != null) { viewLight.type = LightType.Spot; viewLight.range = viewRadius; viewLight.spotAngle = viewAngle; }
+            if (waypoints != null && waypoints.Length > 0) targetPosition = waypoints[0].position;
+
+            // 最初は歩行モデルだけ表示する
+            if (walkModel != null) walkModel.SetActive(true);
+            if (attackModel != null) attackModel.SetActive(false);
+            // アニメーターは歩行モデルのものを取得しておく
+            if (walkModel != null) animator = walkModel.GetComponent<Animator>();
         }
 
         void Update()
         {
+            // 攻撃中は通常の移動や索敵を行わない
+            if (isAttacking) return;
+
             HandleMovement();
             DetectPlayer();
+
+            // アニメーションの更新処理
+            UpdateAnimation();
         }
 
         // インスペクターで値を変更したときに即座に反映（エディタ機能）
@@ -334,21 +380,143 @@ namespace UnityJam.Enemies
                         // obstacleMaskに含まれるオブジェクトに当たったら「見えていない」と判断
                         if (!Physics.Raycast(eyePos, dirToTarget, distToTarget, obstacleMask))
                         {
-                            KillPlayer(target.gameObject);
+                            StartCoroutine(PredationSequence(target.gameObject));
                         }
                     }
                 }
             }
         }
 
-        void KillPlayer(GameObject player)
+        // 捕食シーケンス
+        IEnumerator PredationSequence(GameObject player)
         {
-            Debug.Log($"<color=red>GAME OVER! Player found by {gameObject.name}</color>");
+            isAttacking = true; // Updateを停止
+            animator.SetFloat("Speed", 0);
 
-            // ここに実際のゲームオーバー処理を書く
-            // 例: SceneManager.LoadScene("GameOver");
-            // ここでは 即死 = オブジェクト削除 とする。
+            Debug.Log("発見");
+
+            // 1. プレイヤーを動けなくする
+            // プレイヤー本体とカメラの両方をチェック対象にする
+            List<GameObject> checkTargets = new List<GameObject>();
+            if (player != null) checkTargets.Add(player);
+            if (Camera.main != null) checkTargets.Add(Camera.main.gameObject);
+
+            // 親オブジェクトにスクリプトがある場合もあるので、カメラの親も追加しておく
+            if (Camera.main != null && Camera.main.transform.parent != null)
+                checkTargets.Add(Camera.main.transform.parent.gameObject);
+
+            // リストに登録された名前のスクリプトを片っ端からオフにする
+            foreach (var targetObj in checkTargets)
+            {
+                foreach (string scriptName in scriptsToDisable)
+                {
+                    // 文字列でコンポーネントを取得してオフにする
+                    // (GetComponentは型だけでなく文字列でも検索できます)
+                    var component = targetObj.GetComponent(scriptName) as MonoBehaviour;
+                    if (component != null)
+                    {
+                        component.enabled = false;
+                    }
+                }
+            }
+
+            // 物理挙動も念のため止める
+            var rb = player.GetComponent<Rigidbody>();
+            if (rb) rb.isKinematic = true;
+            var mr = player.GetComponent<MeshRenderer>();
+            if (mr) mr.enabled = false;
+
+            // カメラジャック（FPS視点化 & 敵の方向を向く）
+            Camera mainCam = Camera.main;
+            if (mainCam != null)
+            {
+                // カメラをプレイヤーの目の位置へ移動
+                mainCam.transform.position = player.transform.position + Vector3.up * playerEyeHeight;
+                mainCam.transform.LookAt(transform.position + Vector3.up * eyeHeight);
+            }
+
+            // 2. 敵が一瞬止まって、プレイヤーのほうを向く
+            Vector3 directionToPlayer = (player.transform.position - transform.position).normalized;
+            directionToPlayer.y = 0;
+            transform.rotation = Quaternion.LookRotation(directionToPlayer);
+
+            // 3. モデルの切り替え
+            if (walkModel != null) walkModel.SetActive(false); // 歩きモデルを消す
+            if (attackModel != null)
+            {
+                attackModel.SetActive(true); // 怖いモデルを出す
+            }
+
+            // 4. その場で咆哮（溜め）
+            yield return new WaitForSeconds(roarDuration);
+
+            // 5. 急接近
+            float attackTimer = 0f;
+            Vector3 startScale = attackModel.transform.localScale;
+            Vector3 targetScale = startScale * attackScaleMultiplier; // 指定倍率まで大きくする
+
+            while (Vector3.Distance(transform.position, player.transform.position) > 0.8f)
+            {
+                // A. 敵の移動
+                transform.LookAt(player.transform);
+                transform.position = Vector3.MoveTowards(transform.position, player.transform.position, rushSpeed * Time.deltaTime);
+
+                // B. カメラを常に敵の顔に向ける（逃げられない恐怖）
+                if (mainCam != null)
+                {
+                    // プレイヤーの目の位置に固定
+                    mainCam.transform.position = player.transform.position + Vector3.up * playerEyeHeight;
+
+                    // 敵の顔（少し上）を見る
+                    Vector3 lookTarget = transform.position + Vector3.up * (eyeHeight * 1.2f);
+                    mainCam.transform.LookAt(lookTarget);
+                }
+
+                // C. 迫りくるにつれて巨大化させる
+                // （距離が近づくほど大きくなる、または時間経過で大きくなる）
+                if (attackModel != null)
+                {
+                    attackModel.transform.localScale = Vector3.Lerp(attackModel.transform.localScale, targetScale, Time.deltaTime * 5f);
+                }
+
+                attackTimer += Time.deltaTime;
+                if (attackTimer > 2.0f) break;
+                yield return null;
+            }
+
+            // 6. 捕食
+            // 演出のために一瞬待つ
+            Animator attackAnim = attackModel.GetComponent<Animator>();
+            if (attackAnim != null)
+            {
+                // ここで「噛め！」と命令する
+                attackAnim.SetTrigger("DoBite");
+            }
+
+            // 噛むアニメーションが終わるのを少し待つ（0.5秒くらい）
+            yield return new WaitForSeconds(0.5f);
+
+            // 7. プレイヤー破壊
+            Debug.Log("<color=red>うぎゃああああぁぁぁ！！ぶち56すｯｯ！！！！</color>");
             Destroy(player);
+
+            // ゲームオーバー画面への遷移などをここに書く
+        }
+
+        // 移動速度を計算してアニメーターに渡す関数
+        void UpdateAnimation()
+        {
+            if (animator == null || isAttacking) return;
+
+            // 1フレーム前との位置の差から「実際の移動速度」を計算
+            // （距離 / 時間 = 速さ）
+            float currentSpeed = (transform.position - lastPosition).magnitude / Time.deltaTime;
+
+            // 計算した速度をAnimatorの "Speed" パラメータに渡す
+            animator.SetFloat("Speed", currentSpeed);
+
+            // 現在の位置を保存（次のフレームの計算用）
+            lastPosition = transform.position;
         }
 
         // エディタ拡張・デバッグ表示（Gizmos）
