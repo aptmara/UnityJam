@@ -42,6 +42,7 @@ public class StageManager : MonoBehaviour
         switch (state)
         {
             case GameState.StageIntro:
+                CleanupStage();
                 SetupStage();
                 break;
             case GameState.Gameplay:
@@ -52,6 +53,17 @@ public class StageManager : MonoBehaviour
         }
     }
 
+    private void CleanupStage()
+    {
+        if (currentPlayerInstance != null) Destroy(currentPlayerInstance);
+        if (currentSystemInstance != null) Destroy(currentSystemInstance);
+        if (currentStageInstance != null) Destroy(currentStageInstance);
+
+        currentPlayerInstance = null;
+        currentSystemInstance = null;
+        currentStageInstance = null;
+    }
+
     private void SetupStage()
     {
         // インデックス取得 (PlayerDataManagerがあればそこから、なければ0)
@@ -59,9 +71,11 @@ public class StageManager : MonoBehaviour
         int playerIndex = PlayerDataManager.Instance ? PlayerDataManager.Instance.CurrentPlayerIndex : 0;
 
         // 1. ステージ生成
-        if (currentStageInstance == null && stagePrefabs != null && stagePrefabs.Count > stageIndex)
+        if (stagePrefabs != null && stagePrefabs.Count > 0)
         {
-            GameObject prefab = stagePrefabs[stageIndex];
+            // ステージ数でループさせる
+            int actualStageIndex = stageIndex % stagePrefabs.Count;
+            GameObject prefab = stagePrefabs[actualStageIndex];
             if (prefab != null)
             {
                 currentStageInstance = Instantiate(prefab, Vector3.zero, Quaternion.identity);
@@ -69,9 +83,11 @@ public class StageManager : MonoBehaviour
         }
 
         // 2. システム生成 (ステージ固有のシステム)
-        if (currentSystemInstance == null && systemPrefabs != null && systemPrefabs.Count > stageIndex)
+        if (systemPrefabs != null && systemPrefabs.Count > 0)
         {
-            GameObject prefab = systemPrefabs[stageIndex];
+             // システムも同様にループ（あるいは配列数チェック）
+            int actualSystemIndex = stageIndex % systemPrefabs.Count;
+            GameObject prefab = systemPrefabs[actualSystemIndex];
             if (prefab != null)
             {
                 currentSystemInstance = Instantiate(prefab, Vector3.zero, Quaternion.identity);
@@ -88,7 +104,7 @@ public class StageManager : MonoBehaviour
         }
 
         // 3. プレイヤー生成
-        if (currentPlayerInstance == null && playerPrefabs != null && playerPrefabs.Count > playerIndex)
+        if (playerPrefabs != null && playerPrefabs.Count > playerIndex)
         {
             GameObject prefab = playerPrefabs[playerIndex];
             if (prefab != null)
