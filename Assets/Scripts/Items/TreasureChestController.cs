@@ -1,14 +1,14 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityJam.Core;  // Inventoryを使うため
-using UnityJam.Items; // ItemMasterを使うため
+using UnityJam.Core;         // Inventoryを使うため
+using UnityJam.Items;        // ItemMasterを使うため
 using UnityJam.Interaction;  // 親クラス
 using UnityJam.UI;
+using UnityJam.Effects;      // BloomBurst注入用
 
 namespace UnityJam.Gimmicks
 {
-    public class TreasureChestController : InteractableBase
+    public class TreasureChestController : InteractableBase, IBloomBurstReceiver
     {
         [Header("--- ドロップアイテム ---")]
         [Tooltip("このリストの中からランダムで1つ選ばれます")]
@@ -28,6 +28,28 @@ namespace UnityJam.Gimmicks
         [Tooltip("アイテム取得時の飛び出すエフェクト (Prefab)")]
         [SerializeField] private GameObject popupEffectPrefab;
 
+        [Header("--- ポストエフェクト ---")]
+        [Tooltip("開封時にBloomを一瞬だけ強める（Spawnerから自動注入される想定）")]
+        [SerializeField] private BloomBurstController bloomBurst;
+
+        [Header("--- Light Burst (Optional) ---")]
+        [Tooltip("宝箱開封時に一瞬だけ出す Point Light のPrefab（PFx_TreasureBurstLight など）")]
+        [SerializeField] private GameObject burstLightPrefab;
+
+        [SerializeField, Min(0.01f)]
+        private float burstLightLifeTime = 0.35f;
+
+        [SerializeField]
+        private Vector3 burstLightOffset = new Vector3(0f, 1.0f, 0f);
+
+        /// <summary>
+        /// TreasureSpawner 等から BloomBurstController を注入する。
+        /// </summary>
+        public void SetBloomBurst(BloomBurstController bloomBurstController)
+        {
+            bloomBurst = bloomBurstController;
+        }
+
         // 親クラスにある abstract void OnInteractCompleted
         protected override void OnInteractCompleted()
         {
@@ -35,7 +57,7 @@ namespace UnityJam.Gimmicks
         }
 
         // 宝箱を開ける処理
-        void OpenChest()
+        private void OpenChest()
         {
             // ドロップリストのチェック
             if (dropList == null || dropList.Count == 0)
@@ -59,22 +81,34 @@ namespace UnityJam.Gimmicks
             if (openedModel != null) openedModel.SetActive(true);
 
             // D. エフェクトの再生
-            if(openVfxPrefab != null)
+            if (openVfxPrefab != null)
             {
-                // 宝の位置にエフェクト生成
                 Instantiate(openVfxPrefab, transform.position, Quaternion.identity);
+            }
+
+            // D-1. Light Burst（確実に「光った」感を出す）
+            if (burstLightPrefab != null)
+            {
+                GameObject lightObj = Instantiate(
+                    burstLightPrefab,
+                    transform.position + burstLightOffset,
+                    Quaternion.identity);
+
+                Destroy(lightObj, burstLightLifeTime);
+            }
+
+            // D-2. Bloom ブースト（パターンA：Global VolumeのBloomを一瞬だけ強める）
+            if (bloomBurst != null)
+            {
+                bloomBurst.PlayBurst();
             }
 
             // E. アイテム飛び出し演出
             if (popupEffectPrefab != null)
             {
-                // 1. 生成して、そのGameObjectを変数に入れる
                 GameObject effectObj = Instantiate(popupEffectPrefab, transform.position + Vector3.up, Quaternion.identity);
 
-                // 2. そのオブジェクトについている ItemPopupEffect スクリプトを取得する
                 ItemPopupEffect popupScript = effectObj.GetComponent<ItemPopupEffect>();
-
-                // 3. スクリプトがあれば、アイコン画像を渡して初期化する
                 if (popupScript != null)
                 {
                     popupScript.Initialize(item.icon);

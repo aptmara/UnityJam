@@ -128,3 +128,7 @@ MonoBehaviour:
   closedModel: {fileID: 0}
   openVfxPrefab: {fileID: 2747732066291226005, guid: 707ba6916b2f040448bdf3083cc12e39, type: 3}
   popupEffectPrefab: {fileID: 1874128240729829424, guid: 03285fbcce267b446b6ab80e86e5d278, type: 3}
+  bloomBurst: {fileID: 0}
+  burstLightPrefab: {fileID: 2219302116333303718, guid: d9e54d4e10e7fc944ab23a2adae9b77b, type: 3}
+  burstLightLifeTime: 4
+  burstLightOffset: {x: 0, y: 1, z: 0}
