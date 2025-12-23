@@ -126,4 +126,5 @@ MonoBehaviour:
   - {fileID: 11400000, guid: f5c8cc668796b99419f32d306d911129, type: 2}
   openedModel: {fileID: 0}
   closedModel: {fileID: 0}
+  openVfxPrefab: {fileID: 2747732066291226005, guid: 707ba6916b2f040448bdf3083cc12e39, type: 3}
   popupEffectPrefab: {fileID: 1874128240729829424, guid: 03285fbcce267b446b6ab80e86e5d278, type: 3}
