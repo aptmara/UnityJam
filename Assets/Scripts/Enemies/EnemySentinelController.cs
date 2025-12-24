@@ -423,8 +423,7 @@ namespace UnityJam.Enemies
             // 物理挙動も念のため止める
             var rb = player.GetComponent<Rigidbody>();
             if (rb) rb.isKinematic = true;
-            var mr = player.GetComponent<MeshRenderer>();
-            if (mr) mr.enabled = false;
+            player.active = false;
 
             // カメラジャック（FPS視点化 & 敵の方向を向く）
             Camera mainCam = Camera.main;
