@@ -15,12 +15,12 @@ public class GameOverPanel : MonoBehaviour
     private void OnRetryClicked()
     {
         // 簡易リトライ: 同じステージへ等
-        GameManager.Instance.ChangeState(GameState.Select);
+        GameManager.Instance.ChangeState(GameState.Gameplay);
     }
 
     private void OnReturnClicked()
     {
-        GameManager.Instance.ChangeState(GameState.Select);
+        GameManager.Instance.ChangeState(GameState.Title);
     }
 
     [ContextMenu("Auto Link References")]

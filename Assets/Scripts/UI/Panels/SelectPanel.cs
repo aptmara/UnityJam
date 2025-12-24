@@ -14,7 +14,7 @@ public class SelectPanel : MonoBehaviour
 
     private void OnStartDungeonClicked()
     {
-        GameManager.Instance.ChangeState(GameState.StageIntro);
+        GameManager.Instance.ChangeState(GameState.Gameplay);
     }
 
     private void OnShopClicked()

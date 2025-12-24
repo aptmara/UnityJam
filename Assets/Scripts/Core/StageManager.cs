@@ -22,9 +22,10 @@ public class StageManager : MonoBehaviour
         {
             GameManager.Instance.OnStateChanged += HandleStateChanged;
 
-            if (GameManager.Instance.CurrentState == GameState.StageIntro)
+            if (GameManager.Instance.CurrentState == GameState.Gameplay)
             {
                 SetupStage();
+                if (ScreenFader.Instance != null) ScreenFader.Instance.FadeIn();
             }
         }
     }
@@ -41,13 +42,16 @@ public class StageManager : MonoBehaviour
     {
         switch (state)
         {
-            case GameState.StageIntro:
-                SetupStage();
-                break;
+            case GameState.Title:
             case GameState.Gameplay:
-                // ゲームプレイ開始処理
+                CleanupStage();
+                SetupStage();
+                if (ScreenFader.Instance != null) ScreenFader.Instance.FadeIn();
                 break;
             case GameState.GameOver:
+                // GameOver時は表示だけ残すかもしれないが、
+                // タイトルに戻る時にCleanupされるのでここでは特に何もしない
+                // 必要であればここでもCleanup
                 break;
         }
     }
@@ -97,7 +101,27 @@ public class StageManager : MonoBehaviour
             }
         }
 
-        StartGameplay();
+        // 3. プレイヤー生成
+        if (currentPlayerInstance == null && playerPrefabs != null && playerPrefabs.Count > playerIndex)
+        {
+            GameObject prefab = playerPrefabs[playerIndex];
+            if (prefab != null)
+            {
+                currentPlayerInstance = Instantiate(prefab, foundSpawnPoint.position, foundSpawnPoint.rotation);
+            }
+        }
+
+        // 4. GameFlow初期化 (System内にGameFlowがあると仮定)
+        if (currentSystemInstance != null)
+        {
+            var gameFlow = currentSystemInstance.GetComponentInChildren<UnityJam.Core.GameFlow>();
+            if (gameFlow != null)
+            {
+                gameFlow.Initialize(currentStageInstance);
+            }
+        }
+
+
     }
 
     private Transform FindSpawnPointInStage(GameObject stage)
@@ -117,8 +141,26 @@ public class StageManager : MonoBehaviour
         return null;
     }
 
-    private void StartGameplay()
+
+
+    private void CleanupStage()
     {
-        GameManager.Instance.ChangeState(GameState.Gameplay);
+        if (currentPlayerInstance != null)
+        {
+            Destroy(currentPlayerInstance);
+            currentPlayerInstance = null;
+        }
+
+        if (currentSystemInstance != null)
+        {
+            Destroy(currentSystemInstance);
+            currentSystemInstance = null;
+        }
+
+        if (currentStageInstance != null)
+        {
+            Destroy(currentStageInstance);
+            currentStageInstance = null;
+        }
     }
 }

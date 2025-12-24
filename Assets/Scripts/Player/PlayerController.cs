@@ -145,6 +145,3 @@ namespace UnityJam
 
     }
 }
-
-
-
