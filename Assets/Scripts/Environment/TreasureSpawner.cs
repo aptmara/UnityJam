@@ -167,7 +167,7 @@ namespace UnityJam.Environment
             Vector3 pos = point.position + positionOffset;
             Quaternion rot = point.rotation;
 
-            GameObject go = Instantiate(prefab, pos, rot);
+            GameObject go = Instantiate(prefab, pos, rot, point);
             spawnedObjects.Add(go);
 
             // BloomBurst を自動注入（受け取れる側だけ）
