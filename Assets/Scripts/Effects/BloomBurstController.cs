@@ -12,7 +12,6 @@ namespace UnityJam.Effects
     /// </summary>
     public sealed class BloomBurstController : MonoBehaviour
     {
-#if UNITY_RENDER_PIPELINES_UNIVERSAL
         [Header("--- Target Volume ---")]
         [Tooltip("制御対象の Volume コンポーネント（未設定なら同一GOから自動取得）")]
         [SerializeField] private Volume targetVolume;
@@ -113,6 +112,5 @@ namespace UnityJam.Effects
             bloom.intensity.value = originalIntensity;
             burstCoroutine = null;
         }
-#endif
     }
 }
