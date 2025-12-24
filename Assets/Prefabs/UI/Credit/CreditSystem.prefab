@@ -1,0 +1,97 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1442376223410286240
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7543183668884645482}
+  m_Layer: 0
+  m_Name: ContentRoot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7543183668884645482
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1442376223410286240}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1460527729425725351}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &5021486879605867012
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1460527729425725351}
+  - component: {fileID: 7723665003584398949}
+  m_Layer: 0
+  m_Name: CreditSystem
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1460527729425725351
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5021486879605867012}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.013055617, y: -0.6806283, z: 1.0204982}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 7543183668884645482}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7723665003584398949
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5021486879605867012}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e55532e58d5379468dc1b194186cc9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scrollSpeed: 2
+  startY: -300
+  spacing: 4
+  returnToTitleDelay: 3
+  returnButton: {fileID: 0}
+  scoreText: {fileID: 0}
+  creditTextPrefab: {fileID: 1001233945975630597, guid: 6c74707cdb8e45249bbb62bda5bdf317, type: 3}
+  playerPrefab: {fileID: 9014272258044766846, guid: cb9721e27957dc4479d0d5ac7ec84dd3, type: 3}
+  enemyBulletPrefab: {fileID: 5457413497870522981, guid: f32ecce7486bee64ab7952e4408b8eed, type: 3}
+  contentRoot: {fileID: 7543183668884645482}
+  creditTextData:
+  - "[\u30D7\u30E9\u30F3\u30CA]\n\u4F01\u753B\u3000\u4ED5\u69D8\u3000\u30B9\u30C6\u30FC\u30B8\u4F5C\u6210\r\n\u552F\u4E00\u795E\u3000\u5B87\u91CE\u3000\u6A39"
+  - "[\u30D7\u30E9\u30F3\u30CA]\n\u4F01\u753B\u3000\u4ED5\u69D8\u3000\u30B9\u30C6\u30FC\u30B8\u4F5C\u6210\n\u5B88\u8B77\u795E\u3000\u7532\u6590\u3000\u65E5\u3005\u898F"
+  - "[\u30D7\u30ED\u30B0\u30E9\u30DE\u30FC]\n\u30B2\u30FC\u30E0\u30D5\u30ED\u30FC\u3000\u74B0\u5883\u69CB\u7BC9\r\n\u516B\u767E\u4E07\u3000\u5C71\u5185\u3000\u967D\r"
+  - "[\u30D7\u30ED\u30B0\u30E9\u30DE\u30FC]\n\u6575\u3000\u5B9D\u3000\u30A4\u30F3\u30D9\u30F3\u30C8\u30EA\r\n\u7D76\u5BFE\u795E\u3000\u5CA9\u4E95
+    \u7FD4\u543E a.k.a. \u4E09\u672C \u4E0B\u75E2\u8535 "
+  - "[\u30D7\u30ED\u30B0\u30E9\u30DE\u30FC]\n\u30D7\u30EC\u30A4\u30E4\u30FC\u3000\u30AB\u30E1\u30E9\r\n\u30A4\u30A8\u30B9\u3000\u30B3\u30A4\u30BA\u30C7\u30A3\u30C3\u30AF "
+  - "[\u30C7\u30B6\u30A4\u30CA\u30FC]\n\u304C\u3093\u3070\u3063\u305F\u3053\u3068  
+    \u3048\u3075\u3047\u304F\u3068\r\n\u795E\u306E\u307E\u306B\u307E\u306B  \u91D1\u6FA4\u3000\u611B\u7433"

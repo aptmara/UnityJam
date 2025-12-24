@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 366079651454924619}
   - component: {fileID: 840193949867223720}
+  - component: {fileID: 4461395593474476723}
   m_Layer: 0
   m_Name: Spot Light
   m_TagString: Untagged
@@ -94,6 +95,29 @@ Light:
   m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
   m_ShadowAngle: 0
+--- !u!114 &4461395593474476723
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4955630648052813600}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Version: 3
+  m_UsePipelineSettings: 1
+  m_AdditionalLightsShadowResolutionTier: 2
+  m_LightLayerMask: 1
+  m_RenderingLayers: 1
+  m_CustomShadowLayers: 0
+  m_ShadowLayerMask: 1
+  m_ShadowRenderingLayers: 1
+  m_LightCookieSize: {x: 1, y: 1}
+  m_LightCookieOffset: {x: 0, y: 0}
+  m_SoftShadowQuality: 0
 --- !u!1 &6006777757252301351
 GameObject:
   m_ObjectHideFlags: 0
@@ -332,6 +356,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: anm_cat_walk
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 93a460a578f2e2145bf4f1b3535e9dcf, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3314156374599406893, guid: 93a460a578f2e2145bf4f1b3535e9dcf, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: b4803cb5ecfe5e44e8fb42c91d7fa16b, type: 2}
     - target: {fileID: 5866666021909216657, guid: 93a460a578f2e2145bf4f1b3535e9dcf, type: 3}
       propertyPath: m_Controller
       value: 
@@ -411,6 +443,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7886998986250073847, guid: 132c0f3cadff83a429aa5e19045959c2, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: af2cbda4e40a61e40ad1fe32c4ed5616, type: 2}
     - target: {fileID: 919132149155446097, guid: 132c0f3cadff83a429aa5e19045959c2, type: 3}
       propertyPath: m_Name
       value: anm_cat_open

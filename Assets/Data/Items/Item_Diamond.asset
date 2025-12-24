@@ -17,4 +17,5 @@ MonoBehaviour:
   description: "\u3081\u3063\u3061\u3083\u826F\u3044\u30C0\u30A4\u30E4\u3060\u3041\u3001\u3001\u3001"
   value: 100
   weight: 1
+  isDiscardable: 1
   rarity: 3

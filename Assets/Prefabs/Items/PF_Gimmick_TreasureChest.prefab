@@ -119,14 +119,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   requiredHoldTime: 1.5
-  dropList:
-  - {fileID: 11400000, guid: e94e303a46e4c1447945f20624409cad, type: 2}
-  - {fileID: 11400000, guid: ba238b1144eacd8459495e24d33f4c06, type: 2}
-  - {fileID: 11400000, guid: 170852db877b3d94ab2e4aa0aa0fb915, type: 2}
-  - {fileID: 11400000, guid: f5c8cc668796b99419f32d306d911129, type: 2}
+  dropTable: {fileID: 11400000, guid: 7747a07a3b7f7954bae3e776873e4fef, type: 2}
   openedModel: {fileID: 0}
   closedModel: {fileID: 0}
-  openVfxPrefab: {fileID: 2747732066291226005, guid: 707ba6916b2f040448bdf3083cc12e39, type: 3}
+  rarityVfxPrefabs:
+  - {fileID: 2747732066291226005, guid: 707ba6916b2f040448bdf3083cc12e39, type: 3}
+  - {fileID: 2747732066291226005, guid: 707ba6916b2f040448bdf3083cc12e39, type: 3}
+  - {fileID: 2747732066291226005, guid: 707ba6916b2f040448bdf3083cc12e39, type: 3}
   popupEffectPrefab: {fileID: 1874128240729829424, guid: 03285fbcce267b446b6ab80e86e5d278, type: 3}
   bloomBurst: {fileID: 0}
   burstLightPrefab: {fileID: 2219302116333303718, guid: d9e54d4e10e7fc944ab23a2adae9b77b, type: 3}
