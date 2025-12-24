@@ -118,7 +118,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf5e3cae4d081bd4893fef949601052b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  requiredHoldTime: 1.5
+  requiredHoldTime: 0.8
   dropTable: {fileID: 11400000, guid: 7747a07a3b7f7954bae3e776873e4fef, type: 2}
   openedModel: {fileID: 0}
   closedModel: {fileID: 0}
@@ -127,6 +127,7 @@ MonoBehaviour:
   - {fileID: 2747732066291226005, guid: 707ba6916b2f040448bdf3083cc12e39, type: 3}
   - {fileID: 2747732066291226005, guid: 707ba6916b2f040448bdf3083cc12e39, type: 3}
   popupEffectPrefab: {fileID: 1874128240729829424, guid: 03285fbcce267b446b6ab80e86e5d278, type: 3}
+  iconPopupDelay: 0.5
   bloomBurst: {fileID: 0}
   burstLightPrefab: {fileID: 2219302116333303718, guid: d9e54d4e10e7fc944ab23a2adae9b77b, type: 3}
   burstLightLifeTime: 4
