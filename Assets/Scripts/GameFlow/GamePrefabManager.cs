@@ -10,6 +10,7 @@ public class GamePrefabManager : MonoBehaviour
 
     [Header("State Game Prefabs")]
     [SerializeField] private List<GameObject> titlePrefabs;
+    [SerializeField] private List<GameObject> creditPrefabs;
 
     [SerializeField] private List<GameObject> gameplayPrefabs;
     [SerializeField] private List<GameObject> resultPrefabs;
@@ -63,6 +64,9 @@ public class GamePrefabManager : MonoBehaviour
         {
             case GameState.Title:
                 prefabsToInstantiate = titlePrefabs;
+                break;
+            case GameState.Credits:
+                prefabsToInstantiate = creditPrefabs;
                 break;
 
             case GameState.Gameplay:

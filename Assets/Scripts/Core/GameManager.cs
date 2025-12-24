@@ -6,6 +6,7 @@ using UnityEngine;
 public enum GameState
 {
     Title,
+    Credits,
 
     Gameplay,
     ScoreCalc,
