@@ -47,7 +47,7 @@ public class PlayerLight : MonoBehaviour
 
     [SerializeField,Tooltip("ライト")]
     Light[] light;
-    
+
     [Header("LightDecrease")]
     [SerializeField,Tooltip("強化ライトの持続時間")]
     float PowerLifeTime = 30.0f;
@@ -151,17 +151,16 @@ public class PlayerLight : MonoBehaviour
 
                 float BlinkungDecrease = LightBlinkingMax - LightBlinkingLowest;
 
-                
+
                 float NormalizeBlinkungDecrease = BlinkungDecrease / 100.0f;
                 float NormalizeBlinkungLowest = LightBlinkingLowest / 100.0f;
                 float DecreaseRate = LightBattery / NormalizeLightBlinkingPercentage;
 
-                Debug.Log(DecreaseRate);
                 foreach (Light itLight in light)
                 {
                     itLight.intensity = Mathf.Sin(LightBlinkingInterval * (Mathf.PI / 180)) * LightPower * (NormalizeBlinkungDecrease * DecreaseRate + NormalizeBlinkungLowest);
                 }
-                
+
                 LightBlinkingInterval -= 3;
                 if (LightBlinkingInterval <= 0)
                     LightBlinkingInterval = 180;
