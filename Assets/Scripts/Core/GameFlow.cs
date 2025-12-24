@@ -43,10 +43,39 @@ namespace UnityJam.Core
         private void Start()
         {
             goalReached = false;
-
+            
             if (goalMessageView != null)
             {
                 goalMessageView.Hide();
+            }
+
+            // Startでの自動スポーンは廃止し、Initialize経由で行う
+        }
+
+        public void Initialize(GameObject stageRoot)
+        {
+            // ステージ内の参照を動的に取得
+            if (stageRoot != null)
+            {
+                startPoint = stageRoot.GetComponentInChildren<StartPoint>();
+                goalPoint = stageRoot.GetComponentInChildren<GoalPoint>();
+                
+                // イベント再登録
+                if (goalPoint != null)
+                {
+                    goalPoint.OnReached -= HandleGoalReached; // 重複防止
+                    goalPoint.OnReached += HandleGoalReached;
+                }
+            }
+
+            // プレイヤー参照は PlayerSpawnTarget がシーン内にあればそれを使うが、
+            // 動的生成されたプレイヤーを探す必要がある場合は別途ロジックが必要。
+            // ここでは PlayerSpawnTarget (CameraRigなど) はシーンに常駐していると仮定するか、
+            // もしくは StageManager から渡してもらう設計が良い。
+            // いったん FindFirstObjectByType で安全策をとる。
+            if (playerSpawnTarget == null)
+            {
+                playerSpawnTarget = FindFirstObjectByType<PlayerSpawnTarget>();
             }
 
             if (spawnOnStart)
@@ -58,10 +87,21 @@ namespace UnityJam.Core
         [ContextMenu("Spawn Player Now")]
         public void SpawnPlayer()
         {
-            if (startPoint == null || playerSpawnTarget == null)
+            if (startPoint == null)
             {
-                Debug.LogWarning("StartPoint または PlayerSpawnTarget が未設定です。", this);
+                Debug.LogWarning("StartPoint が未設定です。", this);
                 return;
+            }
+
+            if (playerSpawnTarget == null)
+            {
+                // 再検索
+                playerSpawnTarget = FindFirstObjectByType<PlayerSpawnTarget>();
+                if (playerSpawnTarget == null)
+                {
+                    Debug.LogWarning("PlayerSpawnTarget が見つかりません。", this);
+                    return;
+                }
             }
 
             Transform t = startPoint.PointTransform;

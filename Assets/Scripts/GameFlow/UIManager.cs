@@ -12,8 +12,7 @@ public class UIManager : MonoBehaviour
 
     [Header("State UI Prefabs")]
     [SerializeField] private List<GameObject> titlePrefabs;
-    [SerializeField] private List<GameObject> selectPrefabs;
-    [SerializeField] private List<GameObject> stageIntroPrefabs;
+
     [SerializeField] private List<GameObject> gameplayPrefabs;
     [SerializeField] private List<GameObject> resultPrefabs;
     [SerializeField] private List<GameObject> gameOverPrefabs;
@@ -67,12 +66,7 @@ public class UIManager : MonoBehaviour
             case GameState.Title:
                 prefabsToInstantiate = titlePrefabs;
                 break;
-            case GameState.Select:
-                prefabsToInstantiate = selectPrefabs;
-                break;
-            case GameState.StageIntro:
-                prefabsToInstantiate = stageIntroPrefabs;
-                break;
+
             case GameState.Gameplay:
                 prefabsToInstantiate = gameplayPrefabs;
                 break;

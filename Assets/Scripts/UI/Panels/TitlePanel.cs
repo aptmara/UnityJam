@@ -13,7 +13,7 @@ public class TitlePanel : MonoBehaviour
 
     private void OnStartClicked()
     {
-        GameManager.Instance.ChangeState(GameState.Select);
+        GameManager.Instance.ChangeState(GameState.Gameplay);
     }
 
     [ContextMenu("Auto Link References")]

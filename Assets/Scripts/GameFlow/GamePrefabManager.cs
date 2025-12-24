@@ -4,14 +4,13 @@ using UnityEngine.UI;
 using TMPro;
 using Unity.Mathematics;
 
-public class GamePrefebManager : MonoBehaviour
+public class GamePrefabManager : MonoBehaviour
 {
-    public static GamePrefebManager Instance { get; private set; }
+    public static GamePrefabManager Instance { get; private set; }
 
     [Header("State Game Prefabs")]
     [SerializeField] private List<GameObject> titlePrefabs;
-    [SerializeField] private List<GameObject> selectPrefabs;
-    [SerializeField] private List<GameObject> stageIntroPrefabs;
+
     [SerializeField] private List<GameObject> gameplayPrefabs;
     [SerializeField] private List<GameObject> resultPrefabs;
     [SerializeField] private List<GameObject> gameOverPrefabs;
@@ -65,12 +64,7 @@ public class GamePrefebManager : MonoBehaviour
             case GameState.Title:
                 prefabsToInstantiate = titlePrefabs;
                 break;
-            case GameState.Select:
-                prefabsToInstantiate = selectPrefabs;
-                break;
-            case GameState.StageIntro:
-                prefabsToInstantiate = stageIntroPrefabs;
-                break;
+
             case GameState.Gameplay:
                 prefabsToInstantiate = gameplayPrefabs;
                 break;
@@ -89,10 +83,10 @@ public class GamePrefebManager : MonoBehaviour
             {
                 if (prefab != null)
                 {
-                    float3 positon = float3.zero;
+                    float3 position = float3.zero;
                     Quaternion rotation = quaternion.identity;
-                    // falseを指定してプレハブのローカル設定（位置・スケール）を維持
-                    GameObject uiObj = Instantiate(prefab, positon, rotation);
+                    // 親をこのManagerにする
+                    GameObject uiObj = Instantiate(prefab, position, rotation, transform);
                     currentPrefabInstances.Add(uiObj);
                 }
             }

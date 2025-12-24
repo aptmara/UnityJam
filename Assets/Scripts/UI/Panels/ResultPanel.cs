@@ -25,9 +25,9 @@ public class ResultPanel : MonoBehaviour
 
     private void OnBackToSelectClicked()
     {
-        GameManager.Instance.ChangeState(GameState.Select);
+        GameManager.Instance.ChangeState(GameState.Title);
     }
-    
+
     // Auto-Link helper for UIBuilder
     [ContextMenu("Auto Link References")]
     public void AutoLink()

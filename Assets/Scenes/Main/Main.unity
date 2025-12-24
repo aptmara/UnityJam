@@ -378,7 +378,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1751923033}
-  - component: {fileID: 1751923032}
+  - component: {fileID: 1751923034}
   m_Layer: 0
   m_Name: GamePrefabManager
   m_TagString: Untagged
@@ -386,25 +386,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1751923032
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1751923031}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 633c3604507ddba47a5de7aee77e5297, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  titlePrefabs:
-  - {fileID: 6641426430989537671, guid: d9cb3a9311bf0f54781d3ab5876634ee, type: 3}
-  selectPrefabs: []
-  stageIntroPrefabs: []
-  gameplayPrefabs: []
-  resultPrefabs: []
-  gameOverPrefabs: []
 --- !u!4 &1751923033
 Transform:
   m_ObjectHideFlags: 0
@@ -420,6 +401,24 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1751923034
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1751923031}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf64e260787bb7a4d984b76261b20d52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  titlePrefabs:
+  - {fileID: 6641426430989537671, guid: d9cb3a9311bf0f54781d3ab5876634ee, type: 3}
+  stageIntroPrefabs: []
+  gameplayPrefabs: []
+  resultPrefabs: []
+  gameOverPrefabs: []
 --- !u!1001 &1481497519905508464
 PrefabInstance:
   m_ObjectHideFlags: 0
