@@ -1,13 +1,13 @@
 using System;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.SceneManagement;
+
 
 public enum GameState
 {
     Title,
-    Select,
-    StageIntro,
+    Credits,
+
     Gameplay,
     ScoreCalc,
     Result,
@@ -59,27 +59,21 @@ public class GameManager : MonoBehaviour
         switch (state)
         {
             case GameState.Title:
-                // Titleシーンへ (Single Scene: Title UI handling is done by UIManager)
+                // Title
                 break;
-            case GameState.Select:
-                // セレクト画面・拠点へ
-                break;
-            case GameState.StageIntro:
-                // ステージ開始演出。ステージ生成などはStageManagerが検知して行う
-                break;
+
             case GameState.Gameplay:
-                // プレイ開始処理（入力許可など）
+                // Gameplay
                 break;
             case GameState.ScoreCalc:
-                // スコア計算してリザルトへ
                 CalculateScore();
                 ChangeState(GameState.Result);
                 break;
             case GameState.Result:
-                // 結果表示（UI側でハンドリング）
+                // Result
                 break;
             case GameState.GameOver:
-                // ゲームオーバー処理
+                // Game Over
                 break;
         }
     }
@@ -88,10 +82,5 @@ public class GameManager : MonoBehaviour
     {
         // PlayerDataManagerを使ってスコア計算
         Debug.Log("Calculating Score...");
-        if (PlayerDataManager.Instance != null)
-        {
-            PlayerDataManager.Instance.AdvanceStage();
-            Debug.Log($"Stage Advanced to: {PlayerDataManager.Instance.CurrentStageIndex}");
-        }
     }
 }

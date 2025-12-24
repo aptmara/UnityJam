@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &2290790231133326381
+--- !u!1 &6680129708102262663
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,10 +8,10 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 7543573931293513726}
-  - component: {fileID: 1479563890465428316}
-  - component: {fileID: 1743519693330405235}
-  - component: {fileID: 4375310653754325027}
+  - component: {fileID: 5549993043003701494}
+  - component: {fileID: 209409861690313428}
+  - component: {fileID: 228892385850990770}
+  - component: {fileID: 4315336770163744559}
   m_Layer: 0
   m_Name: PlayerLight
   m_TagString: Untagged
@@ -19,13 +19,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &7543573931293513726
+--- !u!4 &5549993043003701494
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2290790231133326381}
+  m_GameObject: {fileID: 6680129708102262663}
   serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: -0.39, y: 14.3, z: 0.3}
@@ -34,13 +34,13 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
---- !u!108 &1479563890465428316
+--- !u!108 &209409861690313428
 Light:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2290790231133326381}
+  m_GameObject: {fileID: 6680129708102262663}
   m_Enabled: 1
   serializedVersion: 10
   m_Type: 0
@@ -96,13 +96,13 @@ Light:
   m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
   m_ShadowAngle: 0
---- !u!114 &1743519693330405235
+--- !u!114 &228892385850990770
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2290790231133326381}
+  m_GameObject: {fileID: 6680129708102262663}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 552326a69a67c0149a8d5bf987630cf2, type: 3}
@@ -113,23 +113,25 @@ MonoBehaviour:
   AdditionBatteryLife: {fileID: 0}
   BatteryPiecesText: {fileID: 0}
   AdditionPiecesText: {fileID: 0}
-  highPowerLight: 0
-  middlePowerLight: 0
-  lowPowerLight: 0
   BatteryPieces: 0
   LightPower: 1
   LightAngle: 45
-  light: {fileID: 1479563890465428316}
+  light:
+  - {fileID: 0}
+  PowerLifeTime: 30
   LifeTime: 30
   LifeDampingAcceleration: 5
   DmpAccelTime: 2
---- !u!114 &4375310653754325027
+  LightBlinkingLowest: 10
+  LightBlinkingMax: 100
+  LightBlinkingPercentage: 0
+--- !u!114 &4315336770163744559
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2290790231133326381}
+  m_GameObject: {fileID: 6680129708102262663}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}

@@ -423,8 +423,7 @@ namespace UnityJam.Enemies
             // 物理挙動も念のため止める
             var rb = player.GetComponent<Rigidbody>();
             if (rb) rb.isKinematic = true;
-            var mr = player.GetComponent<MeshRenderer>();
-            if (mr) mr.enabled = false;
+            player.active = false;
 
             // カメラジャック（FPS視点化 & 敵の方向を向く）
             Camera mainCam = Camera.main;
@@ -498,7 +497,8 @@ namespace UnityJam.Enemies
 
             // 7. プレイヤー破壊
             Debug.Log("<color=red>うぎゃああああぁぁぁ！！ぶち56すｯｯ！！！！</color>");
-            Destroy(player);
+            player.TryGetComponent<SpriteRenderer>(out var sr);
+            if (sr != null) sr.enabled = false; // プレイヤーを見えなくする
 
             // ゲームオーバー画面への遷移などをここに書く
         }

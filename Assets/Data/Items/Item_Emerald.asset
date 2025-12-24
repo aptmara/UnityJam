@@ -17,4 +17,5 @@ MonoBehaviour:
   description: Aimer
   value: 90
   weight: 2
+  isDiscardable: 1
   rarity: 3

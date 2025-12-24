@@ -11,10 +11,10 @@ namespace UnityJam.UI
     public class InventorySlot : MonoBehaviour, IPointerClickHandler
     {
         [Header("UI Components")]
-        [SerializeField] private Image iconImage;          // アイコン画像
-        [SerializeField] private TextMeshProUGUI amountText; // 個数テキスト
-        [SerializeField] private Image selectionFrame;     // 選択時の黄色い枠
-        [SerializeField] private Image lockIcon;           // ロック時の鍵アイコン
+        [SerializeField] private Image iconImage;               // アイコン画像
+        [SerializeField] private TextMeshProUGUI amountText;    // 個数テキスト
+        [SerializeField] private Image selectionFrame;          // 選択時の黄色い枠
+        [SerializeField] private Image lockIcon;                // ロック時の鍵アイコン
 
         // クリックされた時にViewに通知するためのイベント
         public event Action<InventorySlot> OnSlotClicked;
@@ -30,7 +30,7 @@ namespace UnityJam.UI
             iconImage.enabled = false;     // アイコンを隠す
             amountText.text = "";
             selectionFrame.enabled = false;
-            lockIcon.enabled = false;
+            lockIcon.enabled = true;
 
             // ボタンとしての機能を無効化（空っぽならクリックさせない場合）
             // GetComponent<Button>().interactable = false; 

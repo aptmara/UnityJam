@@ -14,7 +14,17 @@ public class SelectPanel : MonoBehaviour
 
     private void OnStartDungeonClicked()
     {
-        GameManager.Instance.ChangeState(GameState.StageIntro);
+        if (ScreenFader.Instance != null)
+        {
+            ScreenFader.Instance.FadeOut(-1f, () => 
+            {
+                GameManager.Instance.ChangeState(GameState.Gameplay);
+            });
+        }
+        else
+        {
+            GameManager.Instance.ChangeState(GameState.Gameplay);
+        }
     }
 
     private void OnShopClicked()

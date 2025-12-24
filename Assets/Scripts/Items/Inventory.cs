@@ -10,7 +10,6 @@ namespace UnityJam.Core
     {
         // シングルトン（どこからでもアクセス可能にする）
         public static Inventory Instance { get; private set; }
-
         // アイテムの保管場所（辞書形式: データ, 個数）
         private readonly Dictionary<ItemMaster, int> _items = new();
 
@@ -18,8 +17,19 @@ namespace UnityJam.Core
         public event Action OnInventoryUnlocked;                    // 初めて拾った時
         public event Action<ItemMaster, int> OnItemCountChanged;    // 数が変わった時
 
+        // 重量が変化した時のイベント（UI更新用）
+        public event Action<float> OnWeightChanged;
+
         // 状態：インベントリが解放されているか（最初のアイテム取得でtrue）
         public bool isUnlocked { get; private set; } = false;
+
+        // 総重量プロパティ
+        public float TotalWeight { get; private set; } = 0f;
+
+        // 重量によるペナルティを有効にするかどうかのフラグ
+        [Header("Settings")]
+        [Tooltip("重量による移動速度低下を有効にするか")]
+        public bool enableWeightPenalty = false;
 
         // シングルトンの初期化
         private void Awake()
@@ -40,7 +50,7 @@ namespace UnityJam.Core
             if(!isUnlocked)
             {
                 isUnlocked = true;
-                OnInventoryUnlocked.Invoke();
+                OnInventoryUnlocked?.Invoke();
             }
 
             if (_items.ContainsKey(item))
@@ -48,8 +58,49 @@ namespace UnityJam.Core
             else
                 _items[item] = count;
 
+            // 重量再計算
+            CalculateTotalWeight();
+
             Debug.Log($"[Inventory] Get: {item.itemName} (Total: {_items[item]})");
             OnItemCountChanged?.Invoke(item, _items[item]);
+        }
+
+        // アイテムを捨てる（削除する）処理
+        public void RemoveItem(ItemMaster item, int count = 1)
+        {
+            if (!_items.ContainsKey(item)) return;
+
+            _items[item] -= count;
+            int remaining = _items[item];
+
+            if (remaining <= 0)
+            {
+                _items.Remove(item);
+                remaining = 0;
+            }
+
+            // 重量再計算
+            CalculateTotalWeight();
+
+            Debug.Log($"[Inventory] Discard: {item.itemName} (Remaining: {remaining})");
+            OnItemCountChanged?.Invoke(item, remaining);
+        }
+
+        // 総重量の計算ロジック
+        private void CalculateTotalWeight()
+        {
+            float w = 0f;
+            foreach(var kvp in _items)
+            {
+                // アイテムの重さ * 個数
+                w += kvp.Key.weight * kvp.Value;
+            }
+
+            TotalWeight = w;
+            OnWeightChanged?.Invoke(TotalWeight);
+
+            // ※将来的にここでPlayerControllerの速度を変更する処理を呼ぶ
+            // if (enableWeightPenalty) Player.SetSpeedByWeight(TotalWeight);
         }
 
         // 全アイテムを取得（表示用）

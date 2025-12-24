@@ -28,10 +28,23 @@ namespace UnityJam.UI
         [Tooltip("スロットのプレファブ")]
         [SerializeField] private InventorySlot slotPrefab;
 
+        [Header("--- Info UI ---")]
+        [Tooltip("総重量を表示するテキスト")]
+        [SerializeField] private TextMeshProUGUI totalWeightText;
+
+        [Tooltip("宝箱の気配ヒントを表示するテキスト")]
+        [SerializeField] private TextMeshProUGUI treasureHintText;
+
         [Header("--- Description Area ---")]
         [SerializeField] private TextMeshProUGUI nameText;
         [SerializeField] private TextMeshProUGUI descriptionText;
         [SerializeField] private Image descriptionIcon;
+
+        [Tooltip("捨てるボタン")]
+        [SerializeField] private Button discardButton;
+
+        // 選択中のアイテムを保持しておく
+        private InventorySlot currentSelectedSlot;
 
         private List<InventorySlot> spawnedSlots = new List<InventorySlot>();
         private const int MAX_SLOTS = 15;
@@ -43,15 +56,29 @@ namespace UnityJam.UI
         {
             // パネルを初期化（最初は閉じておく）
             inventoryPanel.SetActive(false);
-
+            
             // スロット生成
             InitializeSlots();
 
             // イベント購読（シングルトンがあれば）
             if (Inventory.Instance != null)
             {
-                Inventory.Instance.OnInventoryUnlocked += ForceOpenInventory; // 初回アンロック時は強制的に開く
+                // Inventory.Instance.OnInventoryUnlocked += ForceOpenInventory;   // 初回アンロック時は強制的に開く
                 Inventory.Instance.OnItemCountChanged += RefreshInventory;
+                Inventory.Instance.OnWeightChanged += UpdateWeightUI;           // 重量更新イベント購読
+            }
+
+            // 宝箱カウント更新イベント購読
+            if (TreasureManager.Instance != null)
+            {
+                TreasureManager.Instance.OnTreasureCountChanged += UpdateTreasureHintUI;
+            }
+
+            // 捨てるボタンにリスナー登録
+            if (discardButton != null)
+            {
+                discardButton.onClick.AddListener(OnDiscardPressed);
+                discardButton.gameObject.SetActive(false);  // 最初は非表示
             }
         }
 
@@ -87,6 +114,8 @@ namespace UnityJam.UI
         {
             inventoryPanel.SetActive(true);
             RefreshInventory(null, 0); // データ更新
+            UpdateWeightUI(Inventory.Instance.TotalWeight); // 開いた時に重量更新
+            UpdateTreasureHintUI();                         // 開いた時にヒント更新
 
             // カーソルを表示して操作できるようにする
             Cursor.lockState = CursorLockMode.None;
@@ -171,6 +200,9 @@ namespace UnityJam.UI
         {
             foreach (var s in spawnedSlots) s.SetSelected(false);
             slot.SetSelected(true);
+
+            // 選択中のスロットを保存
+            currentSelectedSlot = slot;
             UpdateDescription(slot.ItemData);
         }
 
@@ -181,6 +213,8 @@ namespace UnityJam.UI
                 nameText.text = "";
                 descriptionText.text = "";
                 descriptionIcon.enabled = false;
+
+                if(discardButton != null) discardButton.gameObject.SetActive(false);
                 return;
             }
 
@@ -188,6 +222,51 @@ namespace UnityJam.UI
             descriptionText.text = item.description;
             descriptionIcon.sprite = item.icon;
             descriptionIcon.enabled = true;
+
+            // 捨てるボタンの表示制御
+            if(discardButton != null)
+            {
+                // アイテムが存在し、かつ「捨てられる」設定ならボタンを表示
+                discardButton.gameObject.SetActive(item.isDiscardable);
+            }
+        }
+
+        // 捨てるボタンが押されたときの処理
+        void OnDiscardPressed()
+        {
+            Debug.Log("ボタンが押されました！");
+
+            if (currentSelectedSlot == null || currentSelectedSlot.ItemData == null)
+            {
+                Debug.Log("選択中のアイテムがありません");
+                return;
+            }
+
+            // 1個捨てる（全捨てしたい場合は個数分ループするか、RemoveItemに個数を渡すUIを作る）
+            Inventory.Instance.RemoveItem(currentSelectedSlot.ItemData, 1);
+
+            // 簡易的に、捨てたら選択解除する
+            UpdateDescription(null);
+            currentSelectedSlot.SetSelected(false);
+            currentSelectedSlot = null;
+        }
+
+        // 重量UI更新
+        void UpdateWeightUI(float weight)
+        {
+            if(totalWeightText != null)
+            {
+                totalWeightText.text = $"Weight: {weight:F2}kg";    // 小数点1桁まで
+            }
+        }
+
+        // 宝箱ヒントUI更新
+        void UpdateTreasureHintUI()
+        {
+            if(treasureHintText != null && TreasureManager.Instance != null)
+            {
+                treasureHintText.text = TreasureManager.Instance.GetTreasureHint();
+            }
         }
     }
 }
