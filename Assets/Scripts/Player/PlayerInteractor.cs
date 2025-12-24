@@ -38,7 +38,7 @@ namespace UnityJam.Player
 
                     // ここで時間を進める関数を呼ぶ！
                     bool isInteract = currentTarget.AddInteractTime();
-                    
+
                     if(isInteract)
                     {
                         playerAnimator.SetTrigger("Interact");
@@ -68,7 +68,12 @@ namespace UnityJam.Player
                 if (interactable != null)
                 {
                     currentTarget = interactable;
+                    Debug.Log("Found interactable target: " + currentTarget.name);
                     return;
+                }
+                else
+                {
+                    Debug.Log("Hit something, but it's not interactable.");
                 }
             }
 

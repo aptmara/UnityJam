@@ -66,20 +66,20 @@ public class StageManager : MonoBehaviour
         if (currentStageInstance == null && stagePrefabs != null && stagePrefabs.Count > stageIndex)
         {
             GameObject prefab = stagePrefabs[stageIndex];
-            if (prefab != null)
-            {
-                currentStageInstance = Instantiate(prefab, Vector3.zero, Quaternion.identity);
-            }
+                if (prefab != null)
+                {
+                    currentStageInstance = Instantiate(prefab, Vector3.zero, Quaternion.identity, transform);
+                }
         }
 
         // 2. システム生成 (ステージ固有のシステム)
         if (currentSystemInstance == null && systemPrefabs != null && systemPrefabs.Count > stageIndex)
         {
             GameObject prefab = systemPrefabs[stageIndex];
-            if (prefab != null)
-            {
-                currentSystemInstance = Instantiate(prefab, Vector3.zero, Quaternion.identity);
-            }
+                if (prefab != null)
+                {
+                    currentSystemInstance = Instantiate(prefab, Vector3.zero, Quaternion.identity, transform);
+                }
         }
 
         // 2. スポーンポイント検索
@@ -95,20 +95,20 @@ public class StageManager : MonoBehaviour
         if (currentPlayerInstance == null && playerPrefabs != null && playerPrefabs.Count > playerIndex)
         {
             GameObject prefab = playerPrefabs[playerIndex];
-            if (prefab != null)
-            {
-                currentPlayerInstance = Instantiate(prefab, foundSpawnPoint.position, foundSpawnPoint.rotation);
-            }
+                if (prefab != null)
+                {
+                    currentPlayerInstance = Instantiate(prefab, foundSpawnPoint.position, foundSpawnPoint.rotation, transform);
+                }
         }
 
         // 3. プレイヤー生成
         if (currentPlayerInstance == null && playerPrefabs != null && playerPrefabs.Count > playerIndex)
         {
             GameObject prefab = playerPrefabs[playerIndex];
-            if (prefab != null)
-            {
-                currentPlayerInstance = Instantiate(prefab, foundSpawnPoint.position, foundSpawnPoint.rotation);
-            }
+                if (prefab != null)
+                {
+                    currentPlayerInstance = Instantiate(prefab, foundSpawnPoint.position, foundSpawnPoint.rotation, transform);
+                }
         }
 
         // 4. GameFlow初期化 (System内にGameFlowがあると仮定)
