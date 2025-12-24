@@ -51,8 +51,8 @@ public class StageManager : MonoBehaviour
             case GameState.Result: // Add Result here to trigger cleanup and initial FadeIn
                 CleanupStage();
                 if (state == GameState.Gameplay) SetupStage(); // Only Setup for Gameplay
-                
-                // For Result, we just cleanup (GamePrefabManager handles UI). 
+
+                // For Result, we just cleanup (GamePrefabManager handles UI).
                 // Then FadeIn.
                 if (ScreenFader.Instance != null) ScreenFader.Instance.FadeIn();
                 break;
@@ -62,17 +62,6 @@ public class StageManager : MonoBehaviour
                 // 必要であればここでもCleanup
                 break;
         }
-    }
-
-    private void CleanupStage()
-    {
-        if (currentPlayerInstance != null) Destroy(currentPlayerInstance);
-        if (currentSystemInstance != null) Destroy(currentSystemInstance);
-        if (currentStageInstance != null) Destroy(currentStageInstance);
-
-        currentPlayerInstance = null;
-        currentSystemInstance = null;
-        currentStageInstance = null;
     }
 
     private void SetupStage()
@@ -236,10 +225,10 @@ public class StageManager : MonoBehaviour
 
         // Proceed to change state
         Debug.Log("Changing GameState to Result (triggered by goal: " + currentGoalPoint.gameObject.name + ")");
-        
+
         if (ScreenFader.Instance != null)
         {
-            ScreenFader.Instance.FadeOut(1.0f, () => 
+            ScreenFader.Instance.FadeOut(1.0f, () =>
             {
                 GameManager.Instance.ChangeState(GameState.Result);
             });
@@ -262,8 +251,6 @@ public class StageManager : MonoBehaviour
 
         OnGoalReached(player);
     }
-
-
 
     private void CleanupStage()
     {

@@ -32,7 +32,6 @@ namespace UnityJam.Effects
 
         private void Awake()
         {
-#if UNITY_RENDER_PIPELINES_UNIVERSAL
             // Inspector未設定でも動くように自動取得（Prefab運用の手戻り防止）
             if (targetVolume == null)
             {
@@ -114,5 +113,6 @@ namespace UnityJam.Effects
             bloom.intensity.value = originalIntensity;
             burstCoroutine = null;
         }
+#endif
     }
 }
