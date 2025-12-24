@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityJam.Core;         // Inventoryを使うため
@@ -11,8 +12,8 @@ namespace UnityJam.Gimmicks
     public class TreasureChestController : InteractableBase, IBloomBurstReceiver
     {
         [Header("--- ドロップアイテム ---")]
-        [Tooltip("このリストの中からランダムで1つ選ばれます")]
-        [SerializeField] private List<ItemMaster> dropList;
+        [Tooltip("作成したドロップテーブルデータをここにセット")]
+        [SerializeField] private TreasureDropTable dropTable;
 
         [Header("--- 演出 ---")]
         [Tooltip("開いた後の宝箱の見た目（空の箱など）。なければ設定しなくてOK")]
@@ -22,11 +23,14 @@ namespace UnityJam.Gimmicks
         [SerializeField] private GameObject closedModel;
 
         [Header("--- エフェクト設定 ---")]
-        [Tooltip("宝箱を開けた瞬間のエフェクト（VFX）")]
-        [SerializeField] private GameObject openVfxPrefab;
+        [Tooltip("レアリティごとの開閉エフェクト (Element 0 がレア度1, Element 1 がレア度2...)")]
+        [SerializeField] private GameObject[] rarityVfxPrefabs;
 
-        [Tooltip("アイテム取得時の飛び出すエフェクト (Prefab)")]
+        [Tooltip("アイテム取得時の飛び出すアイコン (Prefab)")]
         [SerializeField] private GameObject popupEffectPrefab;
+
+        [Tooltip("宝箱が開いてからアイコンが出るまでの待ち時間（秒）")]
+        [SerializeField] private float iconPopupDelay = 0.5f;
 
         [Header("--- ポストエフェクト ---")]
         [Tooltip("開封時にBloomを一瞬だけ強める（Spawnerから自動注入される想定）")]
@@ -41,6 +45,17 @@ namespace UnityJam.Gimmicks
 
         [SerializeField]
         private Vector3 burstLightOffset = new Vector3(0f, 1.0f, 0f);
+
+        private bool isOpen = false;
+
+        // Startでマネージャーに登録
+        private void Start()
+        {
+            if(TreasureManager.Instance != null)
+            {
+                TreasureManager.Instance.RegisterChest(this.gameObject);
+            }
+        }
 
         /// <summary>
         /// TreasureSpawner 等から BloomBurstController を注入する。
@@ -59,16 +74,24 @@ namespace UnityJam.Gimmicks
         // 宝箱を開ける処理
         private void OpenChest()
         {
-            // ドロップリストのチェック
-            if (dropList == null || dropList.Count == 0)
+            if (isOpen) return;
+
+            // ドロップテーブルが設定されているかチェック
+            if (dropTable == null)
             {
-                Debug.LogWarning("宝箱の中身が空っぽです！InspectorでdropListを設定してください。");
+                Debug.LogWarning("宝箱にドロップテーブルが設定されていません！");
                 return;
             }
 
-            // A. ランダム抽選
-            int randomIndex = Random.Range(0, dropList.Count);
-            ItemMaster item = dropList[randomIndex];
+            // A. ドロップテーブルを使って抽選
+            ItemMaster item = dropTable.PickOneItem();
+
+            // 抽選結果が空なら（設定ミスなど）何もしない
+            if (item == null)
+            {
+                Debug.LogWarning("ドロップ抽選に失敗しました（有効なアイテムがありません）");
+                return;
+            }
 
             // B. インベントリに追加
             if (Inventory.Instance != null)
@@ -76,50 +99,74 @@ namespace UnityJam.Gimmicks
                 Inventory.Instance.AddItem(item);
             }
 
-            // C. 見た目の切り替え（閉じた箱を消して、開いた箱を表示）
+            // C. 見た目の変更
+            isOpen = true;
             if (closedModel != null) closedModel.SetActive(false);
             if (openedModel != null) openedModel.SetActive(true);
 
-            // D. エフェクトの再生
-            if (openVfxPrefab != null)
+            if (TreasureManager.Instance != null)
             {
-                Instantiate(openVfxPrefab, transform.position, Quaternion.identity);
+                TreasureManager.Instance.UnregisterChest(this.gameObject);
             }
 
-            // D-1. Light Burst（確実に「光った」感を出す）
+            // D. レアリティに応じたVFXを再生
+            PlayRarityVfx(item.rarity);
+
+            // Light Burst
             if (burstLightPrefab != null)
             {
-                GameObject lightObj = Instantiate(
-                    burstLightPrefab,
-                    transform.position + burstLightOffset,
-                    Quaternion.identity);
-
+                GameObject lightObj = Instantiate(burstLightPrefab, transform.position + burstLightOffset, Quaternion.identity);
                 Destroy(lightObj, burstLightLifeTime);
             }
 
-            // D-2. Bloom ブースト（パターンA：Global VolumeのBloomを一瞬だけ強める）
-            if (bloomBurst != null)
-            {
-                bloomBurst.PlayBurst();
-            }
+            // Bloom
+            if (bloomBurst != null) bloomBurst.PlayBurst();
 
-            // E. アイテム飛び出し演出
+            // E. アイコン演出を遅延実行する
+            StartCoroutine(ShowIconDelayed(item));
+
+            Debug.Log($"宝箱を開けた！ {item.itemName} (Rarity:{item.rarity}) を獲得！");
+        }
+
+        // 遅延実行用
+        private IEnumerator ShowIconDelayed(ItemMaster item)
+        {
+            // 設定した秒数だけ待つ
+            yield return new WaitForSeconds(iconPopupDelay);
+
             if (popupEffectPrefab != null)
             {
+                // 少し上に出現させる
                 GameObject effectObj = Instantiate(popupEffectPrefab, transform.position + Vector3.up, Quaternion.identity);
-
                 ItemPopupEffect popupScript = effectObj.GetComponent<ItemPopupEffect>();
-                if (popupScript != null)
+                if (popupScript != null) popupScript.Initialize(item.icon);
+            }
+        }
+
+        // レアリティVFX再生用メソッド
+        private void PlayRarityVfx(int rarity)
+        {
+            // 設定配列が空なら何もしない
+            if (rarityVfxPrefabs == null || rarityVfxPrefabs.Length == 0) return;
+
+            // レアリティは1から始まるが、配列は0から始まるので -1 する
+            int index = rarity - 1;
+
+            // 配列の範囲内かチェック（レア度4以上のアイテムが来たり、設定が足りない場合の対策）
+            if (index >= 0 && index < rarityVfxPrefabs.Length)
+            {
+                GameObject vfxToPlay = rarityVfxPrefabs[index];
+                if (vfxToPlay != null)
                 {
-                    popupScript.Initialize(item.icon);
-                }
-                else
-                {
-                    Debug.LogWarning("PopupPrefabに 'ItemPopupEffect' スクリプトがついていません！");
+                    Instantiate(vfxToPlay, transform.position, Quaternion.identity);
                 }
             }
-
-            Debug.Log($"宝箱を開けた！ {item.itemName} を獲得！");
+            else
+            {
+                // 該当するレアリティのエフェクトがない場合、とりあえず一番下のレアリティを再生しておく（保険）
+                if (rarityVfxPrefabs[0] != null)
+                    Instantiate(rarityVfxPrefabs[0], transform.position, Quaternion.identity);
+            }
         }
     }
 }

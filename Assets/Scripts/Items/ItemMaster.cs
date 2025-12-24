@@ -31,6 +31,9 @@ namespace UnityJam.Items
         [Tooltip("重さ（持ち運び制限用など）")]
         [Min(0)] public float weight = 1.0f;
 
+        [Tooltip("インベントリから捨てることが出来るか（重要アイテムはFalseにする）")]
+        public bool isDiscardable = true;
+
         [Tooltip("レアリティ（1〜3の星の数）")]
         [Range(1, 3)] public int rarity = 1;
 
