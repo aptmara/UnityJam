@@ -3758,9 +3758,9 @@ MonoBehaviour:
   AdditionBatteryLife: {fileID: 4634636563236154991}
   BatteryPiecesText: {fileID: 6429868611263221643}
   AdditionPiecesText: {fileID: 247329291537617810}
-  BatteryPieces: 1
-  LightPower: 5
-  LightAngle: 45
+  BatteryPieces: 4
+  LightPower: 10
+  LightAngle: 52
   light:
   - {fileID: 7643653989278961997}
   - {fileID: 8775902641603158962}
