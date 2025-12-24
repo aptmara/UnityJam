@@ -2408,6 +2408,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   startButton: {fileID: 3308390653836655813}
+  creditsButton: {fileID: 7565378698181329338}
 --- !u!1 &7635046931844969497
 GameObject:
   m_ObjectHideFlags: 0

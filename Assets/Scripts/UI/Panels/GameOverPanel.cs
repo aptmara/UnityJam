@@ -15,12 +15,32 @@ public class GameOverPanel : MonoBehaviour
     private void OnRetryClicked()
     {
         // 簡易リトライ: 同じステージへ等
-        GameManager.Instance.ChangeState(GameState.Gameplay);
+        if (ScreenFader.Instance != null)
+        {
+            ScreenFader.Instance.FadeOut(-1f, () => 
+            {
+                GameManager.Instance.ChangeState(GameState.Gameplay);
+            });
+        }
+        else
+        {
+            GameManager.Instance.ChangeState(GameState.Gameplay);
+        }
     }
 
     private void OnReturnClicked()
     {
-        GameManager.Instance.ChangeState(GameState.Title);
+        if (ScreenFader.Instance != null)
+        {
+            ScreenFader.Instance.FadeOut(-1f, () => 
+            {
+                GameManager.Instance.ChangeState(GameState.Title);
+            });
+        }
+        else
+        {
+            GameManager.Instance.ChangeState(GameState.Title);
+        }
     }
 
     [ContextMenu("Auto Link References")]
