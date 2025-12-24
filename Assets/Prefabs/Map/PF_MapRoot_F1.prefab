@@ -1878,9 +1878,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ac2ab3ff82217149829dd21fff9a3c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetVolume: {fileID: 5090169410160594256}
-  burstIntensity: 2
-  burstDuration: 0.35
 --- !u!1 &9095605468474796816
 GameObject:
   m_ObjectHideFlags: 0

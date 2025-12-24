@@ -121,6 +121,14 @@ namespace UnityJam.Core
             {
                 goalMessageView.Show(goalMessage);
             }
+
+            StartCoroutine(WaitAndFinishStage());
+        }
+
+        private System.Collections.IEnumerator WaitAndFinishStage()
+        {
+            yield return new WaitForSeconds(2.0f);
+            GameManager.Instance.ChangeState(GameState.ScoreCalc);
         }
     }
 }

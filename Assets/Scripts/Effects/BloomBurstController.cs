@@ -12,6 +12,7 @@ namespace UnityJam.Effects
     /// </summary>
     public sealed class BloomBurstController : MonoBehaviour
     {
+#if UNITY_RENDER_PIPELINES_UNIVERSAL
         [Header("--- Target Volume ---")]
         [Tooltip("制御対象の Volume コンポーネント（未設定なら同一GOから自動取得）")]
         [SerializeField] private Volume targetVolume;
@@ -31,6 +32,7 @@ namespace UnityJam.Effects
 
         private void Awake()
         {
+#if UNITY_RENDER_PIPELINES_UNIVERSAL
             // Inspector未設定でも動くように自動取得（Prefab運用の手戻り防止）
             if (targetVolume == null)
             {

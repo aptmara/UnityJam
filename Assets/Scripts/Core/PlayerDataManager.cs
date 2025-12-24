@@ -12,6 +12,11 @@ public class PlayerDataManager : MonoBehaviour
     public int CurrentStageIndex { get; set; } = 0;
     public int CurrentPlayerIndex { get; set; } = 0;
 
+    public void AdvanceStage()
+    {
+        CurrentStageIndex++;
+    }
+
     private void Awake()
     {
         if (Instance == null)
