@@ -23,6 +23,8 @@ namespace UnityJam
         [SerializeField] float moveFollowSpeed = 360f; // 度 / 秒（小さいほどズレる）
         [SerializeField] float moveSpeed = 5f;
 
+        Vector3 moveVector = new Vector3(0.0f, 0.0f, 0.0f);
+
         // Start is called before the first frame update
 
         void Start()
@@ -37,9 +39,9 @@ namespace UnityJam
 
             float cameraYaw = rig.yaw;
 
-            Vector3 moveVector = CreateMoveVector(cameraYaw);
+            moveVector = CreateMoveVector(cameraYaw);
 
-            PlayerMove(dt, moveVector);
+            
 
 
             if (isCameraChase)
@@ -62,6 +64,11 @@ namespace UnityJam
 
         }
 
+        private void FixedUpdate()
+        {
+            PlayerMove();
+        }
+
 
         void CameraChase(float dt, float targetYaw, float followSpeed)
         {
@@ -78,15 +85,16 @@ namespace UnityJam
         }
 
 
-        void PlayerMove(float dt, Vector3 moveVector)
+        void PlayerMove()
         {
-            moveVector.y = playerRigidbody.velocity.y;
+            Vector3 velocity = playerRigidbody.velocity;
 
-            moveVector *= moveSpeed * dt;
+            Vector3 horizontal = moveVector * moveSpeed;
 
-            moveVector.y = playerRigidbody.velocity.y;
+            velocity.x = horizontal.x;
+            velocity.z = horizontal.z;
 
-            playerRigidbody.velocity = moveVector;
+            playerRigidbody.velocity = velocity;
 
         }
 
