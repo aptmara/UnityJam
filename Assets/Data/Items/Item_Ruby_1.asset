@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23a3e46a35291db44b4d21ac75b320bb, type: 3}
+  m_Name: Item_Ruby_1
+  m_EditorClassIdentifier: 
+  itemName: "\u30EB\u30D3\u30FC"
+  icon: {fileID: 21300000, guid: 62e7e55d291c737429a64f3770425438, type: 3}
+  description: "\u5C0F\u3055\u304F\u6B20\u3051\u305F\u30EB\u30D3\u30FC\u306E\u4E00\u90E8\u3002\n\u308F\u305A\u304B\u3067\u3082\u3001\u60C5\u71B1\u306E\u540D\u6B8B\u306F\u78BA\u304B\u306B\u6B8B\u3063\u3066\u3044\u308B\u3002"
+  value: 20
+  weight: 0.25
+  isDiscardable: 1
+  rarity: 1

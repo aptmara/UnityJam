@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 23a3e46a35291db44b4d21ac75b320bb, type: 3}
-  m_Name: Item_Emerald
+  m_Name: Item_Sapphire_3
   m_EditorClassIdentifier: 
-  itemName: "\u30A8\u30E1\u30E9\u30EB\u30C9"
-  icon: {fileID: 21300000, guid: 27e5b5246ee17c74085914115a45ea4c, type: 3}
-  description: Aimer
+  itemName: "\u30B5\u30D5\u30A1\u30A4\u30A2"
+  icon: {fileID: 21300000, guid: 8eb8ad4f29142844ab24ac3efbc1245e, type: 3}
+  description: "\u6DF1\u3044\u84BC\u8272\u306B\u6F84\u307F\u304D\u3063\u305F\u8F1D\u304D\u3092\u5BBF\u3059\u5B9D\u77F3\u3002\n\u9759\u304B\u306A\u610F\u5FD7\u3092\u6301\u3064\u8005\u306B\u3001\u771F\u306E\u529B\u3092\u793A\u3059\u3002"
   value: 90
   weight: 2
   isDiscardable: 1

@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23a3e46a35291db44b4d21ac75b320bb, type: 3}
+  m_Name: Item_Topaz_2
+  m_EditorClassIdentifier: 
+  itemName: "\u30B5\u30D5\u30A1\u30A4\u30A2"
+  icon: {fileID: 21300000, guid: 4fef67153c802ec4eac8754a7a7c2e93, type: 3}
+  description: "\u6B20\u3051\u305F\u9EC4\u91D1\u8272\u304C\u3001\u306A\u304A\u5F37\u304F\u76EE\u3092\u5F15\u304F\u5B9D\u77F3\u3002\n\u5B8C\u5168\u3067\u306F\u306A\u3044\u304C\u3001\u5341\u5206\u306A\u4FA1\u5024\u304C\u3042\u308B\u3088\u3046\u306B\u898B\u3048\u308B\u3002"
+  value: 35
+  weight: 0.25
+  isDiscardable: 1
+  rarity: 2

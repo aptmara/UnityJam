@@ -245,32 +245,36 @@ MonoBehaviour:
   obstacleMask:
     serializedVersion: 2
     m_Bits: 192
+  lightMode: 0
+  flickerSpeed: 10
   movementType: 4
   moveSpeed: 3
   waitTime: 1
-  waypoints:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  lookAngleStep: 45
+  lookWaitTime: 2
+  lookRotateSpeed: 2
   linearDistance: 5
   linearDirection: {x: 0, y: 0, z: 1}
-  circleRadius: 5
+  circleRadiusX: 5
+  circleRadiusZ: 3
   clockwise: 1
+  figureEightSize: 5
   wanderRadius: 7
+  simpleWaypoints: []
+  currentGraphWaypoint: {fileID: 0}
   viewRadius: 5
   viewAngle: 90
   eyeHeight: 0.25
   rushSpeed: 10
-  attackTriggerName: OnAttack
   roarDuration: 2.5
-  walkModel: {fileID: 558984043309271404}
-  attackModel: {fileID: 5680108140215271393}
-  animator: {fileID: 1680549934497600556}
+  attackScaleMultiplier: 2
   scriptsToDisable:
   - CameraController
   - CameraRigController
-  attackScaleMultiplier: 2
   playerEyeHeight: 1
+  walkModel: {fileID: 558984043309271404}
+  attackModel: {fileID: 5680108140215271393}
+  animator: {fileID: 1680549934497600556}
 --- !u!95 &1680549934497600556
 Animator:
   serializedVersion: 5
