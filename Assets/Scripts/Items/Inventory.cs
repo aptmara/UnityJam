@@ -26,6 +26,9 @@ namespace UnityJam.Core
         // 総重量プロパティ
         public float TotalWeight { get; private set; } = 0f;
 
+        // 総スコア（リザルト用）
+        public int TotalScore { get; private set; } = 0;
+
         // 重量によるペナルティを有効にするかどうかのフラグ
         [Header("Settings")]
         [Tooltip("重量による移動速度低下を有効にするか")]
@@ -58,8 +61,8 @@ namespace UnityJam.Core
             else
                 _items[item] = count;
 
-            // 重量再計算
-            CalculateTotalWeight();
+            // 重量 & 総スコア 再計算
+            CalculateTotals();
 
             Debug.Log($"[Inventory] Get: {item.itemName} (Total: {_items[item]})");
             OnItemCountChanged?.Invoke(item, _items[item]);
@@ -79,28 +82,35 @@ namespace UnityJam.Core
                 remaining = 0;
             }
 
-            // 重量再計算
-            CalculateTotalWeight();
+            // 重量 & 総スコア 再計算
+            CalculateTotals();
 
             Debug.Log($"[Inventory] Discard: {item.itemName} (Remaining: {remaining})");
             OnItemCountChanged?.Invoke(item, remaining);
         }
 
-        // 総重量の計算ロジック
-        private void CalculateTotalWeight()
+        // 重量とスコアをまとめて計算する
+        private void CalculateTotals()
         {
             float w = 0f;
-            foreach(var kvp in _items)
+            int s = 0; // スコア用
+
+            foreach (var kvp in _items)
             {
-                // アイテムの重さ * 個数
-                w += kvp.Key.weight * kvp.Value;
+                ItemMaster item = kvp.Key;
+                int count = kvp.Value;
+
+                // 重さ計算
+                w += item.weight * count;
+
+                // ★スコア計算 (価値 * 個数)
+                s += item.value * count;
             }
 
             TotalWeight = w;
-            OnWeightChanged?.Invoke(TotalWeight);
+            TotalScore = s; // 保存
 
-            // ※将来的にここでPlayerControllerの速度を変更する処理を呼ぶ
-            // if (enableWeightPenalty) Player.SetSpeedByWeight(TotalWeight);
+            OnWeightChanged?.Invoke(TotalWeight);
         }
 
         // 全アイテムを取得（表示用）
