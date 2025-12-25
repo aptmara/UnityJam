@@ -10,7 +10,7 @@ namespace UnityJam.Player
     {
         [Header("--- インタラクト ---")]
         [Tooltip("インタラクトするキー")]
-        [SerializeField] private KeyCode interactKey = KeyCode.E;
+        [SerializeField] private KeyCode interactKey = KeyCode.Mouse0;
 
         [Tooltip("インタラクト可能な距離")]
         [SerializeField] private float interactRange = 2.0f;

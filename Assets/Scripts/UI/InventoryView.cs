@@ -12,7 +12,7 @@ namespace UnityJam.UI
     {
         [Header("--- Input Settings ---")]
         [Tooltip("インベントリを開閉するキー")]
-        [SerializeField] private KeyCode toggleKey = KeyCode.Tab;
+        [SerializeField] private KeyCode toggleKey = KeyCode.E;
 
         [Header("--- Player Control ---")]
         [Tooltip("インベントリ中に停止させたいスクリプト（移動、カメラ、インタラクト等）をここに登録")]
