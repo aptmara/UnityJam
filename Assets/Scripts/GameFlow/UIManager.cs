@@ -81,9 +81,31 @@ public class UIManager : MonoBehaviour
 
         if (prefabsToInstantiate != null)
         {
-            // アクティブなCanvasを探して親にする
-            Canvas canvas = FindFirstObjectByType<Canvas>();
-            Transform parentTransform = canvas != null ? canvas.transform : transform;
+            // Use a dedicated persistent Canvas for System UI
+            string canvasName = "SystemUICanvas";
+            GameObject canvasObj = GameObject.Find(canvasName);
+            Canvas canvas = null;
+
+            if (canvasObj != null)
+            {
+                canvas = canvasObj.GetComponent<Canvas>();
+            }
+
+            if (canvas == null)
+            {
+                // Create a persistent Main Canvas if none exists
+                GameObject cObj = new GameObject(canvasName);
+                canvas = cObj.AddComponent<Canvas>();
+                canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+                canvas.sortingOrder = 100; // Ensure on top
+                var scaler = cObj.AddComponent<CanvasScaler>();
+                scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+                scaler.referenceResolution = new Vector2(1920, 1080);
+                cObj.AddComponent<GraphicRaycaster>();
+                DontDestroyOnLoad(cObj);
+            }
+
+            Transform parentTransform = canvas.transform;
 
             foreach (var prefab in prefabsToInstantiate)
             {

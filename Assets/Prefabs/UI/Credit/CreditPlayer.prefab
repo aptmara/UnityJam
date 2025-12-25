@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1371053278800291658}
   - component: {fileID: 6317789455606887896}
   - component: {fileID: 5703789624758713384}
-  - component: {fileID: 2611496298403172774}
+  - component: {fileID: 8609457671963907444}
   m_Layer: 0
   m_Name: CreditPlayer
   m_TagString: Untagged
@@ -27,13 +27,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9014272258044766846}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.5, y: 0.5, z: 0.5, w: 0.5}
+  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: -0.002953481, y: 0.002481374, z: 0.009873163}
-  m_LocalScale: {x: 3, y: 3, z: 3}
+  m_LocalScale: {x: 5, y: 5, z: 5}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: -90, y: 90, z: 0}
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
 --- !u!33 &6317789455606887896
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -84,7 +84,7 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &2611496298403172774
+--- !u!114 &8609457671963907444
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -93,11 +93,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 9014272258044766846}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 941f79549f5bf974d96d2de32c7420bb, type: 3}
+  m_Script: {fileID: 11500000, guid: dabeaf4e4efe7ac448578f92dbaa70a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 10
-  bulletPrefab: {fileID: 5457413497870522981, guid: 7b1577fadeaa3cd469a3df606086ef0b, type: 3}
-  muzzle: {fileID: 1371053278800291658}
+  moveSpeed: 10
+  bankAmount: 30
+  fireRate: 0.1
   bulletSpeed: 20
-  fireRate: 3
+  laserPrefab: {fileID: 5457413497870522981, guid: 7b1577fadeaa3cd469a3df606086ef0b, type: 3}
+  firePoint: {fileID: 1371053278800291658}
