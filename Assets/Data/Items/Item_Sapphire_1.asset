@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 23a3e46a35291db44b4d21ac75b320bb, type: 3}
-  m_Name: Item_Diamond
+  m_Name: Item_Sapphire_1
   m_EditorClassIdentifier: 
-  itemName: "\u30C0\u30A4\u30E4\u30E2\u30F3\u30C9"
-  icon: {fileID: 21300000, guid: 27e5b5246ee17c74085914115a45ea4c, type: 3}
-  description: "\u3081\u3063\u3061\u3083\u826F\u3044\u30C0\u30A4\u30E4\u3060\u3041\u3001\u3001\u3001"
-  value: 100
-  weight: 1
+  itemName: "\u30B5\u30D5\u30A1\u30A4\u30A2"
+  icon: {fileID: 21300000, guid: ac5d291b4fb1db847849a1da8a6b0429, type: 3}
+  description: "\u5C0F\u3055\u304F\u6B20\u3051\u305F\u30B5\u30D5\u30A1\u30A4\u30A2\u306E\u4E00\u90E8\u3002\n\u9759\u304B\u306A\u5149\u304C\u3001\u78BA\u304B\u306A\u53EF\u80FD\u6027\u3092\u79D8\u3081\u3066\u3044\u308B\u3002"
+  value: 22
+  weight: 0.5
   isDiscardable: 1
   rarity: 1
