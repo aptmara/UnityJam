@@ -47,7 +47,7 @@ public class MapMask : MonoBehaviour
         // 全部黒（未探索）
         Color32[] pixels = new Color32[mapSize * mapSize];
         for (int i = 0; i < pixels.Length; i++)
-            pixels[i] = new Color32(0, 0, 0, 0);
+            pixels[i] = new Color32(1, 1, 1, 1);
 
         fogTexture.SetPixels32(pixels);
         fogTexture.Apply();
@@ -80,7 +80,7 @@ public class MapMask : MonoBehaviour
         int x = (int)(uv.x * mapSize);
         int y = (int)(uv.y * mapSize);
 
-        int radius = 80;
+        int radius = 30;
 
         for (int dx = -radius; dx <= radius; dx++)
             for (int dy = -radius; dy <= radius; dy++)
@@ -91,7 +91,7 @@ public class MapMask : MonoBehaviour
                 if (px < 0 || px >= mapSize || py < 0 || py >= mapSize)
                     continue;
 
-                fogTexture.SetPixel(px, py, new Color(1, 1, 1, 1));
+                fogTexture.SetPixel(px, py, new Color(0, 0, 0, 0));
 
                 //Debug.Log("Debug");
             }
