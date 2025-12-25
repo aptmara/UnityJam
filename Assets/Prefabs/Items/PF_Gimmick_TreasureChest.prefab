@@ -125,7 +125,7 @@ MonoBehaviour:
   rarityVfxPrefabs:
   - {fileID: 2747732066291226005, guid: 707ba6916b2f040448bdf3083cc12e39, type: 3}
   - {fileID: 549805529714841192, guid: 4b96de88314e1ef4da0563c3240c1198, type: 3}
-  - {fileID: 6249558749395066997, guid: 24dae6d1467ce9147970c3618b8a636f, type: 3}
+  - {fileID: 6459050507843350043, guid: 24dae6d1467ce9147970c3618b8a636f, type: 3}
   popupEffectPrefab: {fileID: 1874128240729829424, guid: 03285fbcce267b446b6ab80e86e5d278, type: 3}
   iconPopupDelay: 0.5
   bloomBurst: {fileID: 0}
