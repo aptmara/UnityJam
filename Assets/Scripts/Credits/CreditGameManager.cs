@@ -5,6 +5,8 @@ using TMPro;
 
 namespace UnityJam.Credits
 {
+    /// @brief クレジット演出の進行管理。
+    /// @author 山内陽
     public class CreditGameManager : MonoBehaviour
     {
         public static CreditGameManager Instance { get; private set; }
@@ -21,6 +23,8 @@ namespace UnityJam.Credits
         [SerializeField] private GameObject creditNamePrefab;
 
 
+        /// @brief クレジットのセクション定義。
+        /// @author 山内陽
         [System.Serializable]
         public class CreditSection
         {

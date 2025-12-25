@@ -2,6 +2,8 @@ using UnityEngine;
 
 namespace UnityJam.Credits
 {
+    /// @brief 背景スター演出。
+    /// @author 山内陽
     public class Starfield : MonoBehaviour
     {
         private ParticleSystem ps;

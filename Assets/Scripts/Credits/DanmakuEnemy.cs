@@ -3,6 +3,8 @@ using System.Collections;
 
 namespace UnityJam.Credits
 {
+    /// @brief 弾幕敵の挙動。
+    /// @author 山内陽
     public class DanmakuEnemy : MonoBehaviour
     {
         private Transform player;

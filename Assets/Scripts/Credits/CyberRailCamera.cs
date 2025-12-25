@@ -2,6 +2,8 @@ using UnityEngine;
 
 namespace UnityJam.Credits
 {
+    /// @brief レール移動のカメラ制御。
+    /// @author 山内陽
     [RequireComponent(typeof(Camera))]
     public class CyberRailCamera : MonoBehaviour
     {

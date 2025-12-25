@@ -2,6 +2,8 @@ using UnityEngine;
 
 namespace UnityJam.Credits
 {
+    /// @brief 弾幕弾の挙動。
+    /// @author 山内陽
     public class DanmakuBullet : MonoBehaviour
     {
         public bool IsPlayerBullet { get; set; }

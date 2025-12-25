@@ -2,6 +2,8 @@ using System.Collections.Generic;
 
 namespace UnityJam.Credits
 {
+    /// @brief クレジット表示の1項目。
+    /// @author 山内陽
     [System.Serializable]
     public class CreditEntry
     {
@@ -18,6 +20,8 @@ namespace UnityJam.Credits
         }
     }
 
+    /// @brief クレジットのセクション。
+    /// @author 山内陽
     [System.Serializable]
     public class CreditSection
     {

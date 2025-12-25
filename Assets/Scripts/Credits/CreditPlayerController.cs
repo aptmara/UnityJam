@@ -2,6 +2,8 @@ using UnityEngine;
 
 namespace UnityJam.Credits
 {
+    /// @brief クレジット用プレイヤー操作。
+    /// @author 山内陽
     public class CreditPlayerController : MonoBehaviour
     {
         [SerializeField] private float speed = 10f;

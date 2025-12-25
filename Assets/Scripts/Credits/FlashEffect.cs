@@ -3,6 +3,8 @@ using System.Collections;
 
 namespace UnityJam.Credits
 {
+    /// @brief 被弾フラッシュ制御。
+    /// @author 山内陽
     public class FlashEffect : MonoBehaviour
     {
         private Renderer _renderer;

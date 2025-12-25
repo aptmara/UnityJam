@@ -5,6 +5,8 @@ using System.Collections.Generic;
 
 namespace UnityJam.Credits
 {
+    /// @brief クレジット用ボス挙動。
+    /// @author 山内陽
     public class CreditObject : MonoBehaviour
     {
         [Header("Components")]

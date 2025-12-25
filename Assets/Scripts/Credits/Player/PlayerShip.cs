@@ -3,6 +3,8 @@ using System.Collections.Generic;
 
 namespace UnityJam.Credits
 {
+    /// @brief クレジット用プレイヤー機体。
+    /// @author 山内陽
     public class PlayerShip : MonoBehaviour
     {
         [Header("Movement")]
