@@ -12,15 +12,15 @@ namespace UnityJam.Credits
         [Header("References")]
         [SerializeField] private CyberRailCamera railCamera;
         [SerializeField] private PlayerShip playerShip;
-        [SerializeField] private Transform spawnOrigin; // Far Z
-        [SerializeField] private GameObject creditPrefab; // Monolith prefab
+        [SerializeField] private Transform spawnOrigin;
+        [SerializeField] private GameObject creditPrefab;
         [SerializeField] private TextMeshProUGUI scoreText;
-        [SerializeField] private UnityEngine.UI.Slider hpSlider; // HP Bar
+        [SerializeField] private UnityEngine.UI.Slider hpSlider;
 
-        [SerializeField] private UnityEngine.UI.Slider bossHpSlider; 
-        [SerializeField] private GameObject creditNamePrefab; 
+        [SerializeField] private UnityEngine.UI.Slider bossHpSlider;
+        [SerializeField] private GameObject creditNamePrefab;
 
-        // New Data Structure
+
         [System.Serializable]
         public class CreditSection
         {
@@ -29,8 +29,8 @@ namespace UnityJam.Credits
         }
 
         private List<CreditSection> creditSections = new List<CreditSection>();
-        
-        // Game State
+
+
         private int totalScore = 0;
         private bool isPhaseActive = false;
 
@@ -41,7 +41,7 @@ namespace UnityJam.Credits
 
         private void Start()
         {
-            // Auto-setup Camera if missing
+
             if (railCamera == null)
             {
                 railCamera = FindFirstObjectByType<CyberRailCamera>();
@@ -59,8 +59,8 @@ namespace UnityJam.Credits
                     railCamera = camObj.AddComponent<CyberRailCamera>();
                 }
             }
-            
-            // Ensure visual settings if it existed
+
+
             if (railCamera != null)
             {
                 var cam = railCamera.GetComponent<Camera>();
@@ -71,7 +71,7 @@ namespace UnityJam.Credits
                     cam.orthographic = true;
                     cam.orthographicSize = 5f;
                     cam.transform.position = new Vector3(0, 0, -10f);
-                    
+
 #if UNITY_EDITOR || !UNITY_SERVER
                     var urpData = cam.GetComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>();
                     if (urpData == null)
@@ -79,12 +79,12 @@ namespace UnityJam.Credits
                         urpData = cam.gameObject.AddComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>();
                     }
                     urpData.renderType = UnityEngine.Rendering.Universal.CameraRenderType.Base;
-                    urpData.renderPostProcessing = true; 
+                    urpData.renderPostProcessing = true;
 #endif
                 }
             }
 
-            // Ensure Starfield
+
             if (FindFirstObjectByType<Starfield>() == null)
             {
                 new GameObject("Starfield").AddComponent<Starfield>();
@@ -93,12 +93,12 @@ namespace UnityJam.Credits
             SetupUI();
             LoadCredits();
 
-            if (playerShip != null) 
+            if (playerShip != null)
             {
                 Camera cam = railCamera != null ? railCamera.GetComponent<Camera>() : null;
                 playerShip.Initialize(cam);
             }
-            
+
             if (ScreenFader.Instance != null) ScreenFader.Instance.FadeIn();
 
             StartCoroutine(MainGameLoop());
@@ -141,12 +141,12 @@ namespace UnityJam.Credits
                 scoreText.text = $"SCORE: {totalScore:000000}";
             }
         }
-        
+
         public void TakePlayerDamage(int dmg)
         {
-            // Score Penalty instead of HP
+
             AddScore(-100);
-            
+
             if (railCamera != null) StartCoroutine(railCamera.Shake(0.3f, 1.0f));
             if (scoreText != null) StartCoroutine(FlashScoreRed());
         }
@@ -157,7 +157,7 @@ namespace UnityJam.Credits
             yield return new WaitForSeconds(0.2f);
             if (scoreText != null) scoreText.color = Color.white;
         }
-        
+
         public void UpdateBossHP(float current, float max)
         {
             if (bossHpSlider != null)
@@ -166,18 +166,18 @@ namespace UnityJam.Credits
                 bossHpSlider.value = current / max;
             }
         }
-        
+
         public void OnMonolithFixed()
         {
-            isPhaseActive = false; 
+            isPhaseActive = false;
             if (bossHpSlider != null) bossHpSlider.gameObject.SetActive(false);
         }
 
         private IEnumerator MainGameLoop()
         {
-            yield return new WaitForSeconds(2f); 
+            yield return new WaitForSeconds(2f);
 
-            // Separate End section from Combat sections
+
             List<CreditSection> combatSections = new List<CreditSection>();
             CreditSection endSection = null;
 
@@ -187,17 +187,17 @@ namespace UnityJam.Credits
                 else combatSections.Add(section);
             }
 
-            // Start Combat Phase with ALL sections
+
             if (combatSections.Count > 0)
             {
                 yield return SpawnBossAndBattle(combatSections);
             }
-            
-            // End Section
+
+
             if (endSection != null)
             {
                 string msg = (endSection.Names.Count > 0) ? endSection.Names[0] : "Thank You";
-                if (scoreText != null) scoreText.enabled = false; // Hide score
+                if (scoreText != null) scoreText.enabled = false;
                 yield return ShowEndSequence(msg);
             }
 
@@ -208,40 +208,40 @@ namespace UnityJam.Credits
         private IEnumerator SpawnBossAndBattle(List<CreditSection> sections)
         {
             railCamera.IsBoost = true;
-            
-            float travelTime = 2.5f; 
+
+            float travelTime = 2.5f;
             float timeElapsed = 0f;
             while(timeElapsed < travelTime)
             {
                 timeElapsed += Time.deltaTime;
                 yield return null;
             }
-            
+
             railCamera.IsBoost = false;
 
             float spawnY = 8f;
             GameObject obj = Instantiate(creditPrefab, new Vector3(0, spawnY, 0), Quaternion.identity);
-            
+
             CreditObject co = obj.GetComponent<CreditObject>();
             co.SetupMonolith(sections);
 
             yield return new WaitForSeconds(1.0f);
-            
+
             isPhaseActive = true;
-            
-            // Wait until Boss is completely finished (all phases)
+
+
             while(co != null && !co.IsFixed)
             {
                  yield return null;
             }
-            
+
             isPhaseActive = false;
             yield return new WaitForSeconds(2.0f);
         }
 
         private IEnumerator ShowEndSequence(string msg)
         {
-             // Simple "Thank you" display reusing the CreditName UI or distinct
+
              ShowCreditName(msg);
              yield return new WaitForSeconds(4.0f);
         }
@@ -259,7 +259,7 @@ namespace UnityJam.Credits
                 GameManager.Instance.ChangeState(GameState.Title);
             }
         }
-        
+
         private void SetupUI()
         {
             Canvas canvas = FindFirstObjectByType<Canvas>();
@@ -274,18 +274,18 @@ namespace UnityJam.Credits
                 cObj.AddComponent<UnityEngine.UI.GraphicRaycaster>();
             }
 
-            // Boss HP Setup
+
             if (bossHpSlider == null)
             {
                 GameObject sliderObj = new GameObject("BossHPSlider");
                 sliderObj.transform.SetParent(canvas.transform, false);
                 bossHpSlider = sliderObj.AddComponent<UnityEngine.UI.Slider>();
-                
+
                 GameObject bgObj = new GameObject("Background");
                 bgObj.transform.SetParent(sliderObj.transform, false);
                 var bgImg = bgObj.AddComponent<UnityEngine.UI.Image>();
-                bgImg.color = new Color(0.2f, 0, 0, 0.5f); 
-                
+                bgImg.color = new Color(0.2f, 0, 0, 0.5f);
+
                 GameObject fillArea = new GameObject("Fill Area");
                 fillArea.transform.SetParent(sliderObj.transform, false);
                 var areaRect = fillArea.AddComponent<RectTransform>();
@@ -293,12 +293,12 @@ namespace UnityJam.Credits
                 areaRect.anchorMax = Vector2.one;
                 areaRect.offsetMin = Vector2.zero;
                 areaRect.offsetMax = Vector2.zero;
-                
+
                 GameObject fillObj = new GameObject("Fill");
                 fillObj.transform.SetParent(fillArea.transform, false);
                 var fillImg = fillObj.AddComponent<UnityEngine.UI.Image>();
                 fillImg.color = Color.red;
-                
+
                 bossHpSlider.targetGraphic = bgImg;
                 bossHpSlider.fillRect = fillImg.rectTransform;
                 bossHpSlider.direction = UnityEngine.UI.Slider.Direction.LeftToRight;
@@ -306,16 +306,16 @@ namespace UnityJam.Credits
                 bossHpSlider.interactable = false;
 
                 RectTransform rt = bossHpSlider.GetComponent<RectTransform>();
-                // Stretch Bottom
+
                 rt.anchorMin = new Vector2(0, 0);
                 rt.anchorMax = new Vector2(1, 0);
                 rt.pivot = new Vector2(0.5f, 0);
                 rt.anchoredPosition = new Vector2(0, 0);
-                rt.sizeDelta = new Vector2(0, 20); // Width 0 = stretch, Height 20
-                
+                rt.sizeDelta = new Vector2(0, 20);
+
                 bossHpSlider.gameObject.SetActive(false);
             }
-            // Score Text Setup
+
             if (scoreText == null)
             {
                 GameObject txtObj = new GameObject("ScoreText");
@@ -325,7 +325,7 @@ namespace UnityJam.Credits
                 scoreText.fontSize = 24;
                 scoreText.color = Color.white;
                 scoreText.alignment = TextAlignmentOptions.TopLeft;
-                
+
                 RectTransform rt = scoreText.GetComponent<RectTransform>();
                 rt.anchorMin = new Vector2(0, 1);
                 rt.anchorMax = new Vector2(0, 1);
@@ -334,7 +334,7 @@ namespace UnityJam.Credits
                 rt.sizeDelta = new Vector2(300, 50);
             }
 
-            // Return Button
+
             GameObject btnObj = new GameObject("ReturnButton");
             btnObj.transform.SetParent(canvas.transform, false);
             var btnImg = btnObj.AddComponent<UnityEngine.UI.Image>();
@@ -355,7 +355,7 @@ namespace UnityJam.Credits
             txt.fontSize = 20;
             txt.color = Color.white;
             txt.alignment = TextAlignmentOptions.Center;
-            
+
             RectTransform txtRt = textObj.GetComponent<RectTransform>();
             txtRt.anchorMin = Vector2.zero;
             txtRt.anchorMax = Vector2.one;
@@ -381,14 +381,14 @@ namespace UnityJam.Credits
             if (canvas == null) yield break;
 
             GameObject txtObj = Instantiate(creditNamePrefab, canvas.transform, false);
-            
+
             var tmp = txtObj.GetComponent<TextMeshProUGUI>();
             if (tmp != null)
             {
                 tmp.text = name;
             }
 
-            // Animation: Scale punch -> Fade out
+
             float duration = 2.0f;
             float t = 0f;
             Vector3 startScale = Vector3.one * 0.5f;
@@ -398,12 +398,12 @@ namespace UnityJam.Credits
             {
                 t += Time.deltaTime;
                 float progress = t / duration;
-                
-                // Scale up quickly then slowly drift
-                float scalePhase = Mathf.SmoothStep(0, 1, Mathf.Min(1, t * 2)); // Enter in 0.5s
+
+
+                float scalePhase = Mathf.SmoothStep(0, 1, Mathf.Min(1, t * 2));
                 txtObj.transform.localScale = Vector3.Lerp(startScale, Vector3.one, scalePhase);
 
-                // Fade out in last half
+
                 if (progress > 0.5f && tmp != null)
                 {
                     float alpha = 1f - ((progress - 0.5f) * 2f);

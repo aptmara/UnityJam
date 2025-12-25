@@ -18,7 +18,7 @@ namespace UnityJam.Credits
                 {
                     _originalColor = _renderer.material.color;
                 }
-                else if (_renderer.material.HasProperty("_BaseColor")) // URP
+                else if (_renderer.material.HasProperty("_BaseColor"))
                 {
                     _originalColor = _renderer.material.GetColor("_BaseColor");
                 }
@@ -34,10 +34,10 @@ namespace UnityJam.Credits
 
         private IEnumerator FlashRoutine()
         {
-            // Set White
+
             SetColor(Color.white);
             yield return new WaitForSeconds(0.05f);
-            // Revert
+
             SetColor(_originalColor);
             _flashRoutine = null;
         }

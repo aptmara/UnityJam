@@ -6,7 +6,7 @@ namespace UnityJam.Credits
     {
         private ParticleSystem ps;
         private int starCount = 200;
-        private float starSpeed = 30f; // Much faster
+        private float starSpeed = 30f;
 
         private void Start()
         {
@@ -18,25 +18,25 @@ namespace UnityJam.Credits
             main.maxParticles = starCount;
             main.loop = true;
             main.simulationSpace = ParticleSystemSimulationSpace.World;
-            
+
             var emission = ps.emission;
             emission.rateOverTime = 40f;
 
             var shape = ps.shape;
             shape.shapeType = ParticleSystemShapeType.Box;
-            shape.scale = new Vector3(20, 1, 1); // Wide X, thin Y
-            
-            // Align to spawn from top
-            transform.position = new Vector3(0, 12, 0); 
-            transform.rotation = Quaternion.Euler(90, 0, 0); // Point Down
+            shape.scale = new Vector3(20, 1, 1);
+
+
+            transform.position = new Vector3(0, 12, 0);
+            transform.rotation = Quaternion.Euler(90, 0, 0);
 
             var renderer = GetComponent<ParticleSystemRenderer>();
-            renderer.material = new Material(Shader.Find("Particles/Standard Unlit")); 
+            renderer.material = new Material(Shader.Find("Particles/Standard Unlit"));
         }
 
         private void Update()
         {
-            // Optional dynamic speed?
+
         }
     }
 }

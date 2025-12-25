@@ -8,7 +8,7 @@ namespace UnityJam.Credits
         public string Description;
         public string Title;
         public string Name;
-        
+
         public CreditEntry() {}
 
         public CreditEntry(string title, string name)
@@ -25,7 +25,7 @@ namespace UnityJam.Credits
         public List<CreditEntry> Entries = new List<CreditEntry>();
 
         public CreditSection() {}
-        
+
         public CreditSection(string roleName)
         {
             RoleName = roleName;
