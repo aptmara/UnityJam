@@ -148,8 +148,15 @@ namespace UnityJam.Credits
 
             else if (other.GetComponent<DanmakuEnemy>() != null)
             {
+                 // Enemy contact -> Game Over
                  hit = true;
-                 Destroy(other.gameObject);
+                 if (CreditGameManager.Instance != null)
+                 {
+                     CreditGameManager.Instance.TriggerGameOver();
+                     // Disable self to stop processing
+                     gameObject.SetActive(false);
+                     return;
+                 }
             }
             else if (other.GetComponent<CreditObject>() != null)
             {

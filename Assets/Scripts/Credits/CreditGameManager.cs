@@ -38,6 +38,10 @@ namespace UnityJam.Credits
         private int totalScore = 0;
         private bool isPhaseActive = false;
 
+        // UI References
+        private GameObject returnButtonObj;
+        private TextMeshProUGUI gameOverText;
+
         private void Awake()
         {
             Instance = this;
@@ -339,23 +343,25 @@ namespace UnityJam.Credits
             }
 
 
-            GameObject btnObj = new GameObject("ReturnButton");
-            btnObj.transform.SetParent(canvas.transform, false);
-            var btnImg = btnObj.AddComponent<UnityEngine.UI.Image>();
-            btnImg.color = new Color(0.2f, 0.2f, 0.2f, 0.5f);
-            var btn = btnObj.AddComponent<UnityEngine.UI.Button>();
 
-            RectTransform btnRt = btnObj.GetComponent<RectTransform>();
-            btnRt.anchorMin = new Vector2(1, 1);
-            btnRt.anchorMax = new Vector2(1, 1);
-            btnRt.pivot = new Vector2(1, 1);
-            btnRt.anchoredPosition = new Vector2(-20, -80);
-            btnRt.sizeDelta = new Vector2(160, 40);
+            // Return Button Setup
+            returnButtonObj = new GameObject("ReturnButton");
+            returnButtonObj.transform.SetParent(canvas.transform, false);
+            var btnImg = returnButtonObj.AddComponent<UnityEngine.UI.Image>();
+            btnImg.color = new Color(0.2f, 0.2f, 0.2f, 0.5f);
+            var btn = returnButtonObj.AddComponent<UnityEngine.UI.Button>();
+
+            RectTransform btnRt = returnButtonObj.GetComponent<RectTransform>();
+            btnRt.anchorMin = new Vector2(0.5f, 0.3f); // Center bottom-ish
+            btnRt.anchorMax = new Vector2(0.5f, 0.3f);
+            btnRt.pivot = new Vector2(0.5f, 0.5f);
+            btnRt.anchoredPosition = Vector2.zero;
+            btnRt.sizeDelta = new Vector2(200, 50);
 
             GameObject textObj = new GameObject("Text");
-            textObj.transform.SetParent(btnObj.transform, false);
+            textObj.transform.SetParent(returnButtonObj.transform, false);
             var txt = textObj.AddComponent<TextMeshProUGUI>();
-            txt.text = "RETURN";
+            txt.text = "RETURN TO TITLE";
             txt.fontSize = 20;
             txt.color = Color.white;
             txt.alignment = TextAlignmentOptions.Center;
@@ -371,6 +377,61 @@ namespace UnityJam.Credits
                 StopAllCoroutines();
                 ReturnToTitle();
             });
+
+            returnButtonObj.SetActive(false); // Initially hidden
+
+            // Game Over Text Setup
+            GameObject goObj = new GameObject("GameOverText");
+            goObj.transform.SetParent(canvas.transform, false);
+            gameOverText = goObj.AddComponent<TextMeshProUGUI>();
+            gameOverText.text = "GAME OVER";
+            gameOverText.fontSize = 72;
+            gameOverText.color = Color.red;
+            gameOverText.alignment = TextAlignmentOptions.Center;
+            
+            RectTransform goRt = gameOverText.GetComponent<RectTransform>();
+            goRt.anchorMin = new Vector2(0.5f, 0.5f);
+            goRt.anchorMax = new Vector2(0.5f, 0.5f);
+            goRt.pivot = new Vector2(0.5f, 0.5f);
+            goRt.anchoredPosition = Vector2.zero;
+            goRt.sizeDelta = new Vector2(600, 100);
+
+            gameOverText.gameObject.SetActive(false); // Initially hidden
+        }
+
+        public void TriggerGameOver()
+        {
+            StartCoroutine(GameOverSequence());
+        }
+
+        private IEnumerator GameOverSequence()
+        {
+            // Stop game logic
+            isPhaseActive = false;
+            if (playerShip != null) playerShip.gameObject.SetActive(false);
+            
+            // Show Game Over text
+            if (gameOverText != null)
+            {
+                gameOverText.gameObject.SetActive(true);
+                // Simple pop-in effect
+                gameOverText.transform.localScale = Vector3.zero;
+                float t = 0;
+                while(t < 0.5f)
+                {
+                    t += Time.deltaTime;
+                    gameOverText.transform.localScale = Vector3.Lerp(Vector3.zero, Vector3.one, t / 0.5f);
+                    yield return null;
+                }
+            }
+
+            yield return new WaitForSeconds(2.0f);
+
+            // Show Return Button
+            if (returnButtonObj != null)
+            {
+                returnButtonObj.SetActive(true);
+            }
         }
 
         public void ShowCreditName(string name)

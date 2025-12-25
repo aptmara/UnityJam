@@ -43,6 +43,9 @@ namespace UnityJam
         private void Update()
         {
             float dt = Time.deltaTime;
+            
+            // カーソルロック時のみカメラ操作可能
+            if (Cursor.lockState != CursorLockMode.Locked) return;
 
             // マウス移動を取ってカメラを移動
             float mouseX = Input.GetAxisRaw("Mouse X");

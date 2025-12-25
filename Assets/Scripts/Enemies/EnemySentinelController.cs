@@ -649,6 +649,10 @@ namespace UnityJam.Enemies
             if (sr != null) sr.enabled = false; // プレイヤーを見えなくする
 
             // ゲームオーバー画面への遷移などをここに書く
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.ChangeState(GameState.GameOver);
+            }
         }
 
         // エディタ拡張・デバッグ表示（Gizmos）
