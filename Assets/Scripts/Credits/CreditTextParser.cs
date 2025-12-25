@@ -3,6 +3,8 @@ using System.Collections.Generic;
 
 namespace UnityJam.Credits
 {
+    /// @brief クレジットテキストの解析。
+    /// @author 山内陽
     public static class CreditTextParser
     {
         public static List<CreditSection> Parse(string rawText)

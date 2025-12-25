@@ -7,7 +7,6 @@ public enum GameState
 {
     Title,
     Credits,
-
     Gameplay,
     ScoreCalc,
     Result,
@@ -60,6 +59,7 @@ public class GameManager : MonoBehaviour
         {
             case GameState.Title:
                 // Title
+                if (ScreenFader.Instance != null) ScreenFader.Instance.FadeIn();
                 break;
 
             case GameState.Gameplay:
