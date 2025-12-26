@@ -7,6 +7,17 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
+
+public static class MapUIEvents
+{
+    public static event Action<MapMask> OnUIRequested;
+
+    public static void Request(MapMask ui)
+    {
+        OnUIRequested?.Invoke(ui);
+    }
+}
+
 public class MapMask : MonoBehaviour
 {
     [SerializeField]
@@ -82,12 +93,6 @@ public class MapMask : MonoBehaviour
                 if (index >= datas.Count) break;
 
                 IconData data = datas[index];
-                // TODO:後でMapのScaleをかける
-                //float normalizeIconPosX = (((data.uiTransform.position.x - mapMinX) / (mapMaxX - mapMinX)) - 0.5f);
-                //float normalizeIconPosY = (((data.uiTransform.position.z - mapMinZ) / (mapMaxZ - mapMinZ)) - 0.5f);
-
-                //float iconPosX = normalizeIconPosX * rawImage.texture.width;
-                //float iconPosY = normalizeIconPosY * rawImage.texture.height;
 
                 RectTransform mapRT = rawImage.rectTransform;
                 Vector2 mapSize = mapRT.rect.size;
@@ -153,8 +158,11 @@ public class MapMask : MonoBehaviour
 
     void OnEnable()
     {
+        MapUIEvents.Request(this);
+
         MiniMapEvents.OnRegister += Register;
         MiniMapEvents.OnUnregister += Unregister;
+
     }
 
     void OnDisable()
