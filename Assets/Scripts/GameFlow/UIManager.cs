@@ -16,7 +16,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private List<GameObject> gameplayPrefabs;
     [SerializeField] private List<GameObject> resultPrefabs;
     [SerializeField] private List<GameObject> gameOverPrefabs;
-
+    
     private List<GameObject> currentUIInstances = new List<GameObject>();
 
     private void Awake()
@@ -66,7 +66,6 @@ public class UIManager : MonoBehaviour
             case GameState.Title:
                 prefabsToInstantiate = titlePrefabs;
                 break;
-
             case GameState.Gameplay:
                 prefabsToInstantiate = gameplayPrefabs;
                 break;
@@ -79,6 +78,7 @@ public class UIManager : MonoBehaviour
                 Cursor.lockState = CursorLockMode.None;
                 Cursor.visible = true;
                 break;
+
             // 必要に応じて他のステートも追加
         }
 
