@@ -20,25 +20,40 @@ namespace UnityJam.UI
         [Header("Options")]
         [Tooltip("表示するスコアの種類を選択")]
         [SerializeField] private DisplayType displayType = DisplayType.CurrentScore;
-        
-        // ハイスコア保存時の固定キー
-        private const string HIGH_SCORE_KEY = "HighScore";
+        [Tooltip("ハイスコア保存時のキー")]
+        [SerializeField] private string highScoreKey = "HighScore";
+
+        private void Start()
+        {
+            if (Inventory.Instance == null)
+            {
+                Debug.LogError("[ScoreDisplay] Inventory.Instance is NULL! スコアを取得できません。");
+            }
+            else
+            {
+                Debug.Log($"[ScoreDisplay] Initialized. Inventory found. Current Score: {Inventory.Instance.TotalScore}");
+            }
+
+            if (scoreText == null)
+            {
+                Debug.LogError("[ScoreDisplay] Score Text is not assigned in Inspector! インスペクタでTextコンポーネントをアタッチしてください。");
+            }
+        }
 
         private void Update()
         {
             // Inventoryのインスタンスが存在し、テキストコンポーネントが割り当てられている場合のみ更新
             if (Inventory.Instance != null && scoreText != null)
             {
-                int currentScore = Inventory.Instance.TotalScore; // 引っ張ってくる
+                int currentScore = Inventory.Instance.TotalScore;
 
                 // ハイスコアの更新と取得
-                int highScore = PlayerPrefs.GetInt(HIGH_SCORE_KEY, 0);
+                int highScore = PlayerPrefs.GetInt(highScoreKey, 0);
                 if (currentScore > highScore)
                 {
                     highScore = currentScore;
-                    PlayerPrefs.SetInt(HIGH_SCORE_KEY, highScore);
+                    PlayerPrefs.SetInt(highScoreKey, highScore);
                     PlayerPrefs.Save(); // 確実に保存
-                    Debug.Log($"[ScoreDisplay] HighScore Updated! New Record: {highScore}");
                 }
 
                 // 表示の分岐

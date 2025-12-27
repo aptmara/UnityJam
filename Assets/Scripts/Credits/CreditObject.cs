@@ -88,12 +88,15 @@ namespace UnityJam.Credits
 
 
             SetupPhaseData();
-
             monolithVisual?.SetActive(true);
 
             StartCoroutine(EntryRoutine());
-            StartCoroutine(SpawnNamesRoutine());
+            
+            if (spawnNamesCoroutine != null) StopCoroutine(spawnNamesCoroutine);
+            spawnNamesCoroutine = StartCoroutine(SpawnNamesRoutine());
         }
+
+        private Coroutine spawnNamesCoroutine;
 
         private void SetupPhaseData()
         {
@@ -192,6 +195,19 @@ namespace UnityJam.Credits
             {
 
                 if (!hasFinishedNamesInPhase)
+                {
+                    currentHP = nextPhaseThreshold + 1f;
+
+                    if (monolithVisual != null)
+                    {
+                        var flash = monolithVisual.GetComponent<FlashEffect>();
+                        if (flash != null) flash.Flash();
+                    }
+                    
+                    return;
+                }
+
+                if (false)
                 {
 
 

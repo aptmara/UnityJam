@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed18c1395a5b5e04999e80c90dd95b4b, type: 3}
   m_Name: DropTable_Stage1
   m_EditorClassIdentifier: 
+  batteryPenaltyPercent: 10
   dropList:
   - item: {fileID: 11400000, guid: e94e303a46e4c1447945f20624409cad, type: 2}
     weight: 1
