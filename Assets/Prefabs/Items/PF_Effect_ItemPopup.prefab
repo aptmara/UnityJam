@@ -99,5 +99,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   iconRenderer: {fileID: 5365216165026042339}
   iconSize: 1
-  moveSpeed: 0.5
+  moveSpeed: 0.4
   lifeTime: 2

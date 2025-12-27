@@ -654,6 +654,7 @@ MonoBehaviour:
   playerRigidbody: {fileID: 3319597188436622190}
   isCameraChase: 0
   animator: {fileID: 6518535547322983544}
+  playerMapChange: {fileID: 5772812158569332606}
   rig: {fileID: 4972304098419178497}
   cameraFollowSpeed: 360
   moveFollowSpeed: 720
@@ -2143,6 +2144,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 1636903149006292319}
+  mapChange: {fileID: 5772812158569332606}
   useCamera: {fileID: 745020526972773127}
   sensitivity: 720
   minPitch: -30
