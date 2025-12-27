@@ -184,6 +184,7 @@ Transform:
   m_Children:
   - {fileID: 2088399375680875221}
   - {fileID: 3041474646087041081}
+  - {fileID: 5412231762240318968}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &6612904173803518670
@@ -224,7 +225,9 @@ MonoBehaviour:
   boxModel: {fileID: 0}
   animator: {fileID: 4595698490271103377}
   activateTriggerName: Activate
-  gameOverDelay: 1.5
+  gameOverDelay: 0
+  mimicLight: {fileID: 2967626085230305979}
+  burstLightOffset: {x: 0, y: 1, z: 0}
 --- !u!95 &4595698490271103377
 Animator:
   serializedVersion: 5
@@ -246,3 +249,78 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!1001 &5115202639001447905
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 8378725525905998584}
+    m_Modifications:
+    - target: {fileID: 1000016468755726361, guid: 3ad348e3c9a048e40ace4186bf63cccf, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1000016468755726361, guid: 3ad348e3c9a048e40ace4186bf63cccf, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.38
+      objectReference: {fileID: 0}
+    - target: {fileID: 1000016468755726361, guid: 3ad348e3c9a048e40ace4186bf63cccf, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.59
+      objectReference: {fileID: 0}
+    - target: {fileID: 1000016468755726361, guid: 3ad348e3c9a048e40ace4186bf63cccf, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1000016468755726361, guid: 3ad348e3c9a048e40ace4186bf63cccf, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1000016468755726361, guid: 3ad348e3c9a048e40ace4186bf63cccf, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1000016468755726361, guid: 3ad348e3c9a048e40ace4186bf63cccf, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1000016468755726361, guid: 3ad348e3c9a048e40ace4186bf63cccf, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1000016468755726361, guid: 3ad348e3c9a048e40ace4186bf63cccf, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1000016468755726361, guid: 3ad348e3c9a048e40ace4186bf63cccf, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2219302116333303718, guid: 3ad348e3c9a048e40ace4186bf63cccf, type: 3}
+      propertyPath: m_Name
+      value: PFx_TreasureBurstEnemyLight
+      objectReference: {fileID: 0}
+    - target: {fileID: 2219302116333303718, guid: 3ad348e3c9a048e40ace4186bf63cccf, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8058058492210548570, guid: 3ad348e3c9a048e40ace4186bf63cccf, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3ad348e3c9a048e40ace4186bf63cccf, type: 3}
+--- !u!108 &2967626085230305979 stripped
+Light:
+  m_CorrespondingSourceObject: {fileID: 8058058492210548570, guid: 3ad348e3c9a048e40ace4186bf63cccf, type: 3}
+  m_PrefabInstance: {fileID: 5115202639001447905}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &5412231762240318968 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1000016468755726361, guid: 3ad348e3c9a048e40ace4186bf63cccf, type: 3}
+  m_PrefabInstance: {fileID: 5115202639001447905}
+  m_PrefabAsset: {fileID: 0}

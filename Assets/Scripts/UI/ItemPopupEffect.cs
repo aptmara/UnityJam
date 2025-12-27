@@ -17,11 +17,12 @@ namespace UnityJam.UI
 
         [Tooltip("上昇する速度")]
         [SerializeField] private float moveSpeed = 2.0f;
+
         [Tooltip("消えるまでの時間")]
         [SerializeField] private float lifeTime = 2.0f;
 
         private float timer = 0f;
-        private Camera targetCamera;
+        private UnityEngine.Camera targetCamera;
 
         // 外部から初期化する関数
         public void Initialize(Sprite sprite)
@@ -33,19 +34,15 @@ namespace UnityJam.UI
                 iconRenderer.sprite = sprite;
                 iconRenderer.color = Color.white;
 
-                // 画像サイズに合わせてスケールを自動計算する
                 float maxDimension = Mathf.Max(sprite.bounds.size.x, sprite.bounds.size.y);
 
-                // 0除算防止
                 if (maxDimension > 0)
                 {
-                    // 「目標サイズ ÷ 元のサイズ」で倍率を出す
                     float newScale = iconSize / maxDimension;
                     transform.localScale = Vector3.one * newScale;
                 }
                 else
                 {
-                    // 万が一サイズが取れなかったらそのまま
                     transform.localScale = Vector3.one * iconSize;
                 }
             }
@@ -53,26 +50,22 @@ namespace UnityJam.UI
 
         void Start()
         {
-            // カメラを探す
-            targetCamera = Camera.main;
+            targetCamera = UnityEngine.Camera.main;
             if (targetCamera == null)
             {
-                targetCamera = FindObjectOfType<Camera>();
+                targetCamera = UnityEngine.Object.FindObjectOfType<UnityEngine.Camera>();
             }
         }
 
         void Update()
         {
-            // 1. 上昇
             transform.position += Vector3.up * moveSpeed * Time.deltaTime;
 
-            // 2. カメラの方を向く
             if (targetCamera != null)
             {
                 transform.rotation = targetCamera.transform.rotation;
             }
 
-            // 3. 時間経過で消滅
             timer += Time.deltaTime;
             if (timer >= lifeTime)
             {
