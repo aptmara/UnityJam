@@ -193,6 +193,19 @@ namespace UnityJam.Credits
 
                 if (!hasFinishedNamesInPhase)
                 {
+                    currentHP = nextPhaseThreshold + 1f;
+
+                    if (monolithVisual != null)
+                    {
+                        var flash = monolithVisual.GetComponent<FlashEffect>();
+                        if (flash != null) flash.Flash();
+                    }
+                    
+                    return;
+                }
+
+                if (false)
+                {
 
 
 
