@@ -36,7 +36,7 @@ public class PlayerMapChange : MonoBehaviour
     }
 
 
-
+    
 
     // Update is called once per frame
     void Update()
@@ -47,12 +47,15 @@ public class PlayerMapChange : MonoBehaviour
             {
                 case PlayerMapState.UseMap:
                     playerMapState = PlayerMapState.DontUseMap;
+                    MapUIEvents.UseMiniMap();
                     break;
 
                 case PlayerMapState.DontUseMap:
                     playerMapState = PlayerMapState.UseMap;
+                    MapUIEvents.UseMap();
                     break;
             }
         }
     }
+
 }
