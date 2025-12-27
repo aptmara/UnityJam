@@ -88,12 +88,15 @@ namespace UnityJam.Credits
 
 
             SetupPhaseData();
-
             monolithVisual?.SetActive(true);
 
             StartCoroutine(EntryRoutine());
-            StartCoroutine(SpawnNamesRoutine());
+            
+            if (spawnNamesCoroutine != null) StopCoroutine(spawnNamesCoroutine);
+            spawnNamesCoroutine = StartCoroutine(SpawnNamesRoutine());
         }
+
+        private Coroutine spawnNamesCoroutine;
 
         private void SetupPhaseData()
         {
