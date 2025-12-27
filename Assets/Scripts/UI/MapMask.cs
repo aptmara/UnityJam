@@ -95,7 +95,7 @@ namespace UnityJam.UI
         {
             timer = 0.0f;
 
-            useMapType = MapType.Map;
+            useMapType = MapType.Minimap;
 
             float halfHeight = mapCamera.orthographicSize;
             float halfWidth = mapCamera.orthographicSize * mapCamera.aspect;

@@ -8,8 +8,10 @@ namespace UnityJam
     public class CameraRigController : MonoBehaviour
     {
         // Headerを使うことでUnityで数値を入れるときの視認性が良くなる
-        [Header("Target")]
+        [Header("Player")]
         [SerializeField] Transform player;
+        // ついぞCameraRigがプレイヤー以外につくことはなかったので時間もないし一旦Playerへがっつり依存する
+        [SerializeField] PlayerMapChange mapChange;
 
         [Header("Camera")]
         [SerializeField] Transform useCamera;
@@ -46,6 +48,8 @@ namespace UnityJam
             
             // カーソルロック時のみカメラ操作可能
             if (Cursor.lockState != CursorLockMode.Locked) return;
+
+            if (mapChange.playerMapState == PlayerMapChange.PlayerMapState.UseMap) return;
 
             // マウス移動を取ってカメラを移動
             float mouseX = Input.GetAxisRaw("Mouse X");
