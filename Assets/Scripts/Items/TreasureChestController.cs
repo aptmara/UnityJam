@@ -16,11 +16,8 @@ namespace UnityJam.Gimmicks
         [SerializeField] private TreasureDropTable dropTable;
 
         [Header("--- 演出 ---")]
-        [Tooltip("開いた後の宝箱の見た目（空の箱など）。なければ設定しなくてOK")]
-        [SerializeField] private GameObject openedModel;
-
-        [Tooltip("閉まっている状態のモデル（これを開封時に消します）")]
-        [SerializeField] private GameObject closedModel;
+        [Tooltip("宝箱のAnimator")]
+        [SerializeField] private Animator chestAnimator;
 
         [Header("--- エフェクト設定 ---")]
         [Tooltip("レアリティごとの開閉エフェクト (Element 0 がレア度1, Element 1 がレア度2...)")]
@@ -99,6 +96,7 @@ namespace UnityJam.Gimmicks
                 // バッテリー管理スクリプトを探す
                 // ※ "PlayerBattery" の部分は実際のクラス名に合わせてください。
 
+
                 //var playerBattery = FindObjectOfType<PlayerBattery>();
 
                 //if (playerBattery != null)
@@ -115,8 +113,11 @@ namespace UnityJam.Gimmicks
 
             // C. 見た目の変更
             isOpen = true;
-            if (closedModel != null) closedModel.SetActive(false);
-            if (openedModel != null) openedModel.SetActive(true);
+
+            if (chestAnimator != null)
+            {
+                chestAnimator.SetTrigger("Open");
+            }
 
             if (TreasureManager.Instance != null)
             {
