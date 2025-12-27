@@ -128,6 +128,23 @@ namespace UnityJam.Core
 
         // 全アイテムを取得（表示用）
         public Dictionary<ItemMaster, int> GetAllItems() => _items;
+
+        // インベントリを全て空にする
+        public void Clear()
+        {
+            foreach (var kvp in _items)
+            {
+                OnItemCountChanged?.Invoke(kvp.Key, 0);
+            }
+
+            _items.Clear();
+            TotalWeight = 0f;
+            TotalScore = 0;
+            TotalConsumptionRate = 0f;
+
+            OnWeightChanged?.Invoke(TotalWeight);
+            OnConsumptionRateChanged?.Invoke(TotalConsumptionRate);
+        }
     }
 
 }
