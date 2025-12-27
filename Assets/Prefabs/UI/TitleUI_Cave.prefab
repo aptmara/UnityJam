@@ -162,6 +162,7 @@ GameObject:
   - component: {fileID: 8441827188309846852}
   - component: {fileID: 3977672338718408323}
   - component: {fileID: 1185722074367981040}
+  - component: {fileID: 273375044362113453}
   m_Layer: 0
   m_Name: ScoreLabel
   m_TagString: Untagged
@@ -216,7 +217,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: HighScore:10,000
+  m_text: HighScore:0
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: e6c904ba525c15a4d839f11abbc445d0, type: 2}
   m_sharedMaterial: {fileID: -245469040115016432, guid: e6c904ba525c15a4d839f11abbc445d0, type: 2}
@@ -305,6 +306,21 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &273375044362113453
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1264401972179885316}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7f5bcc2ac1cd9d4b83b6ecadc4d0780, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scoreText: {fileID: 3977672338718408323}
+  displayType: 1
+  highScoreKey: HighScore
 --- !u!1 &1686601581474052152
 GameObject:
   m_ObjectHideFlags: 0
@@ -2399,7 +2415,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: CAVE
+  m_text: "\u30B3\u30EC\u30AF\u30E9\u30A4\u30C8"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: e6c904ba525c15a4d839f11abbc445d0, type: 2}
   m_sharedMaterial: {fileID: -245469040115016432, guid: e6c904ba525c15a4d839f11abbc445d0, type: 2}
@@ -2413,10 +2429,10 @@ MonoBehaviour:
   m_enableVertexGradient: 1
   m_colorMode: 3
   m_fontColorGradient:
-    topLeft: {r: 1, g: 1, b: 1, a: 1}
-    topRight: {r: 1, g: 1, b: 1, a: 1}
-    bottomLeft: {r: 0.6, g: 0.7, b: 0.8, a: 1}
-    bottomRight: {r: 0.3, g: 0.35, b: 0.4, a: 1}
+    topLeft: {r: 0, g: 0, b: 0, a: 1}
+    topRight: {r: 0.5471698, g: 0.5471698, b: 0.5471698, a: 1}
+    bottomLeft: {r: 0.49056602, g: 0.24052933, b: 0.10412959, a: 1}
+    bottomRight: {r: 0, g: 0, b: 0, a: 1}
   m_fontColorGradientPreset: {fileID: 0}
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
@@ -2426,8 +2442,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 200
-  m_fontSizeBase: 200
+  m_fontSize: 141.35
+  m_fontSizeBase: 141.35
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18

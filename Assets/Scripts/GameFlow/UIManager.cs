@@ -16,7 +16,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private List<GameObject> gameplayPrefabs;
     [SerializeField] private List<GameObject> resultPrefabs;
     [SerializeField] private List<GameObject> gameOverPrefabs;
-    
+
     private List<GameObject> currentUIInstances = new List<GameObject>();
 
     private void Awake()
@@ -84,7 +84,6 @@ public class UIManager : MonoBehaviour
 
         if (prefabsToInstantiate != null)
         {
-            // Use a dedicated persistent Canvas for System UI
             string canvasName = "SystemUICanvas";
             GameObject canvasObj = GameObject.Find(canvasName);
             Canvas canvas = null;
@@ -96,7 +95,6 @@ public class UIManager : MonoBehaviour
 
             if (canvas == null)
             {
-                // Create a persistent Main Canvas if none exists
                 GameObject cObj = new GameObject(canvasName);
                 canvas = cObj.AddComponent<Canvas>();
                 canvas.renderMode = RenderMode.ScreenSpaceOverlay;
@@ -139,7 +137,7 @@ public class UIManager : MonoBehaviour
         rt.anchorMax = Vector2.one;
         rt.offsetMin = Vector2.zero;
         rt.offsetMax = Vector2.zero;
-        
+
         // スクリプト追加
         var logic = goObj.AddComponent<UnityJam.UI.GameOverUI>();
         currentUIInstances.Add(goObj);
