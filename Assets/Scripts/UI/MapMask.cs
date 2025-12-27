@@ -8,234 +8,450 @@ using UnityEngine;
 using UnityEngine.UI;
 
 
-public static class MapUIEvents
+namespace UnityJam.UI
 {
-    public static event Action<MapMask> OnUIRequested;
-
-    public static void Request(MapMask ui)
+    public enum MapType
     {
-        OnUIRequested?.Invoke(ui);
+        Map,
+        Minimap
     }
-}
-
-public class MapMask : MonoBehaviour
-{
-    [SerializeField]
-    Camera mapCamera;
-
-    [SerializeField]
-    RawImage rawImage;
-    [SerializeField]
-    Transform targetTransform;
-
-    [SerializeField]
-    GameObject IconPrefab;
-
-    [SerializeField]
-    int mapSize = 256;
-
-    Texture2D fogTexture;
-    float timer;
-
-    private readonly List<IconData> datas = new List<IconData>();
-    private readonly List<GameObject> Icons = new List<GameObject>();
-
-
-    float mapMaxX;
-    float mapMinX;
-    float mapMaxZ;
-    float mapMinZ;
-    // Start is called before the first frame update
-    void Start()
+    public static class MapUIEvents
     {
-        timer = 0.0f;
+        public static event Action<MapMask> OnUIRequested;
 
-        rawImage.color = Color.white;
+        public static event Action<MapType> OnSetMapType;
 
-        float halfHeight = mapCamera.orthographicSize;
-        float halfWidth = mapCamera.orthographicSize * mapCamera.aspect;
-
-        Vector3 camPos = mapCamera.transform.position;
-
-        mapMinX = camPos.x - halfWidth;
-        mapMaxX = camPos.x + halfWidth;
-
-        mapMinZ = camPos.z - halfHeight;
-        mapMaxZ = camPos.z + halfHeight;
-
-        fogTexture = new Texture2D(mapSize, mapSize, TextureFormat.RGBA32, false);
-        fogTexture.filterMode = FilterMode.Bilinear;
-
-        // 全部黒（未探索）
-        Color32[] pixels = new Color32[mapSize * mapSize];
-        for (int i = 0; i < pixels.Length; i++)
-            pixels[i] = new Color32(1, 1, 1, 1);
-
-        fogTexture.SetPixels32(pixels);
-        fogTexture.Apply();
-
-        rawImage.texture = fogTexture;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        timer += Time.deltaTime;
-        if (timer > 0.1f)
+        public static void Request(MapMask ui)
         {
-            Reveal(targetTransform.position);
+            OnUIRequested?.Invoke(ui);
+        }
+
+        public static void UseMap()
+        {
+            OnSetMapType?.Invoke(MapType.Map);
+        }
+
+        public static void UseMiniMap()
+        {
+            OnSetMapType?.Invoke(MapType.Minimap);
+        }
+    }
+
+
+    public class MapMask : MonoBehaviour
+    {
+        public Camera mapCamera { get; set; }
+        public Transform targetTransform {  get; set; }
+
+        
+        public void CameraSetting(Camera camera, Transform target)
+        {
+            mapCamera = camera;
+            targetTransform = target;
+        }
+
+
+        [SerializeField]
+        GameObject IconPrefab;
+        [SerializeField]
+        GameObject map;
+        [SerializeField]
+        GameObject minimap;
+        
+        [SerializeField]
+        int mapSize = 256;
+        [SerializeField]
+        RectTransform mapTextureRectTransform;
+
+        [SerializeField]
+        RectTransform minimapTextureRectTransform;
+        [SerializeField]
+        RectTransform minimapControllerRect;
+
+        [SerializeField]
+        RectTransform minimapMaskRectTransform;
+
+        [SerializeField]
+        RawImage mapMaskImage;
+        [SerializeField]
+        RawImage minimapMaskImage;
+
+        MapType useMapType;
+
+        Texture2D fogTexture;
+        float timer;
+
+        private readonly List<IconData> datas = new List<IconData>();
+        private readonly List<GameObject> Icons = new List<GameObject>();
+
+
+        float mapMaxX;
+        float mapMinX;
+        float mapMaxZ;
+        float mapMinZ;
+        // Start is called before the first frame update
+        void Start()
+        {
             timer = 0.0f;
 
+            useMapType = MapType.Map;
+
+            float halfHeight = mapCamera.orthographicSize;
+            float halfWidth = mapCamera.orthographicSize * mapCamera.aspect;
+
+            Vector3 camPos = mapCamera.transform.position;
+
+            mapMinX = camPos.x - halfWidth;
+            mapMaxX = camPos.x + halfWidth;
+
+            mapMinZ = camPos.z - halfHeight;
+            mapMaxZ = camPos.z + halfHeight;
+
+            // Textureを共有するため一旦コメントアウト
+            fogTexture = new Texture2D(mapSize, mapSize, TextureFormat.RGBA32, false);
+            fogTexture.filterMode = FilterMode.Bilinear;
+
+            // 全部黒（未探索）
+            Color32[] pixels = new Color32[mapSize * mapSize];
+            for (int i = 0; i < pixels.Length; i++)
+                pixels[i] = new Color32(1, 1, 1, 1);
+
+            fogTexture.SetPixels32(pixels);
+            fogTexture.Apply();
+
+            mapMaskImage.texture = fogTexture;
+            minimapMaskImage.texture = fogTexture;
+
+            
+        }
+
+        // Update is called once per frame
+        void Update()
+        {
+            timer += Time.deltaTime;
+            if (timer > 0.1f)
+            {
+                Reveal(targetTransform.position);
+                timer = 0.0f;
+
+            }
+
+            switch (useMapType)
+            {
+                case MapType.Map:
+                    minimap.SetActive(false);
+                    map.SetActive(true);
+
+                    SetMapIcon();
+                    break;
+
+                case MapType.Minimap:
+                    map.SetActive(false);
+                    minimap.SetActive(true);
+                    MinimapMove(targetTransform.position);
+                    SetMiniMapIcon(targetTransform.position);
+                    break;
+            }
+
+            //SetMapIcon();
+            //MinimapMove(targetTransform.position);
+            //SetMiniMapIcon(targetTransform.position);
+            
+
+
+
+
+        }
+
+        Vector2 WorldToMap(Vector3 worldPos)
+        {
+            float u = (worldPos.x - mapMinX) / (mapMaxX - mapMinX);
+            float v = (worldPos.z - mapMinZ) / (mapMaxZ - mapMinZ);
+            return new Vector2(u, v);
+        }
+
+        void Reveal(Vector3 playerPos)
+        {
+            Vector2 uv = WorldToMap(playerPos);
+
+            int x = (int)(uv.x * mapSize);
+            int y = (int)(uv.y * mapSize);
+
+            int radius = 15;
+
+            for (int dx = -radius; dx <= radius; dx++)
+                for (int dy = -radius; dy <= radius; dy++)
+                {
+                    int px = x + dx;
+                    int py = y + dy;
+
+                    if (px < 0 || px >= mapSize || py < 0 || py >= mapSize)
+                        continue;
+
+                    fogTexture.SetPixel(px, py, new Color(0, 0, 0, 0));
+
+
+                }
+
+            fogTexture.Apply();
+
+        }
+
+        // アイコン処理
+
+        void SetMapIcon()
+        {
             int index = 0;
-            foreach(GameObject icon in Icons)
+            foreach (GameObject icon in Icons)
+            {
+                if (!icon.activeSelf) continue;
+                if (index >= datas.Count) break;
+
+                Image iconImage = icon.GetComponent<Image>();
+                IconData data = datas[index];
+
+                if (IsExplored(data.uiTransform.position))
+                {
+
+                    Vector2 mapSize = mapTextureRectTransform.rect.size;
+
+                    float normalizeIconPosX =
+                        ((data.uiTransform.position.x - mapMinX) / (mapMaxX - mapMinX)) - 0.5f;
+
+                    float normalizeIconPosY =
+                        ((data.uiTransform.position.z - mapMinZ) / (mapMaxZ - mapMinZ)) - 0.5f;
+
+                    float iconPosX = normalizeIconPosX * mapSize.x;
+                    float iconPosY = normalizeIconPosY * mapSize.y;
+
+                    Vector3 parentScale = mapTextureRectTransform.parent.localScale;
+
+                    Vector2 iconPos = new Vector2(
+                        iconPosX * parentScale.x,
+                        iconPosY * parentScale.y);
+
+
+                    RectTransform rect = icon.GetComponent<RectTransform>();
+                    rect.localPosition = iconPos;
+
+                    iconImage.color = Color.white;
+                    iconImage.sprite = data.texture;
+                }
+                else
+                {
+                    // 処理をせず透明化
+                    iconImage.color = new Color(1, 1, 1, 0);
+                }
+
+                index++;
+
+            }
+        }
+
+        void MinimapMove(Vector3 playerPos)
+        {
+
+            Vector2 mapSize = minimapTextureRectTransform.rect.size;
+
+            float nx = (playerPos.x - mapMinX) / (mapMaxX - mapMinX) - 0.5f;
+            float ny = (playerPos.z - mapMinZ) / (mapMaxZ - mapMinZ) - 0.5f;
+
+            Vector3 controllerScale = minimapControllerRect.localScale;
+
+            Vector2 offset = new Vector2(
+                -nx * mapSize.x * controllerScale.x,
+                -ny * mapSize.y * controllerScale.y
+            );
+
+            minimapControllerRect.anchoredPosition = offset;
+
+        }
+
+        void SetMiniMapIcon(Vector3 playerPos)
+        {
+            int index = 0;
+
+            Vector2 mapSize = minimapTextureRectTransform.rect.size;
+            Vector3 parentScale = minimapControllerRect.localScale;
+
+            float pnx =
+                (playerPos.x - mapMinX) / (mapMaxX - mapMinX) - 0.5f;
+            float pny =
+                (playerPos.z - mapMinZ) / (mapMaxZ - mapMinZ) - 0.5f;
+
+            foreach (GameObject icon in Icons)
             {
                 if (!icon.activeSelf) continue;
                 if (index >= datas.Count) break;
 
                 IconData data = datas[index];
 
-                RectTransform mapRT = rawImage.rectTransform;
-                Vector2 mapSize = mapRT.rect.size;
+                Image iconImage = icon.GetComponent<Image>();
+                bool isExplored = IsExplored(data.uiTransform.position);
+                
 
-                float normalizeIconPosX =
-                    ((data.uiTransform.position.x - mapMinX) / (mapMaxX - mapMinX)) - 0.5f;
+                if (isExplored)
+                {
+                    float nx =
+                        (data.uiTransform.position.x - mapMinX) / (mapMaxX - mapMinX) - 0.5f;
+                    float ny =
+                        (data.uiTransform.position.z - mapMinZ) / (mapMaxZ - mapMinZ) - 0.5f;
+                    Vector3 minimapOffset = minimap.GetComponent<RectTransform>().anchoredPosition;
+                    Vector3 minimapScale = minimap.GetComponent<RectTransform>().localScale;
 
-                float normalizeIconPosY =
-                    ((data.uiTransform.position.z - mapMinZ) / (mapMaxZ - mapMinZ)) - 0.5f;
+                    Vector2 iconPos = new Vector2(
+                        (nx - pnx) * mapSize.x * parentScale.x * minimapScale.x + minimapOffset.x,
+                        (ny - pny) * mapSize.y * parentScale.y * minimapScale.y + minimapOffset.y
+                    );
 
-                float iconPosX = normalizeIconPosX * mapSize.x;
-                float iconPosY = normalizeIconPosY * mapSize.y;
+                    RectTransform rect = icon.GetComponent<RectTransform>();
+                    rect.anchoredPosition = iconPos;
 
-                Vector3 iconPos = new Vector3(iconPosX, iconPosY, 0.0f);
+                    
 
-                RectTransform rect = icon.GetComponent<RectTransform>();
-                rect.localPosition = iconPos;
-                icon.GetComponent<Image>().sprite = data.texture;
+                    if(IsInsideMinimap(iconPos))
+                    {
+                        iconImage.color = Color.white;
+                        iconImage.sprite = data.texture;
+                    }
+                    else
+                    {
+                        iconImage.color = new Color(1, 1, 1, 0);
+                    }
+
+                }
+                else
+                {
+                    // 処理をせず透明化
+                    iconImage.color = new Color(1, 1, 1, 0);
+                }
+
+
                 index++;
-
             }
+
+
+        }
+        void OnEnable()
+        {
+            MapUIEvents.Request(this);
+
+            MiniMapEvents.OnRegister += Register;
+            MiniMapEvents.OnUnregister += Unregister;
+            MapUIEvents.OnSetMapType += SetMapType;
 
         }
 
-
-        
-    }
-
-    Vector2 WorldToMap(Vector3 worldPos)
-    {
-        float u = (worldPos.x - mapMinX) / (mapMaxX - mapMinX);
-        float v = (worldPos.z - mapMinZ) / (mapMaxZ - mapMinZ);
-        return new Vector2(u, v);
-    }
-
-    void Reveal(Vector3 playerPos)
-    {
-        Vector2 uv = WorldToMap(playerPos);
-
-        int x = (int)(uv.x * mapSize);
-        int y = (int)(uv.y * mapSize);
-
-        int radius = 15;
-
-        for (int dx = -radius; dx <= radius; dx++)
-            for (int dy = -radius; dy <= radius; dy++)
-            {
-                int px = x + dx;
-                int py = y + dy;
-
-                if (px < 0 || px >= mapSize || py < 0 || py >= mapSize)
-                    continue;
-
-                fogTexture.SetPixel(px, py, new Color(0, 0, 0, 0));
-
-
-             }
-
-        fogTexture.Apply();
-    }
-
-    // アイコン処理
-
-    void OnEnable()
-    {
-        MapUIEvents.Request(this);
-
-        MiniMapEvents.OnRegister += Register;
-        MiniMapEvents.OnUnregister += Unregister;
-
-    }
-
-    void OnDisable()
-    {
-        MiniMapEvents.OnRegister -= Register;
-        MiniMapEvents.OnUnregister -= Unregister;
-    }
-
-    void Register(IconData data)
-    {
-        if (!datas.Contains(data))
-            datas.Add(data);
-
-        // アクティブなIcon数よりdataのIcon数の方が大きいか確認
-        if (activIconCount() < datas.Count)
+        void OnDisable()
         {
-            // 非アクティブ含めたIcon数よりdataのIcon数の方が大きいか確認
-            if (Icons.Count < datas.Count)
+            MiniMapEvents.OnRegister -= Register;
+            MiniMapEvents.OnUnregister -= Unregister;
+        }
+
+        void SetMapType(MapType type)
+        {
+            useMapType = type;
+        }
+
+        void Register(IconData data)
+        {
+            if (!datas.Contains(data))
+                datas.Add(data);
+
+            // アクティブなIcon数よりdataのIcon数の方が大きいか確認
+            if (activIconCount() < datas.Count)
             {
-                GameObject addIcon = Instantiate(IconPrefab, transform, false);
-                addIcon.SetActive(true);
-                Icons.Add(addIcon);
+                // 非アクティブ含めたIcon数よりdataのIcon数の方が大きいか確認
+                if (Icons.Count < datas.Count)
+                {
+                    GameObject addIcon = Instantiate(IconPrefab, transform, false);
+                    addIcon.SetActive(true);
+                    Icons.Add(addIcon);
+
+                }
+                else // Icon数自体はData数より多いのでアクティブなアイコンを増やす
+                {
+                    // 非アクティブなIconをアクティブにする
+                    for (int i = Icons.Count - 1; i >= 0; i--)
+                    {
+                        if (!Icons[i].activeSelf)
+                        {
+                            Icons[i].SetActive(true);
+                            break;
+                        }
+                    }
+                }
 
             }
-            else // Icon数自体はData数より多いのでアクティブなアイコンを増やす
+
+
+        }
+
+        void Unregister(IconData data)
+        {
+            datas.Remove(data);
+            // 念のため確認
+            if (activIconCount() > datas.Count)
             {
-                // 非アクティブなIconをアクティブにする
+                // dataが減ったのでアイコンを一つActivにする
                 for (int i = Icons.Count - 1; i >= 0; i--)
                 {
-                    if (!Icons[i].activeSelf)
+                    if (Icons[i].activeSelf)
                     {
-                        Icons[i].SetActive(true);
+                        Icons[i].SetActive(false);
                         break;
                     }
                 }
             }
-
         }
 
-
-    }
-
-    void Unregister(IconData data)
-    {
-        datas.Remove(data);
-        // 念のため確認
-        if (activIconCount() > datas.Count)
+        int activIconCount()
         {
-            // dataが減ったのでアイコンを一つActivにする
-            for (int i = Icons.Count - 1; i >= 0; i--)
+            int ret = 0;
+            foreach (GameObject icon in Icons)
             {
-                if(Icons[i].activeSelf)
+                if (icon.activeSelf)
                 {
-                    Icons[i].SetActive(false);
-                    break;
+                    ret++;
                 }
             }
-        }
-    }
 
-    int activIconCount()
-    {
-        int ret = 0;
-        foreach(GameObject icon in Icons)
+            return ret;
+
+        }
+
+
+        bool IsExplored(Vector3 worldPos)
         {
-            if(icon.activeSelf)
-            {
-                ret++;
-            }
+            float nx = (worldPos.x - mapMinX) / (mapMaxX - mapMinX);
+            float ny = (worldPos.z - mapMinZ) / (mapMaxZ - mapMinZ);
+
+            if (nx < 0f || nx > 1f || ny < 0f || ny > 1f)
+                return false;
+
+            int px = Mathf.FloorToInt(nx * fogTexture.width);
+            int py = Mathf.FloorToInt(ny * fogTexture.height);
+
+            Color32 c = fogTexture.GetPixel(px, py);
+
+            return c.a == 0;
+        }
+        bool IsInsideMinimap(Vector2 iconPos)
+        {
+            RectTransform maskRT = minimapMaskRectTransform;
+            RectTransform minimapRT = minimap.GetComponent<RectTransform>();
+            Vector2 halfSize = maskRT.rect.size * 0.5f * minimapRT.localScale;
+            Vector2 center = maskRT.anchoredPosition + minimapRT.anchoredPosition;
+
+            Vector2 local = iconPos - center;
+
+            return
+                local.x >= -halfSize.x &&
+                local.x <= halfSize.x &&
+                local.y >= -halfSize.y &&
+                local.y <= halfSize.y;
         }
 
-        return ret;
-          
     }
 
 }

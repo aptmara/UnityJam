@@ -8,10 +8,26 @@ public class MapIcon : MonoBehaviour
     [SerializeField]
     Sprite icon;
 
+    private void Start()
+    {
+ 
+    }
 
     void OnEnable()
     {
-        MiniMapEvents.OnRegister?.Invoke(new IconData(icon,transform));
+        StartCoroutine(DelayedInit());
+    }
+
+    IEnumerator DelayedInit()
+    {
+        yield return new WaitForSeconds(0.3f);
+        MiniMapEvents.OnRegister?.Invoke(new IconData(icon, transform));
+      }
+
+
+    private void OnDestroy()
+    {
+
     }
 
     void OnDisable()
