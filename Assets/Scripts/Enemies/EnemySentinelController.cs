@@ -1,10 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.AI;
-using System.Threading;
-using UnityEngine.Experimental.Rendering;
-
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -14,13 +10,14 @@ namespace UnityJam.Enemies
 {
     /// <summary>
     /// 敵キャラクター単体の機能を制御するクラス
-    /// 移動（直線・円・ランダム）と視界判定（扇形・即死）を管理します。
+    /// 移動と視界判定（扇形・即死）を管理します。
     /// </summary>
     public class EnemySentinelController : MonoBehaviour
     {
-        // 設定項目（SerializeField private）
+        // 設定項目（Editor拡張で表示を切り替えるため、Attributeは最低限）
         // ============================================================
 
+        // --- 基本設定 ---
         [Header("--- Settings: References ---")]
         [Tooltip("検知対象のタグ（Findは使用せず、Tag判定を行う）")]
         [SerializeField] private string targetTag = "Player";
@@ -30,6 +27,37 @@ namespace UnityJam.Enemies
 
         [Tooltip("障害物とみなすレイヤー（壁越しに見えないようにする場合設定）")]
         [SerializeField] private LayerMask obstacleMask;
+
+        // --- ライト演出 ---
+        public enum LightMode { Steady, Flicker, Malfunction, Off }
+        [Header("--- Settings: Light ---")]
+        [SerializeField] private LightMode lightMode = LightMode.Steady;
+        [SerializeField] private float flickerSpeed = 10f; // 点滅速度
+
+        // --- 移動設定 ---
+        public enum MovementType
+        {
+            [Tooltip("完全停止")]
+            Idle,
+            [Tooltip("定点監視（首振り）")]
+            SentinelLook,
+            [Tooltip("直線運動")]
+            PatrolLinear,
+            [Tooltip("円運動")]
+            PatrolCircular,
+            [Tooltip("楕円運動")]
+            PatrolElliptical,
+            [Tooltip("8の字")]
+            PatrolFigureEight,
+            [Tooltip("ウェイポイント周回（1 -> 2 -> 3 -> 1）")]
+            PatrolLoop,
+            [Tooltip("ウェイポイント往復（1 -> 2 -> 3 -> 2 -> 1）")]
+            PatrolPingPong,
+            [Tooltip("ウェイポイントランダム")]
+            WaypointGraphRandom,
+            [Tooltip("自由徘徊")]
+            RandomWander,
+        }
 
         [Header("--- Settings: Movement ---")]
         [Tooltip("移動パターンを選択します")]
@@ -41,45 +69,60 @@ namespace UnityJam.Enemies
         [Tooltip("目的地に到着した後の待機時間")]
         [SerializeField] private float waitTime = 1.0f;
 
-        [Header("Pattern: Waypoints (巡回)")]
-        [Tooltip("巡回するポイントのリスト")]
-        [SerializeField] private Transform[] waypoints;
+        // --- 各モード用パラメータ
+        // [SentinelLook]
+        [SerializeField] private float lookAngleStep = 45f;
+        [SerializeField] private float lookWaitTime = 2.0f;
+        [SerializeField] private float lookRotateSpeed = 2.0f;
 
-        [Header("Pattern: Linear (直線往復 - 旧)")]
-        [Tooltip("往復する距離（初期位置からの片道距離）")]
+        // [Linear]
         [SerializeField] private float linearDistance = 5.0f;
-        [Tooltip("往復する方向（ワールド座標基準）")]
         [SerializeField] private Vector3 linearDirection = Vector3.forward;
 
-        [Header("Pattern: Circular (円運動)")]
-        [Tooltip("円の半径")]
-        [SerializeField] private float circleRadius = 5.0f;
-        [Tooltip("右回りかどうか")]
+        // [Circular / Elliptical]
+        [SerializeField] private float circleRadiusX = 5.0f;
+        [SerializeField] private float circleRadiusZ = 3.0f;
         [SerializeField] private bool clockwise = true;
 
-        [Header("Pattern: Random (ランダムうろちょろ)")]
-        [Tooltip("移動範囲の半径（初期位置中心）")]
+        // [Figure Eight]
+        [SerializeField] private float figureEightSize = 5.0f;
+
+        // [Random Wander]
         [SerializeField] private float wanderRadius = 7.0f;
 
+        // [Simple Waypoints (Loop / PingPong)]
+        [SerializeField] private Transform[] simpleWaypoints;
+
+        // [Graph Waypoints (Random)]
+        [SerializeField] private SentinelWaypoint currentGraphWaypoint;
+
+        // --- 視界設定 ---
         [Header("--- Settings: Field of View ---")]
         [Tooltip("視界の距離")]
         [SerializeField, Range(1f, 20f)] private float viewRadius = 5.0f;
         [Tooltip("視界の角度（扇型の広がり）")]
         [SerializeField, Range(0f, 360f)] private float viewAngle = 90.0f;
-
         [Tooltip("目の高さ（地面すれすれではなく、少し高い位置から見る）")]
         [SerializeField, Range(0.1f, 2.0f)] private float eyeHeight = 1.0f;
 
+        // --- 攻撃設定 ---
         [Header("--- Settings: Attack ---")]
         [Tooltip("襲撃時の急接近スピード")]
         [SerializeField] private float rushSpeed = 10.0f;
 
-        [Tooltip("口を開くアニメーションのTrigger名")]
-        [SerializeField] private string attackTriggerName = "OnAttack";
-
         [Tooltip("プレイヤーを食べるまでのため時間（口を開く時間）")]
         [SerializeField] private float roarDuration = 1.5f;
 
+        [Tooltip("襲撃時の巨大化倍率（1.5倍など）")]
+        [SerializeField] private float attackScaleMultiplier = 1.5f;
+
+        [Tooltip("襲撃時に停止させたいスクリプト名（例: FirstPersonController, LookController 等）")]
+        [SerializeField] private List<string> scriptsToDisable = new List<string>();
+
+        [Tooltip("FPS視点にする時の目の高さ")]
+        [SerializeField] private float playerEyeHeight = 1.0f;
+
+        // --- モデル参照 ---
         [Header("--- Models ---")]
         [Tooltip("普段の歩行用モデル")]
         [SerializeField] private GameObject walkModel;
@@ -87,45 +130,33 @@ namespace UnityJam.Enemies
         [Tooltip("襲撃時の口開きモデル")]
         [SerializeField] private GameObject attackModel;
 
+        // --- アニメーション ---
         [Header("--- Animation ---")]
         [SerializeField] private Animator animator;
-
-        [Header("--- Settings: Horror Effect ---")]
-        [Tooltip("襲撃時に停止させたいスクリプト名（例: FirstPersonController, LookController 等）")]
-        [SerializeField] private List<string> scriptsToDisable = new List<string>();
-
-        [Tooltip("襲撃時の巨大化倍率（1.5倍など）")]
-        [SerializeField] private float attackScaleMultiplier = 1.5f;
-
-        [Tooltip("FPS視点にする時の目の高さ")]
-        [SerializeField] private float playerEyeHeight = 1.0f;
 
         // 内部変数
         // ============================================================
 
-        private Vector3 initialPosition;    // 初期位置
-        private float   currentWaitTimer;   // 待機タイマー
-        private Vector3 targetPosition;     // ランダム移動用ターゲット
-        private float   circleAngle;        // 円運動用角度
+        private Vector3 initialPosition;
+        private Quaternion initialRotation;
+        private Vector3 lastPosition;
+        private float currentWaitTimer;
+        private Vector3 targetPosition;
 
-        // Waypoint用
-        private int     currentWaypointIndex = 0;
-        private bool    isMovingForward = true; // PingPong用
-
-        // 攻撃中かどうか
+        // 計算用
+        private float angleTimer;
+        private int currentWaypointIndex;
+        private bool isMovingForward = true; // PingPong用
         private bool isAttacking = false;
-        private Vector3 lastPosition;       // アニメーション速度計算用
 
-        // 移動タイプの定義
-        public enum MovementType
-        {
-            Idle,           // 動かない
-            PatrolLinear,   // 直線往復
-            PatrolCircular, // 円運動
-            RandomWander,   // ランダム徘徊
-            PatrolLoop,     // ウェイポイント周回（1 -> 2 -> 3 -> 1）
-            PatrolPingPong, // ウェイポイント往復（1 -> 2 -> 3 -> 2 -> 1）
-        }
+        // 定点監視用
+        private float sentinelStateTimer;
+        private Quaternion sentinelTargetRot;
+        private bool isSentinelRotating;
+
+        // ライト用
+        private float initialLightIntensity;
+        private float lightNoiseOffset;
 
         // Unity イベント関数
         // ============================================================
@@ -133,32 +164,37 @@ namespace UnityJam.Enemies
         void Start()
         {
             initialPosition = transform.position;
+            initialRotation = transform.rotation;
             lastPosition = transform.position;
-            SetNewRandomTarget();
+            sentinelTargetRot = initialRotation;
 
-            // ライトの初期設定同期
+            if (viewLight != null) initialLightIntensity = viewLight.intensity;
+            lightNoiseOffset = Random.Range(0f, 100f);
+
+            // 初期ターゲット設定
+            if (movementType == MovementType.RandomWander) SetNewRandomTarget();
+
+            // ウェイポイント初期化
+            if ((movementType == MovementType.PatrolLoop || movementType == MovementType.PatrolPingPong)
+                && simpleWaypoints != null && simpleWaypoints.Length > 0)
+            {
+                targetPosition = simpleWaypoints[0].position;
+            }
+
+            if (movementType == MovementType.WaypointGraphRandom && currentGraphWaypoint != null)
+                targetPosition = currentGraphWaypoint.transform.position;
+
             SyncLightSettings();
-
-            if (animator == null) animator = GetComponent<Animator>();
-            if (viewLight != null) { viewLight.type = LightType.Spot; viewLight.range = viewRadius; viewLight.spotAngle = viewAngle; }
-            if (waypoints != null && waypoints.Length > 0) targetPosition = waypoints[0].position;
-
-            // 最初は歩行モデルだけ表示する
-            if (walkModel != null) walkModel.SetActive(true);
-            if (attackModel != null) attackModel.SetActive(false);
-            // アニメーターは歩行モデルのものを取得しておく
-            if (walkModel != null) animator = walkModel.GetComponent<Animator>();
+            InitModels();
         }
 
         void Update()
         {
-            // 攻撃中は通常の移動や索敵を行わない
             if (isAttacking) return;
 
+            UpdateLightEffect();
             HandleMovement();
             DetectPlayer();
-
-            // アニメーションの更新処理
             UpdateAnimation();
         }
 
@@ -175,8 +211,46 @@ namespace UnityJam.Enemies
                 viewLight.type = LightType.Spot;
                 viewLight.range = viewRadius;
                 viewLight.spotAngle = viewAngle;
-                // ライトの色や強さをここで強制してもよいですが、今回はユーザー設定に任せます
+                // ライトの色や強さをここで強制してもよいが、今回はユーザー設定に任せる
             }
+        }
+
+        void UpdateLightEffect()
+        {
+            if (viewLight == null) return;
+            switch (lightMode)
+            {
+                case LightMode.Steady:
+                    viewLight.enabled = true;
+                    viewLight.intensity = initialLightIntensity;
+                    break;
+                case LightMode.Off:
+                    viewLight.enabled = false;
+                    break;
+                case LightMode.Flicker:
+                    viewLight.enabled = true;
+                    float flicker = Mathf.PingPong(Time.time * flickerSpeed, 1.0f);
+                    viewLight.intensity = initialLightIntensity * (0.5f + flicker * 0.5f);
+                    break;
+                case LightMode.Malfunction:
+                    viewLight.enabled = true;
+                    float noise = Mathf.PerlinNoise(Time.time * flickerSpeed, lightNoiseOffset);
+                    viewLight.intensity = initialLightIntensity * (noise > 0.6f ? 1f : 0.1f);
+                    break;
+            }
+        }
+
+        void InitModels()
+        {
+            if (animator == null) animator = GetComponent<Animator>();
+            if (walkModel != null)
+            {
+                walkModel.SetActive(true);
+                // 歩行モデル側にAnimatorがある場合が多いので取得し直す
+                var anim = walkModel.GetComponent<Animator>();
+                if (anim != null) animator = anim;
+            }
+            if (attackModel != null) attackModel.SetActive(false);
         }
 
         // 機能ロジック
@@ -189,152 +263,192 @@ namespace UnityJam.Enemies
         {
             switch (movementType)
             {
+                case MovementType.SentinelLook:
+                    MoveSentinelLook();
+                    break;
                 case MovementType.PatrolLinear:
                     MoveLinear();
                     break;
                 case MovementType.PatrolCircular:
-                    MoveCircular();
+                    MoveElliptical(true);
+                    break;
+                case MovementType.PatrolElliptical:
+                    MoveElliptical(false);
+                    break;
+                case MovementType.PatrolFigureEight:
+                    MoveFigureEight();
                     break;
                 case MovementType.RandomWander:
                     MoveRandom();
                     break;
                 case MovementType.PatrolLoop:
-                    MoveWaypoints(true);
+                    MoveWaypointsSimple(false); // Loop
                     break;
                 case MovementType.PatrolPingPong:
-                    MoveWaypoints(false);
+                    MoveWaypointsSimple(true);  // PingPong
                     break;
-                case MovementType.Idle:
+                case MovementType.WaypointGraphRandom:
+                    MoveWaypointGraph();
+                    break;
                 default:
+                    animator.SetFloat("Speed", 0);
                     break;
+            }
+        }
+
+        // 1. 定点監視（首振り）
+        void MoveSentinelLook()
+        {
+            if (isSentinelRotating)
+            {
+                transform.rotation = Quaternion.RotateTowards(transform.rotation, sentinelTargetRot, lookRotateSpeed * 100f * Time.deltaTime);
+                if (Quaternion.Angle(transform.rotation, sentinelTargetRot) < 0.1f)
+                {
+                    isSentinelRotating = false;
+                    sentinelStateTimer = lookWaitTime;
+                }
+            }
+            else
+            {
+                sentinelStateTimer -= Time.deltaTime;
+                if (sentinelStateTimer <= 0)
+                {
+                    // ランダムな方向へ
+                    float randomAngle = Random.Range(-lookAngleStep, lookAngleStep);
+                    sentinelTargetRot = initialRotation * Quaternion.Euler(0, randomAngle, 0);
+                    isSentinelRotating = true;
+                }
             }
         }
 
         // 直接往復
         void MoveLinear()
         {
-            // PingPong関数を使って 0 ~ 1 の値を作り、それを -1 ~ 1 に変換して往復させる
-            float dist = Mathf.PingPong(Time.time * moveSpeed, linearDistance * 2) - linearDistance;
-            Vector3 nextPos = initialPosition + (linearDirection * dist);
+            // PingPongで 0~1 を作り、-1~1 に変換
+            float t = Mathf.PingPong(Time.time * moveSpeed, linearDistance * 2) - linearDistance;
 
-            // 移動
-            transform.position = nextPos;
+            // 現在位置から少し先の位置を予測して、そこに向かってMoveTowardsする形にする
+            // これで「向き」を自然に制御できる
+            Vector3 targetPos = initialPosition + (linearDirection.normalized * t);
 
-            // 進行方向を向く（オプション）
-            Vector3 dir = nextPos - transform.position;
-            if (dir != Vector3.zero) transform.rotation = Quaternion.LookRotation(dir);
+            MoveToAndLook(targetPos);
         }
 
-        // 円運動
-        void MoveCircular()
+        // 3. 楕円・円軌道
+        void MoveElliptical(bool isCircle)
         {
-            // 角度を更新
-            float speed = moveSpeed / circleRadius; // 半径が大きいほど角速度を遅くして見た目の速度を一定に
-            circleAngle += (clockwise ? speed : -speed) * Time.deltaTime;
+            float rX = isCircle ? circleRadiusX : circleRadiusX;
+            float rZ = isCircle ? circleRadiusX : circleRadiusZ; // 円ならZもXと同じ半径
 
-            // 新しい位置を計算（X-Z平面での円運動）
-            float x = Mathf.Cos(circleAngle) * circleRadius;
-            float z = Mathf.Sin(circleAngle) * circleRadius;
-            Vector3 offset = new Vector3(x, 0, z);
+            // 角速度計算 (半径が大きいほどゆっくり回るように調整)
+            float speed = moveSpeed / Mathf.Max(rX, rZ);
+            angleTimer += (clockwise ? speed : -speed) * Time.deltaTime;
 
-            Vector3 nextPos = initialPosition + offset;
+            float x = Mathf.Cos(angleTimer) * rX;
+            float z = Mathf.Sin(angleTimer) * rZ;
 
-            // 移動
-            transform.position = nextPos;
+            Vector3 targetPos = initialPosition + new Vector3(x, 0, z);
 
-            // 常に進行方向（あるいは円の中心など）を向く
-            // ここでは進行方向を向かせる
-            Vector3 forwardDir = new Vector3(-Mathf.Sin(circleAngle), 0, Mathf.Cos(circleAngle));
-            if (!clockwise) forwardDir *= -1;
-            if (forwardDir != Vector3.zero) transform.rotation = Quaternion.LookRotation(forwardDir);
+            // 移動と向き
+            MoveToAndLook(targetPos);
         }
 
-        // ランダム徘徊
+        // 4. 8の字旋回（インフィニティ）
+        void MoveFigureEight()
+        {
+            // リサージュ図形的な計算
+            float speed = moveSpeed / figureEightSize;
+            angleTimer += speed * Time.deltaTime;
+
+            float x = Mathf.Cos(angleTimer) * figureEightSize;
+            float z = Mathf.Sin(2f * angleTimer) * (figureEightSize / 2f); // Zは2倍の周波数
+
+            Vector3 targetPos = initialPosition + new Vector3(x, 0, z);
+            MoveToAndLook(targetPos);
+        }
+
+        // 5. ランダム徘徊
         void MoveRandom()
         {
-            MoveToTargetAndLook(targetPosition, () =>
-            {
-                SetNewRandomTarget();
-            });
+            MoveToTargetWithWait(targetPosition, () => SetNewRandomTarget());
         }
 
         // 新しいランダムな目的地を設定
         void SetNewRandomTarget()
         {
-            Vector2 randomCircle = Random.insideUnitCircle * wanderRadius;
-            targetPosition = initialPosition + new Vector3(randomCircle.x, 0, randomCircle.y);
+            Vector2 circle = Random.insideUnitCircle * wanderRadius;
+            targetPosition = initialPosition + new Vector3(circle.x, 0, circle.y);
         }
 
-        // Waypoint移動ロジック
-        void MoveWaypoints(bool isLoop)
+        // 6. シンプルWP (Loop & PingPong)
+        void MoveWaypointsSimple(bool isPingPong)
         {
-            if(waypoints == null || waypoints.Length == 0) return;
+            if (simpleWaypoints == null || simpleWaypoints.Length == 0) return;
 
-            // ターゲット位置を更新（動くオブジェクトに対応するため舞フレーム取得）
-            targetPosition = waypoints[currentWaypointIndex].position;
+            // インデックス安全策
+            if (currentWaypointIndex >= simpleWaypoints.Length) currentWaypointIndex = 0;
+            if (simpleWaypoints[currentWaypointIndex] == null) return;
 
-            MoveToTargetAndLook(targetPosition, () =>
-            {
-                // 到着時の処理
-                UpdateNextWaypoint(isLoop);
-            });
-        }
+            targetPosition = simpleWaypoints[currentWaypointIndex].position;
 
-        void UpdateNextWaypoint(bool isLoop)
-        {
-            if(isLoop)
+            MoveToTargetWithWait(targetPosition, () =>
             {
-                // ループ: 0 -> 1 -> 2 -> 0
-                currentWaypointIndex = (currentWaypointIndex + 1) % waypoints.Length;
-            }
-            else
-            {
-                // PingPong: 0 -> 1 -> 2 -> 1 -> 0
-                if(isMovingForward)
+                if (isPingPong)
                 {
-                    if(currentWaypointIndex >=  waypoints.Length - 1)
+                    // 往復ロジック
+                    if (isMovingForward)
                     {
-                        isMovingForward = false;
-                        currentWaypointIndex--;
+                        currentWaypointIndex++;
+                        if (currentWaypointIndex >= simpleWaypoints.Length)
+                        {
+                            currentWaypointIndex = Mathf.Max(0, simpleWaypoints.Length - 2);
+                            isMovingForward = false;
+                        }
                     }
                     else
                     {
-                        currentWaypointIndex++;
+                        currentWaypointIndex--;
+                        if (currentWaypointIndex < 0)
+                        {
+                            currentWaypointIndex = Mathf.Min(simpleWaypoints.Length - 1, 1);
+                            isMovingForward = true;
+                        }
                     }
                 }
                 else
                 {
-                    if(currentWaypointIndex <= 0)
-                    {
-                        isMovingForward = true;
-                        currentWaypointIndex++;
-                    }
-                    else
-                    {
-                        currentWaypointIndex--;
-                    }
+                    // ループ
+                    currentWaypointIndex = (currentWaypointIndex + 1) % simpleWaypoints.Length;
                 }
-            }
+            });
         }
 
-        // 共通: 移動と回転のヘルパー
-        void MoveToTargetAndLook(Vector3 target, System.Action onArrived)
+        // 7. グラフWP
+        void MoveWaypointGraph()
         {
-            // 移動
-            float step = moveSpeed * Time.deltaTime;
-            transform.position = Vector3.MoveTowards(transform.position, target, step);
+            if (currentGraphWaypoint == null) return;
+            targetPosition = currentGraphWaypoint.transform.position;
 
-            // 回転
-            Vector3 direction = target - transform.position;
-            direction.y = 0; // 水平回転のみ
-            if (direction != Vector3.zero && direction.sqrMagnitude > 0.001f)
+            MoveToTargetWithWait(targetPosition, () =>
             {
-                Quaternion toRotation = Quaternion.LookRotation(direction);
-                transform.rotation = Quaternion.Lerp(transform.rotation, toRotation, step * 5f);
-            }
+                if (currentGraphWaypoint.neighbors != null && currentGraphWaypoint.neighbors.Count > 0)
+                {
+                    int rnd = Random.Range(0, currentGraphWaypoint.neighbors.Count);
+                    var next = currentGraphWaypoint.neighbors[rnd];
+                    if (next != null) currentGraphWaypoint = next;
+                }
+            });
+        }
+
+        // --- 共通移動関数 ---
+
+        // 目的地へ移動し、待機時間を消化したら callback を呼ぶ
+        void MoveToTargetWithWait(Vector3 target, System.Action onArrived)
+        {
+            MoveToAndLook(target);
 
             // 到着判定
-            if (Vector3.Distance(transform.position, target) < 0.1f)
+            if (Vector3.Distance(transform.position, target) < 0.2f)
             {
                 currentWaitTimer -= Time.deltaTime;
                 if (currentWaitTimer <= 0)
@@ -343,7 +457,41 @@ namespace UnityJam.Enemies
                     onArrived?.Invoke();
                 }
             }
+            else
+            {
+                currentWaitTimer = waitTime; // 移動中はタイマーリセット
+            }
         }
+
+        // 指定位置へ移動し、その方向を向く
+        void MoveToAndLook(Vector3 target)
+        {
+            // 高さ（Y）は維持
+            Vector3 currentPos = transform.position;
+            Vector3 targetPos = new Vector3(target.x, currentPos.y, target.z);
+
+            // 移動
+            transform.position = Vector3.MoveTowards(currentPos, targetPos, moveSpeed * Time.deltaTime);
+
+            // 向き変更
+            Vector3 dir = (targetPos - currentPos).normalized;
+            if (dir != Vector3.zero && dir.sqrMagnitude > 0.001f)
+            {
+                Quaternion toRotation = Quaternion.LookRotation(dir);
+                transform.rotation = Quaternion.Lerp(transform.rotation, toRotation, Time.deltaTime * 10f); // 滑らかに
+            }
+        }
+
+        void UpdateAnimation()
+        {
+            if (animator == null) return;
+            float speed = (transform.position - lastPosition).magnitude / Time.deltaTime;
+            animator.SetFloat("Speed", speed);
+            lastPosition = transform.position;
+        }
+
+        // 索敵 & 捕食
+        // ============================================================
 
         /// <summary>
         /// プレイヤー検出ロジック
@@ -423,7 +571,7 @@ namespace UnityJam.Enemies
             // 物理挙動も念のため止める
             var rb = player.GetComponent<Rigidbody>();
             if (rb) rb.isKinematic = true;
-            player.active = false;
+            player.SetActive(false);
 
             // カメラジャック（FPS視点化 & 敵の方向を向く）
             Camera mainCam = Camera.main;
@@ -501,22 +649,10 @@ namespace UnityJam.Enemies
             if (sr != null) sr.enabled = false; // プレイヤーを見えなくする
 
             // ゲームオーバー画面への遷移などをここに書く
-        }
-
-        // 移動速度を計算してアニメーターに渡す関数
-        void UpdateAnimation()
-        {
-            if (animator == null || isAttacking) return;
-
-            // 1フレーム前との位置の差から「実際の移動速度」を計算
-            // （距離 / 時間 = 速さ）
-            float currentSpeed = (transform.position - lastPosition).magnitude / Time.deltaTime;
-
-            // 計算した速度をAnimatorの "Speed" パラメータに渡す
-            animator.SetFloat("Speed", currentSpeed);
-
-            // 現在の位置を保存（次のフレームの計算用）
-            lastPosition = transform.position;
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.ChangeState(GameState.GameOver);
+            }
         }
 
         // エディタ拡張・デバッグ表示（Gizmos）
@@ -525,75 +661,107 @@ namespace UnityJam.Enemies
 #if UNITY_EDITOR
         private void OnDrawGizmos()
         {
-            // 移動パターンの可視化（黄色）
-            Gizmos.color = Color.yellow;
-            Vector3 center = Application.isPlaying ? initialPosition : transform.position;
+            Vector3 center = transform.position;
+
+            // 1. 視界の描画
+            Vector3 eye = center + Vector3.up * eyeHeight;
+            Color fovColor = isAttacking ? Color.red : new Color(0, 1, 0, 0.2f);
+            Handles.color = fovColor;
+            Vector3 angleA = DirFromAngle(-viewAngle / 2);
+            Handles.DrawSolidArc(eye, Vector3.up, angleA, viewAngle, viewRadius);
+
+            // 2. 移動パスの描画
+            Gizmos.color = new Color(1, 1, 0, 0.5f); // 薄い黄色
+            Handles.color = Color.yellow;
+
+            // プレイ中は「初期位置」を基準に描画し、停止中は「現在位置」を基準にする
+            Vector3 drawCenter = Application.isPlaying ? initialPosition : center;
 
             switch (movementType)
             {
                 case MovementType.PatrolLinear:
-                    Vector3 start = center - (linearDirection.normalized * linearDistance);
-                    Vector3 end = center + (linearDirection.normalized * linearDistance);
-                    Gizmos.DrawLine(start, end);
-                    Gizmos.DrawWireSphere(start, 0.2f);
-                    Gizmos.DrawWireSphere(end, 0.2f);
+                    // 基準点（プレイ中は初期位置、エディタ中は現在位置）
+                    Vector3 basePos = Application.isPlaying ? initialPosition : center;
+                    Vector3 dir = linearDirection.normalized;
+
+                    // プラス方向とマイナス方向の両端を計算
+                    Vector3 posEnd = basePos + (dir * linearDistance);
+                    Vector3 negEnd = basePos - (dir * linearDistance);
+
+                    // 端から端まで線を引く
+                    Gizmos.DrawLine(negEnd, posEnd);
+
+                    // 両端に球を表示して分かりやすくする
+                    Gizmos.DrawWireSphere(posEnd, 0.3f);
+                    Gizmos.DrawWireSphere(negEnd, 0.3f);
                     break;
 
                 case MovementType.PatrolCircular:
-                    Handles.color = new Color(1, 1, 0, 0.1f);
-                    Handles.DrawWireDisc(center, Vector3.up, circleRadius);
+                    Handles.DrawWireDisc(drawCenter, Vector3.up, circleRadiusX);
+                    break;
+
+                case MovementType.PatrolElliptical:
+                    DrawEllipse(drawCenter, circleRadiusX, circleRadiusZ);
+                    break;
+
+                case MovementType.PatrolFigureEight:
+                    DrawFigureEight(drawCenter, figureEightSize);
                     break;
 
                 case MovementType.RandomWander:
-                    Handles.color = new Color(1, 1, 0, 0.1f);
-                    Handles.DrawSolidDisc(center, Vector3.up, wanderRadius);
+                    Handles.color = Color.cyan;
+                    Handles.DrawWireDisc(drawCenter, Vector3.up, wanderRadius);
                     break;
 
                 case MovementType.PatrolLoop:
                 case MovementType.PatrolPingPong:
-                    // Waypointsの可視化
-                    if (waypoints != null && waypoints.Length > 0)
+                    if (simpleWaypoints != null && simpleWaypoints.Length > 0)
                     {
-                        Gizmos.color = Color.cyan;
-                        for (int i = 0; i < waypoints.Length; i++)
-                        {
-                            if (waypoints[i] != null)
-                            {
-                                Gizmos.DrawWireSphere(waypoints[i].position, 0.3f);
-                                if (i < waypoints.Length - 1)
-                                    Gizmos.DrawLine(waypoints[i].position, waypoints[i + 1].position);
+                        for (int i = 0; i < simpleWaypoints.Length - 1; i++)
+                            if (simpleWaypoints[i] && simpleWaypoints[i + 1])
+                                Gizmos.DrawLine(simpleWaypoints[i].position, simpleWaypoints[i + 1].position);
 
-                                // ループ線
-                                if (i == waypoints.Length - 1 && movementType == MovementType.PatrolLoop)
-                                    Gizmos.DrawLine(waypoints[i].position, waypoints[0].position);
-                            }
-                        }
+                        // Loopの場合のみ最後の線を引く
+                        if (movementType == MovementType.PatrolLoop && simpleWaypoints.Length > 1 && simpleWaypoints[0] && simpleWaypoints[simpleWaypoints.Length - 1])
+                            Gizmos.DrawLine(simpleWaypoints[simpleWaypoints.Length - 1].position, simpleWaypoints[0].position);
                     }
                     break;
-
             }
-
-            // 視界範囲（高さ考慮）
-            Vector3 eyePos = Application.isPlaying ? transform.position + Vector3.up * eyeHeight : transform.position + Vector3.up * eyeHeight;
-            if (viewLight == null)
-            {
-                Handles.color = new Color(1, 0, 0, 0.2f);
-                Vector3 viewAngleA = DirFromAngle(-viewAngle / 2, false);
-                Vector3 viewAngleB = DirFromAngle(viewAngle / 2, false);
-                Handles.DrawSolidArc(eyePos, Vector3.up, viewAngleA, viewAngle, viewRadius);
-            }
-            // 目の位置を緑の球で表示
-            Gizmos.color = Color.green;
-            Gizmos.DrawWireSphere(eyePos, 0.1f);
         }
 
-        // 角度からベクトルを算出するヘルパー関数
-        private Vector3 DirFromAngle(float angleInDegrees, bool angleIsGlobal)
+        // 楕円を描画するヘルパー関数
+        void DrawEllipse(Vector3 center, float rx, float rz)
         {
-            if (!angleIsGlobal)
+            Vector3 prev = center + new Vector3(rx, 0, 0);
+            int segments = 64;
+            for (int i = 1; i <= segments; i++)
             {
-                angleInDegrees += transform.eulerAngles.y;
+                float t = (i / (float)segments) * Mathf.PI * 2;
+                Vector3 next = center + new Vector3(Mathf.Cos(t) * rx, 0, Mathf.Sin(t) * rz);
+                Gizmos.DrawLine(prev, next);
+                prev = next;
             }
+        }
+
+        // 8の字を描画するヘルパー関数
+        void DrawFigureEight(Vector3 center, float size)
+        {
+            Vector3 prev = center;
+            int segments = 64;
+            for (int i = 1; i <= segments; i++)
+            {
+                float t = (i / (float)segments) * Mathf.PI * 2;
+                float x = Mathf.Cos(t) * size;
+                float z = Mathf.Sin(2f * t) * (size / 2f);
+                Vector3 next = center + new Vector3(x, 0, z);
+                Gizmos.DrawLine(prev, next);
+                prev = next;
+            }
+        }
+
+        Vector3 DirFromAngle(float angleInDegrees)
+        {
+            angleInDegrees += transform.eulerAngles.y;
             return new Vector3(Mathf.Sin(angleInDegrees * Mathf.Deg2Rad), 0, Mathf.Cos(angleInDegrees * Mathf.Deg2Rad));
         }
 #endif

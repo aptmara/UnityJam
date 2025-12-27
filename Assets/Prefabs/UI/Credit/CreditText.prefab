@@ -4935,8 +4935,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   textMesh: {fileID: 6684403376686845942}
-  hitEffect: {fileID: 5679710802005604049}
-  hp: 10
+  meshRenderer: {fileID: 0}
+  fixedEffect: {fileID: 0}
+  monolithVisual: {fileID: 0}
+  buggedColor: {r: 1, g: 0, b: 0, a: 1}
+  lockedColor: {r: 1, g: 0.5, b: 0, a: 1}
+  fixedColor: {r: 0, g: 1, b: 1, a: 1}
 --- !u!1 &7088826383445366996
 GameObject:
   m_ObjectHideFlags: 0
@@ -5045,8 +5049,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4278190080
+  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
