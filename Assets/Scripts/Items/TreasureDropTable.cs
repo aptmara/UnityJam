@@ -19,6 +19,11 @@ namespace UnityJam.Core
     [CreateAssetMenu(fileName = "NewDropTable", menuName = "UnityJam/Treasure Drop Table")]
     public class TreasureDropTable : ScriptableObject
     {
+        [Header("--- Trap Settings ---")]
+        [Tooltip("宝箱を開けた時に減少するバッテリー量（最大値の何%を減らすか）\n例: 10 なら 10% 減る")]
+        [Range(0, 100)] public float batteryPenaltyPercent = 10.0f;
+
+        [Header("--- Drop List ---")]
         [Tooltip("ドロップリスト（下のグラフで調整してください）")]
         public List<DropEntry> dropList = new List<DropEntry>();
 

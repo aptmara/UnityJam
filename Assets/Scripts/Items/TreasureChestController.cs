@@ -93,6 +93,20 @@ namespace UnityJam.Gimmicks
                 return;
             }
 
+            // バッテリー減少処理
+            if(dropTable.batteryPenaltyPercent > 0)
+            {
+                // バッテリー管理スクリプトを探す
+                // ※ "PlayerBattery" の部分は実際のクラス名に合わせてください。
+
+                //var playerBattery = FindObjectOfType<PlayerBattery>();
+
+                //if (playerBattery != null)
+                //{
+                //    playerBattery.ReduceBatteryByPercent(dropTable.batteryPenaltyPercent);
+                //}
+            }
+
             // B. インベントリに追加
             if (Inventory.Instance != null)
             {
