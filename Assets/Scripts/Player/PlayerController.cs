@@ -29,8 +29,6 @@ namespace UnityJam
 
         void Start()
         {
-            // TODO 絶対に消す!!
-            GameManager.Instance.ChangeState(GameState.Gameplay);
         }
 
         // Update is called once per frame
