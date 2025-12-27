@@ -1,16 +1,12 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace UnityJam
 {
     public class CameraController : MonoBehaviour
     {
-        // 自分自身の持つカメラ
         private Camera cam;
 
-
-        [SerializeField] private float fieldOfViewDegree;
+        [SerializeField] private float fieldOfViewDegree = 60f;
 
         private enum FOVMode
         {
@@ -18,30 +14,44 @@ namespace UnityJam
             Horizontal
         };
 
-        [SerializeField] private FOVMode fovMode;
+        [SerializeField] private FOVMode fovMode = FOVMode.Vertical;
+
+        // ★Death演出などで外部がFOVを触る間、上書きを止める
+        [SerializeField] private bool lockFov = false;
+
+        public void SetFovLock(bool locked)
+        {
+            lockFov = locked;
+        }
 
         private void Awake()
         {
             cam = GetComponent<Camera>();
+            if (cam == null)
+            {
+                Debug.LogError($"{nameof(CameraController)} は Camera を持つ GameObject に付けてください。", this);
+            }
         }
 
         private void FixedUpdate()
         {
-            // カメラのが
+            if (cam == null) return;
+            if (lockFov) return; 
 
             float currentAspectRatio = cam.aspect;
-            float verticalFov = 0;
+            float verticalFov = 0f;
+
             switch (fovMode)
             {
-                case FOVMode.Vertical: // this.fieldOfViewDegreeが垂直画角
+                case FOVMode.Vertical:
                     verticalFov = fieldOfViewDegree;
                     break;
-                case FOVMode.Horizontal: // this.fieldOfViewDegreeが水平画角
+
+                case FOVMode.Horizontal:
                     verticalFov = HorizontalToVerticalFov(fieldOfViewDegree, currentAspectRatio);
                     break;
             }
 
-            // Cameraの縦の画角に変更
             cam.fieldOfView = verticalFov;
         }
 
@@ -49,12 +59,5 @@ namespace UnityJam
         {
             return 2f * Mathf.Rad2Deg * Mathf.Atan(Mathf.Tan(horizontalFov * 0.5f * Mathf.Deg2Rad) / aspectRatio);
         }
-
-        private float VerticalToHorizontalFov(float verticalFov, float aspectRatio)
-        {
-            return 2f * Mathf.Rad2Deg * Mathf.Atan(Mathf.Tan(verticalFov * 0.5f * Mathf.Deg2Rad) * aspectRatio);
-        }
     }
-
 }
-
