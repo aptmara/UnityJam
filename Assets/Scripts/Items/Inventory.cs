@@ -16,9 +16,9 @@ namespace UnityJam.Core
         // 変更通知イベント
         public event Action OnInventoryUnlocked;                    // 初めて拾った時
         public event Action<ItemMaster, int> OnItemCountChanged;    // 数が変わった時
-
         // 重量が変化した時のイベント（UI更新用）
         public event Action<float> OnWeightChanged;
+        public event Action<float> OnConsumptionRateChanged;
 
         // 状態：インベントリが解放されているか（最初のアイテム取得でtrue）
         public bool isUnlocked { get; private set; } = false;
@@ -28,6 +28,9 @@ namespace UnityJam.Core
 
         // 総スコア（リザルト用）
         public int TotalScore { get; private set; } = 0;
+
+        // 総稼働率
+        public float TotalConsumptionRate { get; private set; } = 0f;
 
         // 重量によるペナルティを有効にするかどうかのフラグ
         [Header("Settings")]
@@ -92,25 +95,35 @@ namespace UnityJam.Core
         // 重量とスコアをまとめて計算する
         private void CalculateTotals()
         {
-            float w = 0f;
-            int s = 0; // スコア用
+            float totalW = 0f;
+            int totalS = 0;
+            float totalC = 0f; // 稼働率計算用
 
             foreach (var kvp in _items)
             {
                 ItemMaster item = kvp.Key;
                 int count = kvp.Value;
 
-                // 重さ計算
-                w += item.weight * count;
+                // 重さ (単体重さ * 個数)
+                totalW += item.weight * count;
 
-                // ★スコア計算 (価値 * 個数)
-                s += item.value * count;
+                // スコア (単体価値 * 個数)
+                totalS += item.value * count;
+
+                // 稼働率 (単体稼働率 * 個数)
+                totalC += item.consumptionRate * count;
             }
 
-            TotalWeight = w;
-            TotalScore = s; // 保存
+            // 結果を保存
+            TotalWeight = totalW;
+            TotalScore = totalS;
+            TotalConsumptionRate = totalC;
 
+            // イベント通知
             OnWeightChanged?.Invoke(TotalWeight);
+
+            // 稼働率変更通知
+            OnConsumptionRateChanged?.Invoke(TotalConsumptionRate);
         }
 
         // 全アイテムを取得（表示用）
