@@ -459,7 +459,7 @@ GameObject:
   - component: {fileID: 4154013155343935461}
   m_Layer: 0
   m_Name: Camera
-  m_TagString: Untagged
+  m_TagString: MainCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -552,6 +552,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fieldOfViewDegree: 120
   fovMode: 1
+  lockFov: 0
 --- !u!114 &4154013155343935461
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1936,6 +1937,8 @@ GameObject:
   - component: {fileID: 674389474760030266}
   - component: {fileID: 6432867303838633975}
   - component: {fileID: 7739956870303599457}
+  - component: {fileID: 5772812158569332606}
+  - component: {fileID: 2082036424154194960}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -2057,6 +2060,31 @@ MonoBehaviour:
   - {fileID: 7643653989278961997}
   collidersToDisable: []
   renderersToHide: []
+--- !u!114 &5772812158569332606
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3209302919271590393}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f69c8ecd9cc570840adc44c408e52968, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2082036424154194960
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3209302919271590393}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9597ece1804fa9e4aaec984ed44c68e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  icon: {fileID: 21300000, guid: ed6a2d7601a8dbe4799924f76e050b33, type: 3}
 --- !u!1 &3234271177035310104
 GameObject:
   m_ObjectHideFlags: 0
@@ -3756,7 +3784,7 @@ GameObject:
   - component: {fileID: 2588504241767402120}
   m_Layer: 0
   m_Name: PF_Camera_CameraRig
-  m_TagString: Untagged
+  m_TagString: MainCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3821,6 +3849,7 @@ MonoBehaviour:
   zoomFov: 62
   blendTime: 0.2
   focusTimeScale: 0
+  restoreDisabledComponentsAfterFocus: 0
 --- !u!1 &8994456411063548228
 GameObject:
   m_ObjectHideFlags: 0

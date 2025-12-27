@@ -20,9 +20,9 @@ public class MapIcon : MonoBehaviour
 
     IEnumerator DelayedInit()
     {
-        yield return new WaitForSeconds(0.4f);
+        yield return new WaitForSeconds(0.8f);
         MiniMapEvents.OnRegister?.Invoke(new IconData(icon, transform));
-      }
+     }
 
 
     private void OnDestroy()
