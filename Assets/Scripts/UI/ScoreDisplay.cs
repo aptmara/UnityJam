@@ -38,6 +38,7 @@ namespace UnityJam.UI
                     highScore = currentScore;
                     PlayerPrefs.SetInt(HIGH_SCORE_KEY, highScore);
                     PlayerPrefs.Save(); // 確実に保存
+                    Debug.Log($"[ScoreDisplay] HighScore Updated! New Record: {highScore}");
                 }
 
                 // 表示の分岐
