@@ -3304,7 +3304,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spawnPointsRoot: {fileID: 462725452021247460}
   treasurePrefab: {fileID: 2627640626536354356, guid: 28af7cc9552828748a922a7a818315d4, type: 3}
-  decoyPrefab: {fileID: 7582272997733639709, guid: 80eca4595555bb048a6044dc14daa2f1, type: 3}
+  decoyPrefab: {fileID: 7296281898194141795, guid: 7078bddb389520d48b8fb0a31439a9c7, type: 3}
   treasureCount: 8
   decoyCount: 0
   positionOffset: {x: 0, y: 0.75, z: 0}
