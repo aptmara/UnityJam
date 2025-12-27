@@ -43,7 +43,7 @@ namespace UnityJam.UI
         public Camera mapCamera { get; set; }
         public Transform targetTransform {  get; set; }
 
-        
+
         public void CameraSetting(Camera camera, Transform target)
         {
             mapCamera = camera;
@@ -57,7 +57,7 @@ namespace UnityJam.UI
         GameObject map;
         [SerializeField]
         GameObject minimap;
-        
+
         [SerializeField]
         int mapSize = 256;
         [SerializeField]
@@ -122,7 +122,7 @@ namespace UnityJam.UI
             mapMaskImage.texture = fogTexture;
             minimapMaskImage.texture = fogTexture;
 
-            
+
         }
 
         // Update is called once per frame
@@ -156,11 +156,6 @@ namespace UnityJam.UI
             //SetMapIcon();
             //MinimapMove(targetTransform.position);
             //SetMiniMapIcon(targetTransform.position);
-            
-
-
-
-
         }
 
         Vector2 WorldToMap(Vector3 worldPos)
@@ -288,7 +283,7 @@ namespace UnityJam.UI
 
                 Image iconImage = icon.GetComponent<Image>();
                 bool isExplored = IsExplored(data.uiTransform.position);
-                
+
 
                 if (isExplored)
                 {
@@ -306,8 +301,6 @@ namespace UnityJam.UI
 
                     RectTransform rect = icon.GetComponent<RectTransform>();
                     rect.anchoredPosition = iconPos;
-
-                    
 
                     if(IsInsideMinimap(iconPos))
                     {

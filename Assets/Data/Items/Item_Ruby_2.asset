@@ -17,5 +17,6 @@ MonoBehaviour:
   description: "\u5272\u308C\u3066\u3082\u306A\u304A\u6B8B\u308B\u8D64\u3044\u8F1D\u304D\u3002\n\u5B8C\u5168\u3067\u306F\u306A\u304F\u3068\u3082\u3001\u60C5\u71B1\u306F\u5931\u308F\u308C\u306A\u3044\u3002"
   value: 40
   weight: 0.5
+  consumptionRate: -0.1
   isDiscardable: 1
   rarity: 2

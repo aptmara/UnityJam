@@ -31,6 +31,9 @@ namespace UnityJam.Items
         [Tooltip("重さ（持ち運び制限用など）")]
         [Min(0)] public float weight = 1.0f;
 
+        [Tooltip("このアイテムを持っている時のバッテリー消費量（例: 1.0 = 標準, 0 = 消費なし）")]
+        public float consumptionRate = 0.0f;
+
         [Tooltip("インベントリから捨てることが出来るか（重要アイテムはFalseにする）")]
         public bool isDiscardable = true;
 

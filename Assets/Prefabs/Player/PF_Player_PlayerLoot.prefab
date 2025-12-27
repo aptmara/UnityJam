@@ -1935,6 +1935,7 @@ GameObject:
   - component: {fileID: 3319597188436622190}
   - component: {fileID: 674389474760030266}
   - component: {fileID: 6432867303838633975}
+  - component: {fileID: 7739956870303599457}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -2038,6 +2039,24 @@ MonoBehaviour:
   rayOrigin: {fileID: 1636903149006292319}
   playerAnimator: {fileID: 6518535547322983544}
   currentTarget: {fileID: 0}
+--- !u!114 &7739956870303599457
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3209302919271590393}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 478728852f10f2d4fb2be18417696e4f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  componentsToDisable:
+  - {fileID: 6432867303838633975}
+  - {fileID: 4644440874734407272}
+  - {fileID: 7643653989278961997}
+  collidersToDisable: []
+  renderersToHide: []
 --- !u!1 &3234271177035310104
 GameObject:
   m_ObjectHideFlags: 0
@@ -3734,6 +3753,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4337787908028965133}
   - component: {fileID: 4972304098419178497}
+  - component: {fileID: 2588504241767402120}
   m_Layer: 0
   m_Name: PF_Camera_CameraRig
   m_TagString: Untagged
@@ -3781,6 +3801,26 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 192
   wallOffset: 0.3
+--- !u!114 &2588504241767402120
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8386547408433674181}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d123d82dcb3b134bae25d5d4adc1d19, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cameraToControl: {fileID: 3031630077409184016}
+  componentsToDisableWhileFocus:
+  - {fileID: 4972304098419178497}
+  focusOffset: {x: 0, y: 1, z: 1.5}
+  lookAtOffset: {x: 0, y: -0.5, z: 0}
+  zoomFov: 62
+  blendTime: 0.2
+  focusTimeScale: 0
 --- !u!1 &8994456411063548228
 GameObject:
   m_ObjectHideFlags: 0
