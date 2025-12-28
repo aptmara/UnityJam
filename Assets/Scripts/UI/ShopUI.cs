@@ -160,9 +160,7 @@ public class ShopUI : MonoBehaviour
         nBatteryBuyCnt = 0;
         nBatteryCartCost = 0;
         
-        // コストを初期値に戻す
-        BatteryNowCost = 10;
-        BatteryNextCost = Mathf.RoundToInt(BatteryNowCost * CostMultiplier);
+        // コストはリセットしない（ショップ終了まで維持）
         
         AddLog("購入をキャンセルしました");
     }

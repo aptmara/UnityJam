@@ -378,6 +378,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fdc6b4f55977fce4aaa7cc3ddf813ac8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  dayDisplayPrefab: {fileID: 7935442144091252700, guid: d7075046e06da1b49a4abde6d2adb8e2, type: 3}
 --- !u!114 &1076204836
 MonoBehaviour:
   m_ObjectHideFlags: 0

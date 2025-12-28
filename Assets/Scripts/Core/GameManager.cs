@@ -22,6 +22,9 @@ public class GameManager : MonoBehaviour
 
     public GameState CurrentState { get; private set; }
 
+    [Header("Day Display")]
+    [SerializeField] private GameObject dayDisplayPrefab; // 日数表示用プレハブ（TMP含む）
+
     // イベント
     public event Action<GameState> OnStateChanged;
 
@@ -121,7 +124,16 @@ public class GameManager : MonoBehaviour
                 break;
 
             case GameState.Gameplay:
-                // Gameplay
+                // Gameplay - 日数表示付きフェードイン
+                int currentDay = 1;
+                if (UnityJam.Core.GameSessionManager.Instance != null)
+                {
+                    currentDay = UnityJam.Core.GameSessionManager.Instance.CurrentDayIndex + 1;
+                }
+                if (ScreenFader.Instance != null) 
+                {
+                    ScreenFader.Instance.FadeInWithDayText(currentDay, dayDisplayPrefab, 1f, 2f);
+                }
                 break;
             case GameState.ScoreCalc:
                 CalculateScore();

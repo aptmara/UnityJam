@@ -97,7 +97,6 @@ namespace UnityJam.UI
         private void OnShortcutBuy()
         {
             if (GameSessionManager.Instance == null) return;
-            if (Inventory.Instance == null) return;
 
             int lastReached = GameSessionManager.Instance.LastReachedFloor;
             if (lastReached <= 1) return;
@@ -106,12 +105,18 @@ namespace UnityJam.UI
             int baseCost = 200;
             int cost = baseCost + (Mathf.Max(0, currentDayIndex - 1) * 50);
 
-            int currentScore = Inventory.Instance.TotalScore;
+            // GameSessionManagerから現在のスコアを取得
+            int currentScore = GameSessionManager.Instance.GetDayScore(currentDayIndex);
 
             if (currentScore >= cost)
             {
-                // Pay
-                Inventory.Instance.SpendScore(cost);
+                // スコア消費（GameSessionManagerから）
+                bool success = GameSessionManager.Instance.SpendFromDayScore(currentDayIndex, cost);
+                if (!success)
+                {
+                    StartCoroutine(ShowErrorFeedback("スコアが足りません！"));
+                    return;
+                }
                 
                 // Set Start Floor
                 GameSessionManager.Instance.NextDayStartFloor = lastReached;
@@ -123,10 +128,15 @@ namespace UnityJam.UI
                     if(shortcutButtonText != null) shortcutButtonText.text = "購入済み";
                 }
                 
-                // Update Total Score Display
+                // Update Score Display (remaining after purchase)
+                if (dayScoreText != null)
+                {
+                    int remainingScore = GameSessionManager.Instance.GetDayScore(currentDayIndex);
+                    dayScoreText.text = $"{currentDayIndex}日目 スコア: {remainingScore:N0}";
+                }
+                
                 if (totalScoreText != null)
                 {
-                    // Total Score (Record) remains the same even if money is spent
                     totalScoreText.text = $"合計スコア: {GameSessionManager.Instance.GetTotalScore():N0}";
                 }
 
