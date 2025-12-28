@@ -10,7 +10,10 @@ public enum GameState
     Gameplay,
     ScoreCalc,
     Result,
-    GameOver
+    Shop,
+    FinalResult,
+    GameOver,
+    Loading // Added for transitions
 }
 
 public class GameManager : MonoBehaviour
@@ -70,7 +73,16 @@ public class GameManager : MonoBehaviour
                 ChangeState(GameState.Result);
                 break;
             case GameState.Result:
-                // Result
+                // Result (Day End)
+                HandleRoundEnd();
+                break;
+            case GameState.Shop:
+                // Shop Entry
+                Debug.Log("Entered Shop State");
+                 if (ScreenFader.Instance != null) ScreenFader.Instance.FadeIn();
+                break;
+            case GameState.FinalResult:
+                // Final Result (Session End)
                 break;
             case GameState.GameOver:
                 // Game Over
@@ -82,5 +94,129 @@ public class GameManager : MonoBehaviour
     {
         // PlayerDataManagerを使ってスコア計算
         Debug.Log("Calculating Score...");
+    }
+
+    /// <summary>
+    /// ゴール到達時にStageManagerから呼ばれる
+    /// </summary>
+    public void HandleGoalReached()
+    {
+        if (UnityJam.Core.GameSessionManager.Instance != null && UnityJam.Core.GameSessionManager.Instance.CurrentFloor < UnityJam.Core.GameSessionManager.MaxFloors)
+        {
+            // 次の階層へ
+            UnityJam.Core.GameSessionManager.Instance.ProceedToNextFloor();
+            StartNextFloor();
+        }
+        else
+        {
+            // 1日の終了（5階層クリア）
+            ChangeState(GameState.Result);
+        }
+    }
+
+    private void StartNextFloor()
+    {
+        Debug.Log("Proceeding to Next Floor...");
+        StartCoroutine(LoadNextFloorRoutine());
+    }
+
+    private IEnumerator LoadNextFloorRoutine()
+    {
+        // 1. Loadingへ遷移（これでStageManager等のGameplayPrefabが破棄される）
+        ChangeState(GameState.Loading);
+        
+        // 2. シーンリロード
+        if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "Main")
+        {
+             // Asyncでロードせずとも、1フレーム待つなどでタイミングをずらす
+             var op = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+             while (!op.isDone) yield return null;
+        }
+        else
+        {
+            // 仮にMainじゃない場合でも1フレーム待つ
+            yield return null;
+        }
+
+        // 3. Gameplayへ復帰（StageManagerが新規生成され、Start()でステージ構築＆FadeInが走る）
+        ChangeState(GameState.Gameplay);
+    }
+
+    private void HandleRoundEnd()
+    {
+        if (UnityJam.Core.Inventory.Instance != null && UnityJam.Core.GameSessionManager.Instance != null)
+        {
+            // 結果をセッションマネージャーに登録
+            int score = UnityJam.Core.Inventory.Instance.TotalScore;
+            var items = UnityJam.Core.Inventory.Instance.GetAllItems();
+            
+            // 1日の結果として登録
+            UnityJam.Core.GameSessionManager.Instance.RegisterDayResult(score, items);
+
+            CheckSessionProgress();
+        }
+    }
+
+    /// <summary>
+    /// 敵に食べられたりして失敗した場合の処理
+    /// </summary>
+    public void HandleDayFailed()
+    {
+        Debug.Log("Day Failed! Penalty applied.");
+
+        if (UnityJam.Core.Inventory.Instance != null && UnityJam.Core.GameSessionManager.Instance != null)
+        {
+            // インベントリ全没収
+            UnityJam.Core.Inventory.Instance.Clear();
+
+            // スコア0、アイテムなしで登録
+            UnityJam.Core.GameSessionManager.Instance.RegisterDayResult(0, new System.Collections.Generic.Dictionary<UnityJam.Items.ItemMaster, int>());
+
+            CheckSessionProgress();
+        }
+    }
+
+    private void CheckSessionProgress()
+    {
+        // 3回(日)終わったかチェック
+        if (UnityJam.Core.GameSessionManager.Instance.IsSessionFinished())
+        {
+            // 全日程終了 -> 最終リザルトへ
+            ChangeState(GameState.FinalResult);
+        }
+        else
+        {
+            // まだ続く -> DailyResultへ遷移 (そこでショートカット選択 -> Shopへ)
+            Debug.Log("Day Finished (Goal or Fail). Proceeding to DailyResult...");
+            ChangeState(GameState.Result);
+        }
+    }
+
+    /// <summary>
+    /// 次の日(Day)を開始する
+    /// </summary>
+    public void StartNextDay()
+    {
+        Debug.Log("Starting Next Day...");
+
+        // セッションマネージャーの開始処理（階層設定など）
+        if (UnityJam.Core.GameSessionManager.Instance != null)
+        {
+            UnityJam.Core.GameSessionManager.Instance.StartNextDay();
+        }
+
+        // インベントリのクリア
+        if (UnityJam.Core.Inventory.Instance != null)
+        {
+            UnityJam.Core.Inventory.Instance.Clear();
+        }
+
+        // プレイヤーやステージのリセット
+        ChangeState(GameState.Gameplay);
+        
+        if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "Main")
+        {
+             UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+        }
     }
 }

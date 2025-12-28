@@ -92,6 +92,9 @@ namespace UnityJam.Core
             OnItemCountChanged?.Invoke(item, remaining);
         }
 
+        // 消費したスコア
+        private int _spentScore = 0;
+
         // 重量とスコアをまとめて計算する
         private void CalculateTotals()
         {
@@ -116,7 +119,8 @@ namespace UnityJam.Core
 
             // 結果を保存
             TotalWeight = totalW;
-            TotalScore = totalS;
+            // 獲得スコア - 消費スコア (0未満にはならないようにする)
+            TotalScore = Mathf.Max(0, totalS - _spentScore);
             TotalConsumptionRate = totalC;
 
             // イベント通知
@@ -126,8 +130,37 @@ namespace UnityJam.Core
             OnConsumptionRateChanged?.Invoke(TotalConsumptionRate);
         }
 
+        /// <summary>
+        /// スコアを消費する（ショップなどの支払いで使用）
+        /// </summary>
+        public void SpendScore(int amount)
+        {
+            if (amount < 0) return;
+            _spentScore += amount;
+            CalculateTotals();
+            Debug.Log($"[Inventory] Spent Score: {amount} (Total Spent: {_spentScore})");
+        }
+
         // 全アイテムを取得（表示用）
         public Dictionary<ItemMaster, int> GetAllItems() => _items;
+
+        // インベントリを全て空にする
+        public void Clear()
+        {
+            foreach (var kvp in _items)
+            {
+                OnItemCountChanged?.Invoke(kvp.Key, 0);
+            }
+
+            _items.Clear();
+            _spentScore = 0; // 消費スコアもリセット
+            TotalWeight = 0f;
+            TotalScore = 0;
+            TotalConsumptionRate = 0f;
+
+            OnWeightChanged?.Invoke(TotalWeight);
+            OnConsumptionRateChanged?.Invoke(TotalConsumptionRate);
+        }
     }
 
 }

@@ -12,19 +12,35 @@ namespace UnityJam.Gimmicks
     public class TreasureChestController : InteractableBase, IBloomBurstReceiver
     {
         [Header("--- ドロップアイテム ---")]
-        [Tooltip("作成したドロップテーブルデータをここにセット")]
+        [Tooltip("デフォルトのドロップテーブル（階層指定がない場合に使用）")]
         [SerializeField] private TreasureDropTable dropTable;
 
-        [Header("--- 演出 ---")]
-        [Tooltip("開いた後の宝箱の見た目（空の箱など）。なければ設定しなくてOK")]
-        [SerializeField] private GameObject openedModel;
+        [Tooltip("階層ごとのドロップテーブル（Index 0 = 1階, Index 1 = 2階...）\n要素数が階層数より少ない場合は、リストの最後が使われます。")]
+        [SerializeField] private List<TreasureDropTable> floorDropTables;
 
-        [Tooltip("閉まっている状態のモデル（これを開封時に消します）")]
-        [SerializeField] private GameObject closedModel;
+        [Header("--- 演出 ---")]
+        [Tooltip("宝箱のAnimator")]
+        [SerializeField] private Animator chestAnimator;
 
         [Header("--- エフェクト設定 ---")]
+        [Tooltip("宝箱の中から吹き出す光。宝箱の子オブジェクトにして配置想定")]
+        [SerializeField] private ParticleSystem innerGlowParticles;
+
+        [Tooltip("レアリティに関係なく必ず再生されるベースエフェクト")]
+        [SerializeField] private GameObject baseVfxPrefab;
+
         [Tooltip("レアリティごとの開閉エフェクト (Element 0 がレア度1, Element 1 がレア度2...)")]
         [SerializeField] private GameObject[] rarityVfxPrefabs;
+
+        [Header("--- 演出（サウンド） ---")]
+        [Tooltip("開けた時の効果音")]
+        [SerializeField] private AudioClip openSound;
+        [SerializeField] private AudioSource audioSource;
+
+        [Header("--- 演出（カメラ振動） ---")]
+        [Tooltip("開けた瞬間にカメラを揺らす強さ（0なら揺らさない）")]
+        [SerializeField] private float cameraShakeStrength = 0.2f;
+        [SerializeField] private float cameraShakeDuration = 0.3f;
 
         [Tooltip("アイテム取得時の飛び出すアイコン (Prefab)")]
         [SerializeField] private GameObject popupEffectPrefab;
@@ -41,7 +57,7 @@ namespace UnityJam.Gimmicks
         [SerializeField] private GameObject burstLightPrefab;
 
         [SerializeField, Min(0.01f)]
-        private float burstLightLifeTime = 0.35f;
+        private float burstLightLifeTime = 0.5f;
 
         [SerializeField]
         private Vector3 burstLightOffset = new Vector3(0f, 1.0f, 0f);
@@ -54,6 +70,12 @@ namespace UnityJam.Gimmicks
             if(TreasureManager.Instance != null)
             {
                 TreasureManager.Instance.RegisterChest(this.gameObject);
+            }
+
+            // AudioSourceがアタッチされていなくて、音設定がある場合は自動追加
+            if (audioSource == null && openSound != null)
+            {
+                audioSource = gameObject.AddComponent<AudioSource>();
             }
         }
 
@@ -76,21 +98,56 @@ namespace UnityJam.Gimmicks
         {
             if (isOpen) return;
 
+            // ドロップテーブルの選定
+            TreasureDropTable selectedTable = dropTable;
+
+            if (floorDropTables != null && floorDropTables.Count > 0)
+            {
+                int floor = 1;
+                if (GameSessionManager.Instance != null)
+                {
+                    floor = GameSessionManager.Instance.CurrentFloor;
+                }
+                
+                // floorは1始まり、リストは0始まり
+                // 階層がリスト数より多い場合は最後の要素を使う
+                int index = Mathf.Clamp(floor - 1, 0, floorDropTables.Count - 1);
+                selectedTable = floorDropTables[index];
+                
+                // もし万が一nullならデフォルトに戻す
+                if (selectedTable == null) selectedTable = dropTable;
+            }
+
             // ドロップテーブルが設定されているかチェック
-            if (dropTable == null)
+            if (selectedTable == null)
             {
                 Debug.LogWarning("宝箱にドロップテーブルが設定されていません！");
                 return;
             }
 
             // A. ドロップテーブルを使って抽選
-            ItemMaster item = dropTable.PickOneItem();
+            ItemMaster item = selectedTable.PickOneItem();
 
             // 抽選結果が空なら（設定ミスなど）何もしない
             if (item == null)
             {
                 Debug.LogWarning("ドロップ抽選に失敗しました（有効なアイテムがありません）");
                 return;
+            }
+
+            // バッテリー減少処理
+            if(selectedTable.batteryPenaltyPercent > 0)
+            {
+                // バッテリー管理スクリプトを探す
+                // ※ "PlayerBattery" の部分は実際のクラス名に合わせてください。
+
+
+                //var playerBattery = FindObjectOfType<PlayerBattery>();
+
+                //if (playerBattery != null)
+                //{
+                //    playerBattery.ReduceBatteryByPercent(dropTable.batteryPenaltyPercent);
+                //}
             }
 
             // B. インベントリに追加
@@ -101,12 +158,40 @@ namespace UnityJam.Gimmicks
 
             // C. 見た目の変更
             isOpen = true;
-            if (closedModel != null) closedModel.SetActive(false);
-            if (openedModel != null) openedModel.SetActive(true);
+
+            if (chestAnimator != null)
+            {
+                chestAnimator.SetTrigger("Open");
+            }
+
+            // 内部からの光
+            if (innerGlowParticles != null)
+            {
+                innerGlowParticles.gameObject.SetActive(true);
+                innerGlowParticles.Play();
+            }
+
+            // サウンド再生
+            if (audioSource != null && openSound != null)
+            {
+                audioSource.PlayOneShot(openSound);
+            }
+
+            // カメラシェイク
+            if (cameraShakeStrength > 0)
+            {
+                StartCoroutine(ShakeCamera(cameraShakeDuration, cameraShakeStrength));
+            }
 
             if (TreasureManager.Instance != null)
             {
                 TreasureManager.Instance.UnregisterChest(this.gameObject);
+            }
+
+            // ベースエフェクト再生
+            if (baseVfxPrefab != null)
+            {
+                Instantiate(baseVfxPrefab, transform.position, Quaternion.identity);
             }
 
             // D. レアリティに応じたVFXを再生
@@ -116,7 +201,7 @@ namespace UnityJam.Gimmicks
             if (burstLightPrefab != null)
             {
                 GameObject lightObj = Instantiate(burstLightPrefab, transform.position + burstLightOffset, Quaternion.identity);
-                Destroy(lightObj, burstLightLifeTime);
+                StartCoroutine(FadeOutLight(lightObj, burstLightLifeTime));
             }
 
             // Bloom
@@ -126,6 +211,66 @@ namespace UnityJam.Gimmicks
             StartCoroutine(ShowIconDelayed(item));
 
             Debug.Log($"宝箱を開けた！ {item.itemName} (Rarity:{item.rarity}) を獲得！");
+        }
+
+        // カメラ用シェイク
+        private IEnumerator ShakeCamera(float duration, float magnitude)
+        {
+            if (Camera.main == null) yield break;
+
+            Transform camTransform = Camera.main.transform;
+            Vector3 originalPos = camTransform.localPosition;
+            float elapsed = 0.0f;
+
+            // シェイク処理（元の位置に戻る補正付き）
+            while (elapsed < duration)
+            {
+                float x = Random.Range(-1f, 1f) * magnitude;
+                float y = Random.Range(-1f, 1f) * magnitude;
+
+                camTransform.localPosition = originalPos + new Vector3(x, y, 0);
+
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+
+            camTransform.localPosition = originalPos;
+        }
+
+        // ライトのフェードアウト
+        private IEnumerator FadeOutLight(GameObject lightObj, float duration)
+        {
+            // ライトコンポーネントを取得
+            Light l = lightObj.GetComponent<Light>();
+
+            // ライトがついていないPrefabだった場合の安全策
+            if (l == null)
+            {
+                Destroy(lightObj, duration);
+                yield break;
+            }
+
+            float startIntensity = l.intensity;
+            float elapsed = 0f;
+
+            while (elapsed < duration)
+            {
+                // 時間経過
+                elapsed += Time.deltaTime;
+
+                // 割合を計算 (0.0 -> 1.0)
+                float t = elapsed / duration;
+
+                // 強さを初期値から0へ徐々に減らす
+                l.intensity = Mathf.Lerp(startIntensity, 0f, t);
+
+                // 1フレーム待つ
+                yield return null;
+            }
+
+            // 完全に0にしてから削除
+            l.intensity = 0f;
+            Destroy(lightObj);
         }
 
         // 遅延実行用

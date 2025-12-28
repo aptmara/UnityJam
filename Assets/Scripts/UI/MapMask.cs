@@ -41,13 +41,14 @@ namespace UnityJam.UI
     public class MapMask : MonoBehaviour
     {
         public Camera mapCamera { get; set; }
-        public Transform targetTransform {  get; set; }
+        public MapCamera targetCameraComponents {  get; set; }
 
 
-        public void CameraSetting(Camera camera, Transform target)
+        public void CameraSetting(MapCamera camera)
         {
-            mapCamera = camera;
-            targetTransform = target;
+            mapCamera = camera.GetComponent<Camera>();
+            targetCameraComponents = camera; 
+            
         }
 
 
@@ -94,7 +95,7 @@ namespace UnityJam.UI
         {
             timer = 0.0f;
 
-            useMapType = MapType.Map;
+            useMapType = MapType.Minimap;
 
             float halfHeight = mapCamera.orthographicSize;
             float halfWidth = mapCamera.orthographicSize * mapCamera.aspect;
@@ -131,7 +132,7 @@ namespace UnityJam.UI
             timer += Time.deltaTime;
             if (timer > 0.1f)
             {
-                Reveal(targetTransform.position);
+                Reveal(targetCameraComponents.targetTransform.position);
                 timer = 0.0f;
 
             }
@@ -148,8 +149,8 @@ namespace UnityJam.UI
                 case MapType.Minimap:
                     map.SetActive(false);
                     minimap.SetActive(true);
-                    MinimapMove(targetTransform.position);
-                    SetMiniMapIcon(targetTransform.position);
+                    MinimapMove(targetCameraComponents.targetTransform.position);
+                    SetMiniMapIcon(targetCameraComponents.targetTransform.position);
                     break;
             }
 

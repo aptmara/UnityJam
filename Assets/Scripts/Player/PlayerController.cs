@@ -14,6 +14,7 @@ namespace UnityJam
         [SerializeField] Rigidbody playerRigidbody;
         [SerializeField] bool isCameraChase;
         [SerializeField] Animator animator;
+        [SerializeField] PlayerMapChange playerMapChange;
 
         [Header("Camera")]
         [SerializeField] CameraRigController rig;
@@ -38,9 +39,18 @@ namespace UnityJam
 
             float cameraYaw = rig.yaw;
 
-            moveVector = CreateMoveVector(cameraYaw);
+            if(playerMapChange.playerMapState != PlayerMapChange.PlayerMapState.UseMap)
+            {
+                moveVector = CreateMoveVector(cameraYaw);
+            }
+            else
+            {
+                moveVector.x = 0.0f;
+                moveVector.z = 0.0f;
+            }
 
-            
+
+
 
 
             if (isCameraChase)

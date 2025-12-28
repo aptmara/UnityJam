@@ -44,11 +44,17 @@ namespace UnityJam.Credits
 
         private void Awake()
         {
+            if (Instance != null && Instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
             Instance = this;
         }
 
         private void Start()
         {
+            creditSections.Clear();
 
             if (railCamera == null)
             {

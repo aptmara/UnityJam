@@ -17,6 +17,18 @@ namespace UnityJam.Editors
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("ドロップ率の調整", EditorStyles.boldLabel);
 
+            SerializedProperty batteryProp = serializedObject.FindProperty("batteryPenaltyPercent");
+            if (batteryProp != null )
+            {
+                EditorGUILayout.BeginVertical(GUI.skin.box);
+                {
+                    EditorGUILayout.LabelField("罠設定 (Trap Settings)", EditorStyles.boldLabel);
+                    EditorGUILayout.PropertyField(batteryProp, new GUIContent("Battery Penalty (%)", "宝箱を開けた時に減少するバッテリー量"));
+                }
+                EditorGUILayout.EndVertical();
+                EditorGUILayout.Space(10);
+            }
+
             // 1. 円グラフの描画
             DrawPieChart(table);
 
