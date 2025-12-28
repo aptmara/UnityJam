@@ -38,6 +38,7 @@ namespace UnityJam.Editors
         SerializedProperty viewRadius;
         SerializedProperty viewAngle;
         SerializedProperty eyeHeight;
+        SerializedProperty weightSensitivity;
 
         SerializedProperty rushSpeed;
         SerializedProperty roarDuration;
@@ -81,6 +82,7 @@ namespace UnityJam.Editors
             viewRadius = serializedObject.FindProperty("viewRadius");
             viewAngle = serializedObject.FindProperty("viewAngle");
             eyeHeight = serializedObject.FindProperty("eyeHeight");
+            weightSensitivity = serializedObject.FindProperty("weightSensitivity");
 
             rushSpeed = serializedObject.FindProperty("rushSpeed");
             roarDuration = serializedObject.FindProperty("roarDuration");
@@ -183,6 +185,11 @@ namespace UnityJam.Editors
                 EditorGUILayout.Slider(viewRadius, 0.1f, 50f, new GUIContent("View Radius", "見える距離(m)"));
                 EditorGUILayout.Slider(viewAngle, 0f, 360f, new GUIContent("View Angle", "視野角(度)"));
                 EditorGUILayout.Slider(eyeHeight, 0.1f, 3f, new GUIContent("Eye Height", "目の高さ(m)"));
+
+                EditorGUILayout.Space(5);
+                EditorGUILayout.LabelField("Weight Penalty", EditorStyles.boldLabel);
+                EditorGUILayout.Slider(weightSensitivity, 0f, 2.0f, new GUIContent("Sensitivity (m/kg)", "1kgあたり広がる距離"));
+                EditorGUILayout.HelpBox("総重量が増えると視界が広がります。\n計算式: Base Radius + (Total Weight * Sensitivity)", MessageType.Info);
             }
             EditorGUILayout.EndVertical();
 
