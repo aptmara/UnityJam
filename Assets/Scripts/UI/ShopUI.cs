@@ -59,6 +59,14 @@ public class ShopUI : MonoBehaviour
     {
         Debug.Log("[ShopUI] Start called");
         
+        // ショップ入店時にコストと購入済み追加バッテリー数をリセット（その日限りの強化とするため）
+        ResetCost();
+        if (PlayerDataManager.Instance != null)
+        {
+            PlayerDataManager.Instance.BatteryAdditionPieces = 0;
+            Debug.Log("[ShopUI] Reset BatteryAdditionPieces to 0.");
+        }
+
         // ボタンイベント登録
         if (batteryBuyButton != null) batteryBuyButton.onClick.AddListener(OnBatteryBuy);
         if (cancelButton != null) cancelButton.onClick.AddListener(OnCansel);
@@ -74,7 +82,7 @@ public class ShopUI : MonoBehaviour
         
         ScreenFader.Instance.FadeIn();
 
-        // ショップ入店時のコストを確定コストとして記録
+        // ショップ入店時のコストを確定コストとして記録（ResetCost後の値を採用）
         s_CommittedNowCost = s_BatteryNowCost;
         s_CommittedNextCost = s_BatteryNextCost;
         

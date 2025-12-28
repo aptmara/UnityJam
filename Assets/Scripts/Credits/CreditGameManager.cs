@@ -274,6 +274,8 @@ namespace UnityJam.Credits
 
         private IEnumerator ShowEndSequence(string msg)
         {
+             // Send Score to Unityroom (Board No.2)
+             SendScoreToUnityRoom();
 
              ShowCreditName(msg);
              yield return new WaitForSeconds(4.0f);
@@ -452,12 +454,28 @@ namespace UnityJam.Credits
                 }
             }
 
+            // Send Score to Unityroom (Board No.2)
+            SendScoreToUnityRoom();
+
             yield return new WaitForSeconds(2.0f);
 
             // Show Return Button
             if (returnButtonObj != null)
             {
                 returnButtonObj.SetActive(true);
+            }
+        }
+
+        private void SendScoreToUnityRoom()
+        {
+            if (unityroom.Api.UnityroomApiClient.Instance != null)
+            {
+                Debug.Log($"[CreditGameManager] Sending Score to Unityroom Board 2: {totalScore}");
+                unityroom.Api.UnityroomApiClient.Instance.SendScore(2, totalScore, unityroom.Api.ScoreboardWriteMode.HighScoreDesc);
+            }
+            else
+            {
+                Debug.LogWarning("[CreditGameManager] UnityroomApiClient.Instance is null. Score not sent.");
             }
         }
 
