@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed18c1395a5b5e04999e80c90dd95b4b, type: 3}
+  m_Name: DropTable_Stage3
+  m_EditorClassIdentifier: 
+  batteryPenaltyPercent: 15
+  dropList:
+  - item: {fileID: 11400000, guid: e94e303a46e4c1447945f20624409cad, type: 2}
+    weight: 20
+  - item: {fileID: 11400000, guid: f975ed9d5f481984c93e9cceadcfd3a0, type: 2}
+    weight: 20
+  - item: {fileID: 11400000, guid: c4aaa630bae0782479537510a6d308e2, type: 2}
+    weight: 20
+  - item: {fileID: 11400000, guid: 3b3d4a3fbfd8b0d4896ee96dc597f6fd, type: 2}
+    weight: 20
+  - item: {fileID: 11400000, guid: 0462235b2ffe58346bf254e6ceedadcc, type: 2}
+    weight: 20
+  - item: {fileID: 11400000, guid: ba238b1144eacd8459495e24d33f4c06, type: 2}
+    weight: 40
+  - item: {fileID: 11400000, guid: 64d70b05aae05dd40bfea15d1f88098d, type: 2}
+    weight: 40
+  - item: {fileID: 11400000, guid: b9c627b2280040448844d92bc39b3c51, type: 2}
+    weight: 40
+  - item: {fileID: 11400000, guid: b7ec576d15fdbb74f81bb740686bff74, type: 2}
+    weight: 40
+  - item: {fileID: 11400000, guid: c1d2ea85a4fed1948bd6e6d851ab7321, type: 2}
+    weight: 40
+  - item: {fileID: 11400000, guid: 37651715ca017dc4f817030627b0d462, type: 2}
+    weight: 30
+  - item: {fileID: 11400000, guid: 2fcd47fe8cd0b1c4ba174da1238217ba, type: 2}
+    weight: 30
+  - item: {fileID: 11400000, guid: 8c2516b194f2e08448146a2ce0c43842, type: 2}
+    weight: 30
+  - item: {fileID: 11400000, guid: b4c757eb1d1057545b6ebcee13de8ffc, type: 2}
+    weight: 30
+  - item: {fileID: 11400000, guid: 4d183ccdf5e0d9a419c8b61b5c947b2a, type: 2}
+    weight: 30
+  - item: {fileID: 11400000, guid: 26a8de3f66054c044aa6f5e40dd66d2b, type: 2}
+    weight: 25
+  - item: {fileID: 11400000, guid: 59c47ad6e96158c49a8224472144403b, type: 2}
+    weight: 25

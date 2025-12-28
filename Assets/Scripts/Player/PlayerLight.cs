@@ -70,6 +70,8 @@ public class PlayerLight : MonoBehaviour
     bool isLighting = true;
     bool isCollect = false;
 
+    float damageAmount;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -139,30 +141,52 @@ public class PlayerLight : MonoBehaviour
                else
                 LightBattery -= 1.0f / (LifeTime * 60.0f);//加速減衰
 
+            if(damageAmount != 0.0f)
+            {
+                LightBattery -= damageAmount;
+                damageAmount = 0.0f;
+            }
+
             float NormalizeLightBlinkingPercentage = LightBlinkingPercentage / 100.0f;
             if (LightBattery <= 0.0f)
             {
-                if(BatteryAdditionPieces > 0)
-                {
-                    BatteryAdditionPieces--;
-                }
-                else
-                {
-                    --BatteryPieces;
-                }
+                // 減少量を取る
+                float ReducedLight = LightBattery;
 
-                if (BatteryPieces <= 0)
-                {
-                    isLighting = false;
 
-                    //ライトを点灯させないための処理
-                    foreach (Light itLight in light)
+
+                while (LightBattery < 0.0f)
+                { 
+                    if (BatteryAdditionPieces > 0)
                     {
-                        itLight.intensity = 0.0f;
+                        BatteryAdditionPieces--;
+                    }
+                    else
+                    {
+                        --BatteryPieces;
                     }
 
+                    if (BatteryPieces <= 0)
+                    {
+                        isLighting = false;
+
+                        //ライトを点灯させないための処理
+                        foreach (Light itLight in light)
+                        {
+                            itLight.intensity = 0.0f;
+                        }
+
+                    }
+                    else
+                    {
+                        float damage = 
+
+                        LightBattery = 1.0f + ReducedLight;
+                        ReducedLight = ReducedLight + LightBattery;
+                        
+                    }
                 }
-                else LightBattery = 1.0f;
+
             }
             else if (LightBattery <= NormalizeLightBlinkingPercentage && BatteryAdditionPieces == 0)
             {//点滅の処理
@@ -235,5 +259,11 @@ public class PlayerLight : MonoBehaviour
     public void AddBattery(int AddPieces)
     {
         BatteryAdditionPieces += AddPieces;
+    }
+
+    public void ReduceBatteryByPercent(float percent)
+    {
+        damageAmount += percent / 100.0f;
+
     }
 }

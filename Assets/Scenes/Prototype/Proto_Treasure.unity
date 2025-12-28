@@ -132,6 +132,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 1300883546263247804, guid: 28af7cc9552828748a922a7a818315d4, type: 3}
+      propertyPath: dropTable
+      value: 
+      objectReference: {fileID: 11400000, guid: 91162bc6bc1d8204a8898f348de6ff94, type: 2}
+    - target: {fileID: 1300883546263247804, guid: 28af7cc9552828748a922a7a818315d4, type: 3}
       propertyPath: dropList.Array.size
       value: 4
       objectReference: {fileID: 0}

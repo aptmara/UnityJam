@@ -737,6 +737,22 @@ PrefabInstance:
       propertyPath: m_Name
       value: PF_Player_PlayerLoot
       objectReference: {fileID: 0}
+    - target: {fileID: 2342774669954361106, guid: 02021e2ee4397ff4ab4881449f848753, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -336
+      objectReference: {fileID: 0}
+    - target: {fileID: 2342774669954361106, guid: 02021e2ee4397ff4ab4881449f848753, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 176
+      objectReference: {fileID: 0}
+    - target: {fileID: 2392452725365942316, guid: 02021e2ee4397ff4ab4881449f848753, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 2416
+      objectReference: {fileID: 0}
+    - target: {fileID: 2392452725365942316, guid: 02021e2ee4397ff4ab4881449f848753, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 772
+      objectReference: {fileID: 0}
     - target: {fileID: 3957573770441348253, guid: 02021e2ee4397ff4ab4881449f848753, type: 3}
       propertyPath: LightBlinkingPercentage
       value: 10
