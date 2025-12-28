@@ -49,12 +49,54 @@ public class GameManager : MonoBehaviour
             Debug.LogWarning("[GameManager] Instance is being destroyed! This should only happen on application quit.");
              // Instance = null; // Usually Unity handles this, but good to know.
         }
+
+        // 脱出イベント購読解除
+        if (UnityJam.Core.EscapeState.Instance != null)
+        {
+            UnityJam.Core.EscapeState.Instance.OnEscaped -= HandleEscape;
+        }
     }
 
     private void Start()
     {
         // 初期状態はTitleと仮定
         ChangeState(GameState.Title);
+
+        // 脱出イベント購読
+        if (UnityJam.Core.EscapeState.Instance != null)
+        {
+            UnityJam.Core.EscapeState.Instance.OnEscaped += HandleEscape;
+        }
+    }
+
+    /// <summary>
+    /// 脱出成功時の処理（スコアそのままでDayResultへ）
+    /// </summary>
+    private void HandleEscape()
+    {
+        Debug.Log("Escape triggered! Transitioning to DayResult with current score.");
+
+        if (ScreenFader.Instance != null)
+        {
+            ScreenFader.Instance.FadeOut(1.0f, () =>
+            {
+                // 脱出フラグリセット（次のラウンド用）
+                if (UnityJam.Core.EscapeState.Instance != null)
+                {
+                    UnityJam.Core.EscapeState.Instance.ResetState();
+                }
+                // Resultへ遷移（HandleRoundEnd経由でスコア登録）
+                ChangeState(GameState.Result);
+            });
+        }
+        else
+        {
+            if (UnityJam.Core.EscapeState.Instance != null)
+            {
+                UnityJam.Core.EscapeState.Instance.ResetState();
+            }
+            ChangeState(GameState.Result);
+        }
     }
 
     public void ChangeState(GameState newState)
