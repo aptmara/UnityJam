@@ -38,6 +38,7 @@ namespace UnityJam.UI
         private void OnDisable()
         {
             MapUIEvents.OnUIRequested -= Register;
+            MapTargetRegister.OnTargetRegistered -= SetTransform;
         }
 
         void Register(MapMask mask)

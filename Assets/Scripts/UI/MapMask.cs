@@ -109,6 +109,7 @@ namespace UnityJam.UI
         {
             timer = 0.0f;
 
+
             useMapType = MapType.Minimap;
 
             float halfHeight = mapCamera.orthographicSize;
@@ -148,7 +149,7 @@ namespace UnityJam.UI
             {
                 if(mapCamera == null)
                 {
-
+                    MapUIEvents.Request(this);
                 }
 
                 Reveal(targetCameraComponents.targetTransform.position);
@@ -359,6 +360,7 @@ namespace UnityJam.UI
         {
             MiniMapEvents.OnRegister -= Register;
             MiniMapEvents.OnUnregister -= Unregister;
+            MapUIEvents.OnSetMapType -= SetMapType;
         }
 
         void SetMapType(MapType type)
