@@ -224,18 +224,18 @@ public class StageManager : MonoBehaviour
         }
 
         // Proceed to change state
-        Debug.Log("Changing GameState to Result (triggered by goal: " + currentGoalPoint.gameObject.name + ")");
+        Debug.Log("Goal Reached! notifying GameManager...");
 
         if (ScreenFader.Instance != null)
         {
             ScreenFader.Instance.FadeOut(1.0f, () =>
             {
-                GameManager.Instance.ChangeState(GameState.Result);
+                GameManager.Instance.HandleGoalReached();
             });
         }
         else
         {
-            GameManager.Instance.ChangeState(GameState.Result);
+            GameManager.Instance.HandleGoalReached();
         }
     }
 

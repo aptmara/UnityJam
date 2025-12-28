@@ -10,9 +10,9 @@ namespace UnityJam.UI
     public class FinalResultUI : MonoBehaviour
     {
         [Header("Score Texts")]
-        [SerializeField] private TMP_Text round1ScoreText;
-        [SerializeField] private TMP_Text round2ScoreText;
-        [SerializeField] private TMP_Text round3ScoreText;
+        [SerializeField] private TMP_Text day1ScoreText;
+        [SerializeField] private TMP_Text day2ScoreText;
+        [SerializeField] private TMP_Text day3ScoreText;
         [SerializeField] private TMP_Text totalScoreText;
 
         [Header("Item List")]
@@ -30,7 +30,7 @@ namespace UnityJam.UI
 
         [Header("Tweet Settings")]
         [Tooltip("unityroomのゲームID (URLの最後)")]
-        [SerializeField] private string gameId = "コレクライト";
+        [SerializeField] private string gameId = "unity-jam-project"; // デフォルト値あるいは空
 
         private void Start()
         {
@@ -40,9 +40,9 @@ namespace UnityJam.UI
             if (GameSessionManager.Instance != null)
             {
                 // スコア表示
-                SetScoreText(round1ScoreText, GameSessionManager.Instance.GetRoundScore(1));
-                SetScoreText(round2ScoreText, GameSessionManager.Instance.GetRoundScore(2));
-                SetScoreText(round3ScoreText, GameSessionManager.Instance.GetRoundScore(3));
+                SetScoreText(day1ScoreText, GameSessionManager.Instance.GetDayScore(1));
+                SetScoreText(day2ScoreText, GameSessionManager.Instance.GetDayScore(2));
+                SetScoreText(day3ScoreText, GameSessionManager.Instance.GetDayScore(3));
                 
                 int totalScore = GameSessionManager.Instance.GetTotalScore();
                 SetScoreText(totalScoreText, totalScore);

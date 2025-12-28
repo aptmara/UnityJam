@@ -22,11 +22,13 @@
 カラス、宝箱、ミミック
 グループ１のかわいいもの好き　藤原朱理
 [Sound Design]
-だれか
+BGM、一部の効果音
+グループ１の甘党　書丹聡真
 [Special Thanks]
 Unity 1 Week Jam
 Lite Dungeon Pack
 Low Poly 3D Art by Gridness
+魔王魂
 You!
 
 [End]

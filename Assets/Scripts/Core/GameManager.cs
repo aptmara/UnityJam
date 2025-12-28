@@ -89,6 +89,35 @@ public class GameManager : MonoBehaviour
         Debug.Log("Calculating Score...");
     }
 
+    /// <summary>
+    /// ゴール到達時にStageManagerから呼ばれる
+    /// </summary>
+    public void HandleGoalReached()
+    {
+        if (UnityJam.Core.GameSessionManager.Instance != null && UnityJam.Core.GameSessionManager.Instance.CurrentFloor < UnityJam.Core.GameSessionManager.MaxFloors)
+        {
+            // 次の階層へ
+            UnityJam.Core.GameSessionManager.Instance.ProceedToNextFloor();
+            StartNextFloor();
+        }
+        else
+        {
+            // 1日の終了（5階層クリア）
+            ChangeState(GameState.Result);
+        }
+    }
+
+    private void StartNextFloor()
+    {
+        Debug.Log("Proceeding to Next Floor...");
+        // 階層遷移時の演出（必要なら）
+        // 現在はそのままリロード＝次の階層生成（StageManagerがCurrentFloorを見て生成を変える想定）
+        if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "Main")
+        {
+             UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+        }
+    }
+
     private void HandleRoundEnd()
     {
         if (UnityJam.Core.Inventory.Instance != null && UnityJam.Core.GameSessionManager.Instance != null)
@@ -96,9 +125,11 @@ public class GameManager : MonoBehaviour
             // 結果をセッションマネージャーに登録
             int score = UnityJam.Core.Inventory.Instance.TotalScore;
             var items = UnityJam.Core.Inventory.Instance.GetAllItems();
-            UnityJam.Core.GameSessionManager.Instance.RegisterRoundResult(score, items);
+            
+            // 1日の結果として登録
+            UnityJam.Core.GameSessionManager.Instance.RegisterDayResult(score, items);
 
-            // 3回終わったかチェック
+            // 3回(日)終わったかチェック
             if (UnityJam.Core.GameSessionManager.Instance.IsSessionFinished())
             {
                 // 全ラウンド終了 -> 最終リザルトへ
@@ -106,10 +137,8 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-                // まだ続く -> 次のラウンドへ (少し待ってから、あるいはUIでボタンを押してから)
-                // ここではシンプルにログを出し、InventoryをクリアしてGameplayに戻る例を示す
-                // 実際はResultUIで「Next Round」ボタンを押させるのが一般的
-                Debug.Log("Round Finished. Proceeding to next round...");
+                // まだ続く -> 次のラウンド(日)へ
+                Debug.Log("Day Finished. Proceeding to next day...");
             }
         }
     }
@@ -122,12 +151,9 @@ public class GameManager : MonoBehaviour
             UnityJam.Core.Inventory.Instance.Clear();
         }
 
-        // プレイヤーやステージのリセット (シーンのリロードが手っ取り早い場合が多い)
-        // ここではGameplay状態へ戻す
+        // プレイヤーやステージのリセット
         ChangeState(GameState.Gameplay);
         
-        // 注意: 実際にはステージ生成の再実行などが必要。
-        // シーン遷移を伴う場合はSceneManager.LoadSceneを使うか、StageManagerにリセット処理を実装する。
         if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "Main")
         {
              UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
