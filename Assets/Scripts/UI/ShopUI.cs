@@ -5,6 +5,27 @@ using UnityEngine.UI;
 
 public class ShopUI : MonoBehaviour
 {
+    // 静的コスト管理（セッション間で保持）
+    private static int s_BatteryNowCost = 10;
+    private static int s_BatteryNextCost = 15;
+    private static float s_CostMultiplier = 1.5f;
+    
+    // 確定済みコスト（購入確定後のコスト、キャンセル時に戻る基準）
+    private static int s_CommittedNowCost = 10;
+    private static int s_CommittedNextCost = 15;
+    
+    /// <summary>
+    /// コストを初期値にリセット（ゲームリセット時に呼ぶ）
+    /// </summary>
+    public static void ResetCost()
+    {
+        s_BatteryNowCost = 10;
+        s_BatteryNextCost = 15;
+        s_CommittedNowCost = 10;
+        s_CommittedNextCost = 15;
+        Debug.Log("[ShopUI] Cost Reset to initial values");
+    }
+
     [Header("Audio")]
     [SerializeField] AudioSource audioSource;
     [SerializeField] AudioClip BuySE;
@@ -24,10 +45,6 @@ public class ShopUI : MonoBehaviour
 
     [Header("BatteryBuyText")]
     [SerializeField] TMPro.TMP_Text BatteryTMP;
-    [SerializeField, Tooltip("バッテリー初期コスト")]
-    int BatteryNowCost = 10;
-    int BatteryNextCost = 15;
-    [SerializeField] float CostMultiplier = 1.5f;
     [SerializeField] int MaxBuyBattery = 10;
     int LogEnd;
     [SerializeField] TMPro.TMP_Text BatteryNowCostTMP;
@@ -57,14 +74,14 @@ public class ShopUI : MonoBehaviour
         
         ScreenFader.Instance.FadeIn();
 
-        // コスト初期化
-        BatteryNowCost = 10;
-        BatteryNextCost = Mathf.RoundToInt(BatteryNowCost * CostMultiplier);
+        // ショップ入店時のコストを確定コストとして記録
+        s_CommittedNowCost = s_BatteryNowCost;
+        s_CommittedNextCost = s_BatteryNextCost;
         
         RefreshCostLabels();
         
         int score = GetTotalScore();
-        Debug.Log($"[ShopUI] Initial Score: {score}, BatteryNowCost: {BatteryNowCost}, BatteryNextCost: {BatteryNextCost}");
+        Debug.Log($"[ShopUI] Initial Score: {score}, BatteryNowCost: {s_BatteryNowCost}, BatteryNextCost: {s_BatteryNextCost}");
         
         if (HaveManeyText != null)
         {
@@ -103,12 +120,12 @@ public class ShopUI : MonoBehaviour
     {
         if (BatteryNowCostTMP != null)
         {
-            BatteryNowCostTMP.text = BatteryNowCost.ToString();
+            BatteryNowCostTMP.text = s_BatteryNowCost.ToString();
         }
 
         if (BatteryNextCostTMP != null)
         {
-            BatteryNextCostTMP.text = BatteryNextCost.ToString();
+            BatteryNextCostTMP.text = s_BatteryNextCost.ToString();
         }
     }
 
@@ -137,12 +154,12 @@ public class ShopUI : MonoBehaviour
         }
         
         // カートに現在のコストで追加
-        nBatteryCartCost += BatteryNowCost;
+        nBatteryCartCost += s_BatteryNowCost;
         nBatteryBuyCnt++;
         
         // 次回のコストを計算（表示用）
-        BatteryNowCost = BatteryNextCost;
-        BatteryNextCost = Mathf.RoundToInt(BatteryNowCost * CostMultiplier);
+        s_BatteryNowCost = s_BatteryNextCost;
+        s_BatteryNextCost = Mathf.RoundToInt(s_BatteryNowCost * s_CostMultiplier);
         
         AddLog($"バッテリーをカートに追加 (Cost: {nBatteryCartCost})");
         
@@ -160,7 +177,9 @@ public class ShopUI : MonoBehaviour
         nBatteryBuyCnt = 0;
         nBatteryCartCost = 0;
         
-        // コストはリセットしない（ショップ終了まで維持）
+        // コストをショップ入店時（または最後の購入確定時）の値に戻す
+        s_BatteryNowCost = s_CommittedNowCost;
+        s_BatteryNextCost = s_CommittedNextCost;
         
         AddLog("購入をキャンセルしました");
     }
@@ -223,6 +242,10 @@ public class ShopUI : MonoBehaviour
         if (nBatteryBuyCnt > 0 && audioSource != null && BuySE != null)
             audioSource.PlayOneShot(BuySE);
 
+        // 購入確定：現在のコストを確定コストとして記録
+        s_CommittedNowCost = s_BatteryNowCost;
+        s_CommittedNextCost = s_BatteryNextCost;
+
         nBatteryBuyCnt = 0;
         nBatteryCartCost = 0;
     }
@@ -260,8 +283,8 @@ public class ShopUI : MonoBehaviour
 
     public void SetCost(int now, int future)
     {
-        BatteryNowCost = now;
-        BatteryNextCost = future;
+        s_BatteryNowCost = now;
+        s_BatteryNextCost = future;
         RefreshCostLabels();
     }
 }
