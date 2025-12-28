@@ -59,7 +59,7 @@ RectTransform:
   m_GameObject: {fileID: 222214315902885293}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.6276, y: 1.6276, z: 1.6276}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6452814574224112187}
@@ -67,7 +67,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 2752, y: 606}
+  m_AnchoredPosition: {x: 2829.4033, y: 560.46}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8903840225382439905
@@ -98,7 +98,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: c98cc66e9accdff43ad8c303e61c6693, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -140,10 +140,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 2392452725365942316}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0}
-  m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: 10}
-  m_SizeDelta: {x: 60, y: 80}
+  m_AnchorMin: {x: 0.5, y: 1}
+  m_AnchorMax: {x: 0.5, y: 1}
+  m_AnchoredPosition: {x: 0, y: -100}
+  m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!222 &8540623196061986858
 CanvasRenderer:
@@ -166,15 +166,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.09945214, g: 1, b: 0, a: 1}
+  m_Color: {r: 0.9683334, g: 1, b: 0.5518868, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
-  m_Type: 0
+  m_Sprite: {fileID: 21300000, guid: b6d9f11200e7ca947bc80c666ba188b1, type: 3}
+  m_Type: 3
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -400,10 +400,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 7281233053446064959}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0}
-  m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: 10}
-  m_SizeDelta: {x: 60, y: 80}
+  m_AnchorMin: {x: 0.5, y: 1}
+  m_AnchorMax: {x: 0.5, y: 1}
+  m_AnchoredPosition: {x: 0, y: -100}
+  m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!222 &5877618693756557906
 CanvasRenderer:
@@ -426,14 +426,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.09945214, g: 1, b: 0, a: 1}
+  m_Color: {r: 0.71614873, g: 1, b: 0.5330188, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: b6d9f11200e7ca947bc80c666ba188b1, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -810,7 +810,7 @@ Transform:
   m_GameObject: {fileID: 3133328293371532815}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -917.19604, y: -383.82257, z: -253.7553}
+  m_LocalPosition: {x: -1239.7478, y: -281.34872, z: -253.7553}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -851,7 +851,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 2592, y: 736}
+  m_AnchoredPosition: {x: 2669.4033, y: 729.0727}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5341525699422985624
@@ -1219,6 +1219,7 @@ MonoBehaviour:
   - {fileID: 6432867303838633975}
   - {fileID: 4644440874734407272}
   - {fileID: 7643653989278961997}
+  - {fileID: 8775902641603158962}
   collidersToDisable: []
   renderersToHide: []
 --- !u!114 &5772812158569332606
@@ -1561,7 +1562,7 @@ RectTransform:
   m_GameObject: {fileID: 4634636563236154991}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.548, y: 1.548, z: 1.548}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2342774669954361106}
@@ -1569,7 +1570,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 2752, y: 716}
+  m_AnchoredPosition: {x: 2829.4033, y: 711.1279}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &569774012312847359
@@ -1600,7 +1601,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: c98cc66e9accdff43ad8c303e61c6693, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1680,7 +1681,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 2592, y: 626}
+  m_AnchoredPosition: {x: 2669.4033, y: 579.24054}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2066075696455388881
@@ -2146,7 +2147,7 @@ MonoBehaviour:
   player: {fileID: 1636903149006292319}
   mapChange: {fileID: 5772812158569332606}
   useCamera: {fileID: 745020526972773127}
-  sensitivity: 720
+  sensitivity: 100
   minPitch: -30
   maxPitch: 60
   distance: 4
@@ -2171,9 +2172,9 @@ MonoBehaviour:
   cameraToControl: {fileID: 3031630077409184016}
   componentsToDisableWhileFocus:
   - {fileID: 4972304098419178497}
-  focusOffset: {x: 0, y: 1, z: 1.5}
-  lookAtOffset: {x: 0, y: -0.5, z: 0}
-  zoomFov: 62
+  focusOffset: {x: 0, y: 1.8, z: 2.5}
+  lookAtOffset: {x: 0, y: -0.2, z: 0}
+  zoomFov: 40.5
   blendTime: 0.2
   focusTimeScale: 0
   restoreDisabledComponentsAfterFocus: 0
@@ -2222,8 +2223,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isDampingDebug: 0
-  BatteryLife: {fileID: 222214315902885293}
-  AdditionBatteryLife: {fileID: 4634636563236154991}
+  BatteryLife: {fileID: 224113087557720626}
+  AdditionBatteryLife: {fileID: 505779603171822899}
   BatteryPiecesText: {fileID: 6429868611263221643}
   AdditionPiecesText: {fileID: 247329291537617810}
   BatteryPieces: 4
