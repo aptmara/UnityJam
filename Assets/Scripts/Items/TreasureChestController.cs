@@ -12,8 +12,11 @@ namespace UnityJam.Gimmicks
     public class TreasureChestController : InteractableBase, IBloomBurstReceiver
     {
         [Header("--- ドロップアイテム ---")]
-        [Tooltip("作成したドロップテーブルデータをここにセット")]
+        [Tooltip("デフォルトのドロップテーブル（階層指定がない場合に使用）")]
         [SerializeField] private TreasureDropTable dropTable;
+
+        [Tooltip("階層ごとのドロップテーブル（Index 0 = 1階, Index 1 = 2階...）\n要素数が階層数より少ない場合は、リストの最後が使われます。")]
+        [SerializeField] private List<TreasureDropTable> floorDropTables;
 
         [Header("--- 演出 ---")]
         [Tooltip("宝箱のAnimator")]
@@ -95,15 +98,35 @@ namespace UnityJam.Gimmicks
         {
             if (isOpen) return;
 
+            // ドロップテーブルの選定
+            TreasureDropTable selectedTable = dropTable;
+
+            if (floorDropTables != null && floorDropTables.Count > 0)
+            {
+                int floor = 1;
+                if (GameSessionManager.Instance != null)
+                {
+                    floor = GameSessionManager.Instance.CurrentFloor;
+                }
+                
+                // floorは1始まり、リストは0始まり
+                // 階層がリスト数より多い場合は最後の要素を使う
+                int index = Mathf.Clamp(floor - 1, 0, floorDropTables.Count - 1);
+                selectedTable = floorDropTables[index];
+                
+                // もし万が一nullならデフォルトに戻す
+                if (selectedTable == null) selectedTable = dropTable;
+            }
+
             // ドロップテーブルが設定されているかチェック
-            if (dropTable == null)
+            if (selectedTable == null)
             {
                 Debug.LogWarning("宝箱にドロップテーブルが設定されていません！");
                 return;
             }
 
             // A. ドロップテーブルを使って抽選
-            ItemMaster item = dropTable.PickOneItem();
+            ItemMaster item = selectedTable.PickOneItem();
 
             // 抽選結果が空なら（設定ミスなど）何もしない
             if (item == null)
@@ -113,7 +136,7 @@ namespace UnityJam.Gimmicks
             }
 
             // バッテリー減少処理
-            if(dropTable.batteryPenaltyPercent > 0)
+            if(selectedTable.batteryPenaltyPercent > 0)
             {
                 // バッテリー管理スクリプトを探す
                 // ※ "PlayerBattery" の部分は実際のクラス名に合わせてください。

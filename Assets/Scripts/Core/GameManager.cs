@@ -10,8 +10,10 @@ public enum GameState
     Gameplay,
     ScoreCalc,
     Result,
+    Shop,
     FinalResult,
-    GameOver
+    GameOver,
+    Loading // Added for transitions
 }
 
 public class GameManager : MonoBehaviour
@@ -71,8 +73,13 @@ public class GameManager : MonoBehaviour
                 ChangeState(GameState.Result);
                 break;
             case GameState.Result:
-                // Result (Round End)
+                // Result (Day End)
                 HandleRoundEnd();
+                break;
+            case GameState.Shop:
+                // Shop Entry
+                Debug.Log("Entered Shop State");
+                 if (ScreenFader.Instance != null) ScreenFader.Instance.FadeIn();
                 break;
             case GameState.FinalResult:
                 // Final Result (Session End)
@@ -110,12 +117,29 @@ public class GameManager : MonoBehaviour
     private void StartNextFloor()
     {
         Debug.Log("Proceeding to Next Floor...");
-        // 階層遷移時の演出（必要なら）
-        // 現在はそのままリロード＝次の階層生成（StageManagerがCurrentFloorを見て生成を変える想定）
+        StartCoroutine(LoadNextFloorRoutine());
+    }
+
+    private IEnumerator LoadNextFloorRoutine()
+    {
+        // 1. Loadingへ遷移（これでStageManager等のGameplayPrefabが破棄される）
+        ChangeState(GameState.Loading);
+        
+        // 2. シーンリロード
         if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "Main")
         {
-             UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+             // Asyncでロードせずとも、1フレーム待つなどでタイミングをずらす
+             var op = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+             while (!op.isDone) yield return null;
         }
+        else
+        {
+            // 仮にMainじゃない場合でも1フレーム待つ
+            yield return null;
+        }
+
+        // 3. Gameplayへ復帰（StageManagerが新規生成され、Start()でステージ構築＆FadeInが走る）
+        ChangeState(GameState.Gameplay);
     }
 
     private void HandleRoundEnd()
@@ -132,19 +156,31 @@ public class GameManager : MonoBehaviour
             // 3回(日)終わったかチェック
             if (UnityJam.Core.GameSessionManager.Instance.IsSessionFinished())
             {
-                // 全ラウンド終了 -> 最終リザルトへ
+                // 全日程終了 -> 最終リザルトへ
                 ChangeState(GameState.FinalResult);
             }
             else
             {
-                // まだ続く -> 次のラウンド(日)へ
-                Debug.Log("Day Finished. Proceeding to next day...");
+                // まだ続く -> DailyResultへ遷移 (そこでショートカット選択 -> Shopへ)
+                Debug.Log("Day Finished. Proceeding to DailyResult...");
+                ChangeState(GameState.Result);
             }
         }
     }
 
-    public void StartNextRound()
+    /// <summary>
+    /// 次の日(Day)を開始する
+    /// </summary>
+    public void StartNextDay()
     {
+        Debug.Log("Starting Next Day...");
+
+        // セッションマネージャーの開始処理（階層設定など）
+        if (UnityJam.Core.GameSessionManager.Instance != null)
+        {
+            UnityJam.Core.GameSessionManager.Instance.StartNextDay();
+        }
+
         // インベントリのクリア
         if (UnityJam.Core.Inventory.Instance != null)
         {

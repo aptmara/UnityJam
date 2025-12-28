@@ -20,6 +20,12 @@ namespace UnityJam.Core
         // 現在の階層（1始まり: 1=1階, 2=2階...）
         public int CurrentFloor { get; private set; } = 1;
 
+        // 前日に到達した階層（ショートカット可能上限）
+        public int LastReachedFloor { get; private set; } = 1;
+
+        // 次の日の開始階層（ショップで購入して設定）
+        public int NextDayStartFloor { get; set; } = 1;
+
         // 各ラウンド(日)のスコア履歴
         public List<int> DayScores { get; private set; } = new List<int>();
 
@@ -62,10 +68,31 @@ namespace UnityJam.Core
                     TotalItems[item] = count;
             }
 
-            // 日付進行
+            // 到達階層を記録 (クリアしてれば5+1=6になるかもしれないし、脱出ならその階)
+            // CurrentFloorが5でクリアした場合、次は5までスキップできるべきか？
+            // 仕様: 「前日に到達した階層まで」 -> クリア時は6階扱いだと変だが、最大5階。
+            // 5階クリア = Reached 5.
+            // もしCurrentFloorが5で、ProceedToNextFloorが呼ばれる前にここに来るなら5。
+            // MaxFloorsでキャップする。
+            LastReachedFloor = Mathf.Min(CurrentFloor, MaxFloors);
+            
+            // 次の日へ
             CurrentDayIndex++;
-            // 階層リセット
-            CurrentFloor = 1;
+            
+            // 階層リセットは StartNextDay で NextDayStartFloor を使うため、ここでは一旦1に戻すか、
+            // あるいは StartNextDay で上書きされるので気にしないか。
+            // デフォルトは1
+            NextDayStartFloor = 1;
+            CurrentFloor = 1; 
+        }
+
+        /// <summary>
+        /// 次の日の開始処理（GameManagerから呼ばれる）
+        /// </summary>
+        public void StartNextDay()
+        {
+            CurrentFloor = NextDayStartFloor;
+            Debug.Log($"[GameSessionManager] Starting Day {CurrentDayIndex + 1} at Floor {CurrentFloor}");
         }
 
         /// <summary>

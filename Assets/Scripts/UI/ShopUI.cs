@@ -65,7 +65,7 @@ public class ShopUI : MonoBehaviour
     void FixedUpdate()
     {
         int BuyCost = nBatteryBuyCnt * BatteryNowCost;
-        BatteryTMP.SetText("×{0} 費用:{1}", nBatteryBuyCnt,BuyCost);
+        BatteryTMP.SetText("×{0} Cost:{1}", nBatteryBuyCnt,BuyCost);
         BuyCost = nLightBuyCnt * LightCost;
         //LightTMP.SetText("×{0} Cost:{1}", nLightBuyCnt,BuyCost);
 
@@ -80,11 +80,17 @@ public class ShopUI : MonoBehaviour
         {
             --BuyActionFrame;
         }
+        
         //プレイヤーの所持金を表示する
-        HaveManeyText.SetText("$");
+        HaveManeyText.SetText($"{GetTotalScore()}"); // Show actual score
     }
 
-
+    // Helper to get score
+    private int GetTotalScore()
+    {
+         return UnityJam.Core.Inventory.Instance != null ? UnityJam.Core.Inventory.Instance.TotalScore : 0;
+    }
+    
     public void OnBatteryBuy()
     {
         //プレイヤーを参照しつつ最大個数を上回っていたら
@@ -205,10 +211,15 @@ public class ShopUI : MonoBehaviour
 
     public void OnShopEnd()
     {
-        ScreenFader.Instance.FadeOut();
+        ScreenFader.Instance.FadeOut(1.0f, () =>
+        {
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.StartNextDay();
+            }
+        });
         audioSource.PlayOneShot(selectSE);
         //シーン読み込み
-
     }
 
     public void SetCost(int now,int future)

@@ -719,6 +719,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   requiredHoldTime: 0.8
   dropTable: {fileID: 11400000, guid: 7747a07a3b7f7954bae3e776873e4fef, type: 2}
+  floorDropTables: []
   chestAnimator: {fileID: 5052682542061879234}
   innerGlowParticles: {fileID: 0}
   baseVfxPrefab: {fileID: 0}
@@ -944,6 +945,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   requiredHoldTime: 0.8
   dropTable: {fileID: 11400000, guid: 7747a07a3b7f7954bae3e776873e4fef, type: 2}
+  floorDropTables: []
   chestAnimator: {fileID: 9020335340556290262}
   innerGlowParticles: {fileID: 0}
   baseVfxPrefab: {fileID: 0}
