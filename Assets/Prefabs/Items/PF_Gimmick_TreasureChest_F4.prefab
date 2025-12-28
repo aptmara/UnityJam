@@ -122,7 +122,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   requiredHoldTime: 0.8
-  dropTable: {fileID: 11400000, guid: 7747a07a3b7f7954bae3e776873e4fef, type: 2}
+  dropTable: {fileID: 11400000, guid: 189a2dd0379f3ff4fbd7bfa19a466cd7, type: 2}
   floorDropTables: []
   chestAnimator: {fileID: 1774389180717080807}
   innerGlowParticles: {fileID: 2270082512324040483}

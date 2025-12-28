@@ -16,6 +16,12 @@ public class TitlePanel : MonoBehaviour
 
     private void OnStartClicked()
     {
+        // ゲーム開始前にセッション状態をリセット
+        if (UnityJam.Core.GameSessionManager.Instance != null)
+        {
+            UnityJam.Core.GameSessionManager.Instance.ResetSession();
+        }
+        
         if (ScreenFader.Instance != null)
         {
             ScreenFader.Instance.FadeOut(-1f, () => 

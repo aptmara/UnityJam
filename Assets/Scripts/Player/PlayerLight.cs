@@ -283,7 +283,7 @@ public class PlayerLight : MonoBehaviour
                 --BatteryPieces;
             }
 
-            // どちらも尽きたら消灯
+            // どちらも尽きたら消灯 → ゲームオーバー
             if (BatteryPieces <= 0 && BatteryAdditionPieces <= 0)
             {
                 BatteryPieces = 0;
@@ -296,6 +296,14 @@ public class PlayerLight : MonoBehaviour
                 {
                     itLight.intensity = 0.0f;
                 }
+                
+                // バッテリー切れ → 敵に捕まったのと同様にスコア0で日終了
+                if (GameManager.Instance != null)
+                {
+                    Debug.Log("[PlayerLight] Battery depleted! Triggering day failure.");
+                    GameManager.Instance.HandleDayFailed();
+                }
+                
                 return;
             }
 

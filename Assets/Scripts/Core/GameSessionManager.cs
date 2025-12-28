@@ -121,6 +121,10 @@ namespace UnityJam.Core
             CurrentFloor = 1;
             DayScores.Clear();
             TotalItems.Clear();
+            
+            // ショップのコストもリセット
+            ShopUI.ResetCost();
+            
             Debug.Log("[GameSessionManager] Session Reset");
         }
 
