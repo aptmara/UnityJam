@@ -46,11 +46,6 @@ public class ShopUI : MonoBehaviour
 
     int nLightBuyCnt;
 
-    [Header("Shortcut")]
-    [SerializeField] private TMPro.TMP_Text shortcutInfoText; // "スキップ不可" or "3Fまでスキップ(200G)"
-    [SerializeField] private UnityEngine.UI.Button shortcutButton;
-    private int shortcutCostPerFloor = 200;
-
     int AllBuyCost;
 
 
@@ -64,15 +59,13 @@ public class ShopUI : MonoBehaviour
         LogEnd = 0;
         BuyActionText = BuyActionText.GetComponent<TMPro.TMP_Text>();
         ScreenFader.Instance.FadeIn();
-
-        UpdateShortcutUI();
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
         int BuyCost = nBatteryBuyCnt * BatteryNowCost;
-        BatteryTMP.SetText("×{0} 費用:{1}", nBatteryBuyCnt,BuyCost);
+        BatteryTMP.SetText("×{0} Cost:{1}", nBatteryBuyCnt,BuyCost);
         BuyCost = nLightBuyCnt * LightCost;
         //LightTMP.SetText("×{0} Cost:{1}", nLightBuyCnt,BuyCost);
 
@@ -87,9 +80,6 @@ public class ShopUI : MonoBehaviour
         {
             --BuyActionFrame;
         }
-        // Shortcut UI update (if dynamic) - moved to separate method or here if needed
-        // For efficiency, mostly static unless updated.
-        // UpdateShortcutUI(); // Call if needed in update loop, but cost is static per day.
         
         //プレイヤーの所持金を表示する
         HaveManeyText.SetText($"{GetTotalScore()}"); // Show actual score
@@ -98,96 +88,7 @@ public class ShopUI : MonoBehaviour
     // Helper to get score
     private int GetTotalScore()
     {
-         if (UnityJam.Core.Inventory.Instance != null) return UnityJam.Core.Inventory.Instance.TotalScore; // Inventory uses current score?
-         // Note: Inventory.TotalScore is reset day by day?
-         // In new flow, RegisterDayResult clears inventory? No, clearing happens on StartNextDay.
-         // So Inventory.TotalScore is available here.
          return UnityJam.Core.Inventory.Instance != null ? UnityJam.Core.Inventory.Instance.TotalScore : 0;
-    }
-
-    private void UpdateShortcutUI()
-    {
-        if (shortcutInfoText == null) return;
-        
-        if (UnityJam.Core.GameSessionManager.Instance != null)
-        {
-            int lastReached = UnityJam.Core.GameSessionManager.Instance.LastReachedFloor;
-            // 固定コスト: 200スタート (Day2=200, Day3=250...)
-            // CurrentDayIndexはShop突入前にインクリメントされている想定 (Day1終了後=1)
-            int currentDayIndex = UnityJam.Core.GameSessionManager.Instance.CurrentDayIndex;
-            // 補正: Day1(Idx0)終わり -> Idx1 (Day2) -> Cost 200
-            // Day2(Idx1)終わり -> Idx2 (Day3) -> Cost 250
-            int baseCost = 200;
-            int cost = baseCost + (Mathf.Max(0, currentDayIndex - 1) * 50);
-
-            if (lastReached > 1)
-            {
-                shortcutInfoText.text = $"{lastReached}Fから開始 (Cost:{cost})";
-                
-                if (shortcutButton != null)
-                {
-                    shortcutButton.interactable = true;
-                }
-            }
-            else
-            {
-                shortcutInfoText.text = "スキップ不可";
-                if (shortcutButton != null) shortcutButton.interactable = false;
-            }
-        }
-    }
-    
-    public void OnShortcutBuy()
-    {
-        if (UnityJam.Core.GameSessionManager.Instance == null) return;
-        if (UnityJam.Core.Inventory.Instance == null) return;
-
-        int lastReached = UnityJam.Core.GameSessionManager.Instance.LastReachedFloor;
-        if (lastReached <= 1) return;
-
-        // Cost Calculation
-        int currentDayIndex = UnityJam.Core.GameSessionManager.Instance.CurrentDayIndex;
-        int baseCost = 200;
-        int cost = baseCost + (Mathf.Max(0, currentDayIndex - 1) * 50);
-
-        int currentScore = UnityJam.Core.Inventory.Instance.TotalScore;
-
-        if (currentScore >= cost)
-        {
-            // Pay
-            UnityJam.Core.Inventory.Instance.SpendScore(cost);
-            
-            // Apply Skip
-            UnityJam.Core.GameSessionManager.Instance.NextDayStartFloor = lastReached;
-            
-            // Log
-            if (LogEnd >= 4)
-            {
-                LogEnd = 3;
-                for (int i = 0; i < 3; ++i)
-                {
-                    LogText[i].SetText(LogText[i + 1].GetParsedText());
-                }
-            }
-            LogText[LogEnd].SetText($"Skipped to {lastReached}F (-{cost})");
-            LogEnd++;
-             
-             // Update UI
-             if (shortcutButton != null) shortcutButton.interactable = false; // bought
-        }
-        else
-        {
-             if (LogEnd >= 4)
-             {
-                 LogEnd = 3;
-                 for (int i = 0; i < 3; ++i)
-                 {
-                     LogText[i].SetText(LogText[i + 1].GetParsedText());
-                 }
-             }
-             LogText[LogEnd].SetText("Not enough Score");
-             LogEnd++;
-        }
     }
     
     public void OnBatteryBuy()

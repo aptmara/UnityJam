@@ -10,9 +10,10 @@ public enum GameState
     Gameplay,
     ScoreCalc,
     Result,
-    Shop, // Shop added
+    Shop,
     FinalResult,
-    GameOver
+    GameOver,
+    Loading // Added for transitions
 }
 
 public class GameManager : MonoBehaviour
@@ -116,12 +117,29 @@ public class GameManager : MonoBehaviour
     private void StartNextFloor()
     {
         Debug.Log("Proceeding to Next Floor...");
-        // 階層遷移時の演出（必要なら）
-        // 現在はそのままリロード＝次の階層生成（StageManagerがCurrentFloorを見て生成を変える想定）
+        StartCoroutine(LoadNextFloorRoutine());
+    }
+
+    private IEnumerator LoadNextFloorRoutine()
+    {
+        // 1. Loadingへ遷移（これでStageManager等のGameplayPrefabが破棄される）
+        ChangeState(GameState.Loading);
+        
+        // 2. シーンリロード
         if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "Main")
         {
-             UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+             // Asyncでロードせずとも、1フレーム待つなどでタイミングをずらす
+             var op = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+             while (!op.isDone) yield return null;
         }
+        else
+        {
+            // 仮にMainじゃない場合でも1フレーム待つ
+            yield return null;
+        }
+
+        // 3. Gameplayへ復帰（StageManagerが新規生成され、Start()でステージ構築＆FadeInが走る）
+        ChangeState(GameState.Gameplay);
     }
 
     private void HandleRoundEnd()
@@ -143,9 +161,9 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-                // まだ続く -> ショップへ遷移
-                Debug.Log("Day Finished. Proceeding to Shop...");
-                ChangeState(GameState.Shop);
+                // まだ続く -> DailyResultへ遷移 (そこでショートカット選択 -> Shopへ)
+                Debug.Log("Day Finished. Proceeding to DailyResult...");
+                ChangeState(GameState.Result);
             }
         }
     }

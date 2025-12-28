@@ -14,7 +14,9 @@ public class UIManager : MonoBehaviour
     [SerializeField] private List<GameObject> titlePrefabs;
 
     [SerializeField] private List<GameObject> gameplayPrefabs;
-    [SerializeField] private List<GameObject> resultPrefabs;
+    [SerializeField] private List<GameObject> resultPrefabs; // Used for Daily Result
+    [SerializeField] private List<GameObject> shopPrefabs;
+    [SerializeField] private List<GameObject> finalResultPrefabs;
     [SerializeField] private List<GameObject> gameOverPrefabs;
 
     private List<GameObject> currentUIInstances = new List<GameObject>();
@@ -72,14 +74,18 @@ public class UIManager : MonoBehaviour
             case GameState.Result:
                 prefabsToInstantiate = resultPrefabs;
                 break;
+            case GameState.Shop:
+                prefabsToInstantiate = shopPrefabs;
+                break;
+            case GameState.FinalResult:
+                prefabsToInstantiate = finalResultPrefabs;
+                break;
             case GameState.GameOver:
                 prefabsToInstantiate = gameOverPrefabs;
                 // 強制的にカーソル解放
                 Cursor.lockState = CursorLockMode.None;
                 Cursor.visible = true;
                 break;
-
-            // 必要に応じて他のステートも追加
         }
 
         if (prefabsToInstantiate != null)

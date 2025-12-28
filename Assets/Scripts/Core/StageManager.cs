@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityJam.Environment;
+using UnityJam.Core;
 
 public class StageManager : MonoBehaviour
 {
@@ -22,52 +23,30 @@ public class StageManager : MonoBehaviour
 
     private void Start()
     {
-        if (GameManager.Instance != null)
-        {
-            GameManager.Instance.OnStateChanged += HandleStateChanged;
-
-            if (GameManager.Instance.CurrentState == GameState.Gameplay)
-            {
-                SetupStage();
-                if (ScreenFader.Instance != null) ScreenFader.Instance.FadeIn();
-            }
-        }
+        // プレハブとして生成された瞬間(=Gameplay開始)に構築
+        SetupStage();
+        if (ScreenFader.Instance != null) ScreenFader.Instance.FadeIn();
     }
 
     private void OnDestroy()
     {
-        if (GameManager.Instance != null)
-        {
-            GameManager.Instance.OnStateChanged -= HandleStateChanged;
-        }
-    }
-
-    private void HandleStateChanged(GameState state)
-    {
-        switch (state)
-        {
-            case GameState.Title:
-            case GameState.Gameplay:
-            case GameState.Result: // Add Result here to trigger cleanup and initial FadeIn
-                CleanupStage();
-                if (state == GameState.Gameplay) SetupStage(); // Only Setup for Gameplay
-
-                // For Result, we just cleanup (GamePrefabManager handles UI).
-                // Then FadeIn.
-                if (ScreenFader.Instance != null) ScreenFader.Instance.FadeIn();
-                break;
-            case GameState.GameOver:
-                // GameOver時は表示だけ残すかもしれないが、
-                // タイトルに戻る時にCleanupされるのでここでは特に何もしない
-                // 必要であればここでもCleanup
-                break;
-        }
+        CleanupStage();
     }
 
     private void SetupStage()
     {
-        // インデックス取得 (PlayerDataManagerがあればそこから、なければ0)
-        int stageIndex = PlayerDataManager.Instance ? PlayerDataManager.Instance.CurrentStageIndex : 0;
+        // インデックス取得
+        // GameSessionManagerがあればそこから階層を取得(1始まりなので-1)
+        int stageIndex = 0;
+        if (GameSessionManager.Instance != null)
+        {
+            stageIndex = GameSessionManager.Instance.CurrentFloor - 1;
+        }
+        else if (PlayerDataManager.Instance != null)
+        {
+            stageIndex = PlayerDataManager.Instance.CurrentStageIndex;
+        }
+
         int playerIndex = PlayerDataManager.Instance ? PlayerDataManager.Instance.CurrentPlayerIndex : 0;
 
         // 1. ステージ生成
