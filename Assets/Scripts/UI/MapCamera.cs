@@ -33,6 +33,9 @@ namespace UnityJam.UI
             MapUIEvents.OnUIRequested += Register;
             MapTargetRegister.OnTargetRegistered += SetTransform;
 
+
+            Debug.Log("MapCamera Enable");
+
         }
 
         private void OnDisable()

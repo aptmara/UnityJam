@@ -29,10 +29,11 @@ public class PlayerMapChange : MonoBehaviour
 
     IEnumerator DelayedInit()
     {
-        yield return new WaitForSeconds(0.8f);
+        yield return new WaitForSeconds(1.8f);
         playerMapState = PlayerMapState.DontUseMap;
         MapUIEvents.UseMiniMap();
         MapTargetRegister.Register(this.gameObject.transform);
+        Debug.Log("Player Enable");
     }
 
 

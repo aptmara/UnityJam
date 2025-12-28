@@ -24,6 +24,7 @@ namespace UnityJam.UI
         public static void Request(MapMask ui)
         {
             OnUIRequested?.Invoke(ui);
+
         }
 
         public static void UseMap()
@@ -40,8 +41,8 @@ namespace UnityJam.UI
 
     public class MapMask : MonoBehaviour
     {
-        public Camera mapCamera { get; set; }
-        public MapCamera targetCameraComponents {  get; set; }
+        public Camera mapCamera = null;
+        public MapCamera targetCameraComponents = null;
 
 
         public void CameraSetting(MapCamera camera)
@@ -107,36 +108,7 @@ namespace UnityJam.UI
         // Start is called before the first frame update
         void Start()
         {
-            timer = 0.0f;
 
-
-            useMapType = MapType.Minimap;
-
-            float halfHeight = mapCamera.orthographicSize;
-            float halfWidth = mapCamera.orthographicSize * mapCamera.aspect;
-
-            Vector3 camPos = mapCamera.transform.position;
-
-            mapMinX = camPos.x - halfWidth;
-            mapMaxX = camPos.x + halfWidth;
-
-            mapMinZ = camPos.z - halfHeight;
-            mapMaxZ = camPos.z + halfHeight;
-
-            // Textureを共有するため一旦コメントアウト
-            fogTexture = new Texture2D(mapSize, mapSize, TextureFormat.RGBA32, false);
-            fogTexture.filterMode = FilterMode.Bilinear;
-
-            // 全部黒（未探索）
-            Color32[] pixels = new Color32[mapSize * mapSize];
-            for (int i = 0; i < pixels.Length; i++)
-                pixels[i] = new Color32(1, 1, 1, 1);
-
-            fogTexture.SetPixels32(pixels);
-            fogTexture.Apply();
-
-            mapMaskImage.texture = fogTexture;
-            minimapMaskImage.texture = fogTexture;
 
 
         }
@@ -147,9 +119,10 @@ namespace UnityJam.UI
             timer += Time.deltaTime;
             if (timer > 0.1f)
             {
-                if(mapCamera == null)
+                if(mapCamera == null || targetCameraComponents == null)
                 {
                     MapUIEvents.Request(this);
+                    return;
                 }
 
                 Reveal(targetCameraComponents.targetTransform.position);
@@ -348,11 +321,47 @@ namespace UnityJam.UI
         }
         void OnEnable()
         {
+
             MapUIEvents.Request(this);
 
             MiniMapEvents.OnRegister += Register;
             MiniMapEvents.OnUnregister += Unregister;
             MapUIEvents.OnSetMapType += SetMapType;
+
+            timer = 0.0f;
+
+
+            useMapType = MapType.Minimap;
+
+            if(mapCamera != null && targetCameraComponents != null)
+            {
+                float halfHeight = mapCamera.orthographicSize;
+                float halfWidth = mapCamera.orthographicSize * mapCamera.aspect;
+
+                Vector3 camPos = mapCamera.transform.position;
+
+                mapMinX = camPos.x - halfWidth;
+                mapMaxX = camPos.x + halfWidth;
+
+                mapMinZ = camPos.z - halfHeight;
+                mapMaxZ = camPos.z + halfHeight;
+
+            }
+
+            // Textureを共有するため一旦コメントアウト
+            fogTexture = new Texture2D(mapSize, mapSize, TextureFormat.RGBA32, false);
+            fogTexture.filterMode = FilterMode.Bilinear;
+
+            // 全部黒（未探索）
+            Color32[] pixels = new Color32[mapSize * mapSize];
+            for (int i = 0; i < pixels.Length; i++)
+                pixels[i] = new Color32(1, 1, 1, 1);
+
+            fogTexture.SetPixels32(pixels);
+            fogTexture.Apply();
+
+            mapMaskImage.texture = fogTexture;
+            minimapMaskImage.texture = fogTexture;
 
         }
 
