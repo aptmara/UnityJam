@@ -501,7 +501,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u6B21\u306E\u65E5\u306E\u4FA1\u683C"
+  m_text: "\u6B21\u306E\u4FA1\u683C"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: e6c904ba525c15a4d839f11abbc445d0, type: 2}
   m_sharedMaterial: {fileID: -245469040115016432, guid: e6c904ba525c15a4d839f11abbc445d0, type: 2}
@@ -564,7 +564,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: -38.424316, y: 0, z: -38.09424, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -637,8 +637,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\u4ECA\u306E\u30D0\u30C3\u30C6\u30EA\u30FC\u306E\u8CBB\u7528\u3092\u30B3\u30FC\u30C9\u3067\u5165\u308C\u308B"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: e6c904ba525c15a4d839f11abbc445d0, type: 2}
+  m_sharedMaterial: {fileID: -245469040115016432, guid: e6c904ba525c15a4d839f11abbc445d0, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1522,8 +1522,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\u6B21\u306E\u65E5\u306E\u4FA1\u683C\u3092\u30B3\u30FC\u30C9\u3067\u5165\u308C\u308B\n"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: e6c904ba525c15a4d839f11abbc445d0, type: 2}
+  m_sharedMaterial: {fileID: -245469040115016432, guid: e6c904ba525c15a4d839f11abbc445d0, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1649,8 +1649,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   audioSource: {fileID: 5838254401884051382}
-  selectSE: {fileID: 8300000, guid: 337a7d757b56ff1429e989cfd0f55769, type: 3}
   BuySE: {fileID: 8300000, guid: 6c57b5c121825e04b9b1ad90ba8dd2a4, type: 3}
+  batteryBuyButton: {fileID: 19233674914910010}
+  cancelButton: {fileID: 1890698304843302111}
+  buyButton: {fileID: 1593563554481671248}
+  shopEndButton: {fileID: 2824841092515981956}
   LogText:
   - {fileID: 2351489516439267808}
   - {fileID: 4997967613840047002}
@@ -1659,12 +1662,11 @@ MonoBehaviour:
   BuyActionText: {fileID: 7694149057300959964}
   HaveManeyText: {fileID: 6134677246749276354}
   BatteryTMP: {fileID: 3334781481508564417}
-  BatteryNowCost: 100
-  MaxBuyBattery: 3
-  BatteryNowCostTMP: {fileID: 8917837717143112087}
-  BatteryNextCostTMP: {fileID: 3226058780828026724}
-  LightCost: 200
-  MaxUpgrade: 3
+  BatteryNowCost: 10
+  CostMultiplier: 1.5
+  MaxBuyBattery: 10
+  BatteryNowCostTMP: {fileID: 6238451653491175379}
+  BatteryNextCostTMP: {fileID: 3819350502896997307}
 --- !u!82 &5838254401884051382
 AudioSource:
   m_ObjectHideFlags: 0
@@ -2949,7 +2951,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: -47.07849, y: 0, z: -46.646362, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0

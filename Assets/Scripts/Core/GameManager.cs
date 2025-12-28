@@ -129,6 +129,7 @@ public class GameManager : MonoBehaviour
                 break;
             case GameState.Result:
                 // Result (Day End)
+                if (ScreenFader.Instance != null) ScreenFader.Instance.FadeIn();
                 HandleRoundEnd();
                 break;
             case GameState.Shop:
