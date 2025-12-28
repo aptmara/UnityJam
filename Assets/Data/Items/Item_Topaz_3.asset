@@ -12,10 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23a3e46a35291db44b4d21ac75b320bb, type: 3}
   m_Name: Item_Topaz_3
   m_EditorClassIdentifier: 
-  itemName: "\u30B5\u30D5\u30A1\u30A4\u30A2"
+  itemName: "\u30C8\u30D1\u30FC\u30BA"
   icon: {fileID: 21300000, guid: e147f857fabdc76479d0804a23dbe7af, type: 3}
   description: "\u6F84\u3093\u3060\u9EC4\u91D1\u8272\u306E\u8F1D\u304D\u3092\u653E\u3064\u5B9D\u77F3\u3002\n\u6301\u3064\u8005\u306B\u3001\u524D\u3078\u9032\u3081\u308B\u3068\u3044\u3046\u78BA\u4FE1\u3092\u4E0E\u3048\u308B\u3002"
   value: 70
   weight: 0.5
+  consumptionRate: 0
   isDiscardable: 1
   rarity: 3
