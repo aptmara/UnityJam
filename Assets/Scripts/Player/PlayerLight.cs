@@ -79,11 +79,29 @@ public class PlayerLight : MonoBehaviour
         BatteryImage = BatteryLife.GetComponent<Image>();
         AdditionBatteryImage = AdditionBatteryLife.GetComponent<Image>();
 
-        BatteryAdditionPieces = 0;
-
-        LightBattery = 1.0f;
-
-        damageAmount = 0.0f;
+        // 永続化データのロード
+        if (PlayerDataManager.Instance != null)
+        {
+            if (PlayerDataManager.Instance.BatteryPieces == -1)
+            {
+                // 初回（データなし）：現在のInspector値を保存
+                PlayerDataManager.Instance.BatteryPieces = BatteryPieces;
+                PlayerDataManager.Instance.BatteryAdditionPieces = BatteryAdditionPieces;
+                PlayerDataManager.Instance.LightBattery = LightBattery;
+            }
+            else
+            {
+                // データあり：ロードして上書き
+                BatteryPieces = PlayerDataManager.Instance.BatteryPieces;
+                BatteryAdditionPieces = PlayerDataManager.Instance.BatteryAdditionPieces;
+                LightBattery = PlayerDataManager.Instance.LightBattery;
+            }
+        }
+        else
+        {
+            BatteryAdditionPieces = 0;
+            LightBattery = 1.0f;
+        }
     }
 
     // Update is called once per frame
@@ -213,8 +231,17 @@ public class PlayerLight : MonoBehaviour
             BatteryImage.rectTransform.localScale = scale;
         }
         //テキスト設定
+        //テキスト設定
         BatteryPiecesText.SetText("{0}×",BatteryPieces);
         AdditionPiecesText.SetText("{0}×",BatteryAdditionPieces);
+
+        // 状態保存
+        if (PlayerDataManager.Instance != null)
+        {
+            PlayerDataManager.Instance.BatteryPieces = BatteryPieces;
+            PlayerDataManager.Instance.BatteryAdditionPieces = BatteryAdditionPieces;
+            PlayerDataManager.Instance.LightBattery = LightBattery;
+        }
     }
 
     /// <summary>

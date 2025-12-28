@@ -18,6 +18,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private List<GameObject> shopPrefabs;
     [SerializeField] private List<GameObject> finalResultPrefabs;
     [SerializeField] private List<GameObject> gameOverPrefabs;
+    [SerializeField] private List<GameObject> creditPrefabs; // Added
 
     private List<GameObject> currentUIInstances = new List<GameObject>();
 
@@ -80,6 +81,9 @@ public class UIManager : MonoBehaviour
             case GameState.FinalResult:
                 prefabsToInstantiate = finalResultPrefabs;
                 break;
+            case GameState.Credits: // Added
+                prefabsToInstantiate = creditPrefabs;
+                break;
             case GameState.GameOver:
                 prefabsToInstantiate = gameOverPrefabs;
                 // 強制的にカーソル解放
@@ -128,6 +132,19 @@ public class UIManager : MonoBehaviour
                             // falseを指定してプレハブのローカル設定（位置・スケール）を維持
                             GameObject uiObj = Instantiate(prefab, parentTransform, false);
                             currentUIInstances.Add(uiObj);
+
+                            // Auto-bind click sound to all buttons
+                            var buttons = uiObj.GetComponentsInChildren<Button>(true);
+                            foreach (var btn in buttons)
+                            {
+                                btn.onClick.AddListener(() => 
+                                {
+                                    if (UnityJam.Core.SoundManager.Instance != null)
+                                    {
+                                        UnityJam.Core.SoundManager.Instance.PlayUIClick();
+                                    }
+                                });
+                            }
                         }
                     }
                 }

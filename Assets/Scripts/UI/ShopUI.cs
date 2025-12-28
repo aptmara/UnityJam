@@ -59,6 +59,8 @@ public class ShopUI : MonoBehaviour
         LogEnd = 0;
         BuyActionText = BuyActionText.GetComponent<TMPro.TMP_Text>();
         ScreenFader.Instance.FadeIn();
+
+        RefreshCostLabels();
     }
 
     // Update is called once per frame
@@ -69,8 +71,7 @@ public class ShopUI : MonoBehaviour
         BuyCost = nLightBuyCnt * LightCost;
         //LightTMP.SetText("×{0} Cost:{1}", nLightBuyCnt,BuyCost);
 
-        BatteryNowCostTMP.SetText("{0}", BatteryNowCost);
-        BatteryNextCostTMP.SetText("{0}", BatteryNextCost);
+        RefreshCostLabels();
 
         if(BuyActionFrame <= 0)
         {
@@ -83,6 +84,19 @@ public class ShopUI : MonoBehaviour
         
         //プレイヤーの所持金を表示する
         HaveManeyText.SetText($"{GetTotalScore()}"); // Show actual score
+    }
+
+    void RefreshCostLabels()
+    {
+        if (BatteryNowCostTMP != null)
+        {
+            BatteryNowCostTMP.text = BatteryNowCost.ToString();
+        }
+
+        if (BatteryNextCostTMP != null)
+        {
+            BatteryNextCostTMP.text = BatteryNextCost.ToString();
+        }
     }
 
     // Helper to get score
@@ -138,7 +152,7 @@ public class ShopUI : MonoBehaviour
                     LogText[i].SetText(LogText[i + 1].GetParsedText());
                 }
             }
-            LogText[LogEnd].SetText("Cant Buy Light");
+            LogText[LogEnd].SetText("ライトはこれ以上買えません");
             LogEnd++;
             return;
         }
@@ -152,7 +166,7 @@ public class ShopUI : MonoBehaviour
                 LogText[i].SetText(LogText[i + 1].GetParsedText());
             }
         }
-        LogText[LogEnd].SetText("Buy Light");
+        LogText[LogEnd].SetText("ライトを買いました");
         LogEnd++;
         BuyActionText.rectTransform.localPosition = new Vector3(-280, 200, 0);
         BuyActionFrame = 10;
@@ -226,5 +240,6 @@ public class ShopUI : MonoBehaviour
     {
         BatteryNowCost = now;
         BatteryNextCost = future;
+        RefreshCostLabels();
     }
 }

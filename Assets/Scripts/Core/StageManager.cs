@@ -175,7 +175,7 @@ public class StageManager : MonoBehaviour
 
         if (GameManager.Instance == null)
         {
-            Debug.LogWarning("GameManager.Instance is null - cannot change state.");
+            Debug.LogError("GameManager.Instance is null - cannot change state.");
             return;
         }
 
@@ -183,22 +183,24 @@ public class StageManager : MonoBehaviour
 
         if (currentPlayerInstance == null)
         {
-            Debug.LogWarning("currentPlayerInstance is null - ignoring goal.");
+            Debug.LogError("currentPlayerInstance is null - ignoring goal. Player might have been destroyed?");
             return;
         }
 
         // Ensure the triggered object is the current player or a child of it
         bool isCurrentPlayer = player == currentPlayerInstance || player.transform.IsChildOf(currentPlayerInstance.transform);
-        Debug.Log("Is current player: " + isCurrentPlayer);
+        Debug.Log($"Is current player: {isCurrentPlayer} (Triggered: {player.name}, Registered: {currentPlayerInstance.name})");
+        
         if (!isCurrentPlayer)
         {
+            Debug.LogError("Goal triggerer is NOT the registered current player. Ignoring.");
             return;
         }
 
         // Only consider hits to the designated Goal_G object (identity check handled in wrapper)
         if (currentGoalPoint == null)
         {
-            Debug.LogWarning("currentGoalPoint is null - cannot verify goal identity.");
+            Debug.LogError("currentGoalPoint is null - cannot verify goal identity.");
             return;
         }
 
@@ -207,13 +209,23 @@ public class StageManager : MonoBehaviour
 
         if (ScreenFader.Instance != null)
         {
+            Debug.Log("Starting FadeOut...");
             ScreenFader.Instance.FadeOut(1.0f, () =>
             {
-                GameManager.Instance.HandleGoalReached();
+                Debug.Log("FadeOut Complete. Calling HandleGoalReached.");
+                if (GameManager.Instance != null)
+                {
+                    GameManager.Instance.HandleGoalReached();
+                }
+                else
+                {
+                    Debug.LogError("GameManager lost during fade!");
+                }
             });
         }
         else
         {
+            Debug.Log("No ScreenFader found. Calling HandleGoalReached immediately.");
             GameManager.Instance.HandleGoalReached();
         }
     }
