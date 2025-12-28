@@ -392,6 +392,7 @@ public class GameManager : MonoBehaviour
         // インベントリのクリア
         if (UnityJam.Core.Inventory.Instance != null)
         {
+            Debug.Log("[GameManager] Clearing Inventory for Next Day.");
             UnityJam.Core.Inventory.Instance.Clear();
         }
 
