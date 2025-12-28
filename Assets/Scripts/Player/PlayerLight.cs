@@ -236,7 +236,7 @@ public class PlayerLight : MonoBehaviour
 
     public void ReduceBatteryByPercent(float percent)
     {
-        damageAmount += percent * 100.0f;
+        damageAmount += percent / 100.0f;
 
     }
 }

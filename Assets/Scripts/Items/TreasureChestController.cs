@@ -119,12 +119,12 @@ namespace UnityJam.Gimmicks
                 // ※ "PlayerBattery" の部分は実際のクラス名に合わせてください。
 
 
-                //var playerBattery = FindObjectOfType<PlayerBattery>();
+                var playerBattery = FindObjectOfType<PlayerLight>();
 
-                //if (playerBattery != null)
-                //{
-                //    playerBattery.ReduceBatteryByPercent(dropTable.batteryPenaltyPercent);
-                //}
+                if (playerBattery != null)
+                {
+                    playerBattery.ReduceBatteryByPercent(dropTable.batteryPenaltyPercent);
+                }
             }
 
             // B. インベントリに追加
