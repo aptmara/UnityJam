@@ -11,13 +11,23 @@ namespace UnityJam.Core
     {
         public static GameSessionManager Instance { get; private set; }
 
-        public const int MaxRounds = 3;
+        public const int MaxDays = 3; // 3日間
+        public const int MaxFloors = 5; // 各日5階層
 
-        // 現在のラウンド（0始まり: 0=1回目, 1=2回目...）
-        public int CurrentRoundIndex { get; private set; } = 0;
+        // 現在の日数（0始まり: 0=1日目, 1=2日目...）
+        public int CurrentDayIndex { get; private set; } = 0;
 
-        // 各ラウンドのスコア履歴
-        public List<int> RoundScores { get; private set; } = new List<int>();
+        // 現在の階層（1始まり: 1=1階, 2=2階...）
+        public int CurrentFloor { get; private set; } = 1;
+
+        // 前日に到達した階層（ショートカット可能上限）
+        public int LastReachedFloor { get; private set; } = 1;
+
+        // 次の日の開始階層（ショップで購入して設定）
+        public int NextDayStartFloor { get; set; } = 1;
+
+        // 各ラウンド(日)のスコア履歴
+        public List<int> DayScores { get; private set; } = new List<int>();
 
         // セッション全体で取得したアイテムの総数
         public Dictionary<ItemMaster, int> TotalItems { get; private set; } = new Dictionary<ItemMaster, int>();
@@ -37,14 +47,14 @@ namespace UnityJam.Core
         }
 
         /// <summary>
-        /// ラウンドの結果を記録し、次のラウンドへ進む準備をする
+        /// 1日の終了（5階層クリア、または脱出）時の処理
         /// </summary>
-        public void RegisterRoundResult(int score, Dictionary<ItemMaster, int> items)
+        public void RegisterDayResult(int score, Dictionary<ItemMaster, int> items)
         {
-            Debug.Log($"[GameSessionManager] Registering Round {CurrentRoundIndex + 1} Result. Score: {score}");
+            Debug.Log($"[GameSessionManager] Registering Day {CurrentDayIndex + 1} Result. Score: {score}");
 
             // スコア記録
-            RoundScores.Add(score);
+            DayScores.Add(score);
 
             // アイテム集計
             foreach (var kvp in items)
@@ -58,16 +68,48 @@ namespace UnityJam.Core
                     TotalItems[item] = count;
             }
 
-            // ラウンド進行
-            CurrentRoundIndex++;
+            // 到達階層を記録 (クリアしてれば5+1=6になるかもしれないし、脱出ならその階)
+            // CurrentFloorが5でクリアした場合、次は5までスキップできるべきか？
+            // 仕様: 「前日に到達した階層まで」 -> クリア時は6階扱いだと変だが、最大5階。
+            // 5階クリア = Reached 5.
+            // もしCurrentFloorが5で、ProceedToNextFloorが呼ばれる前にここに来るなら5。
+            // MaxFloorsでキャップする。
+            LastReachedFloor = Mathf.Min(CurrentFloor, MaxFloors);
+            
+            // 次の日へ
+            CurrentDayIndex++;
+            
+            // 階層リセットは StartNextDay で NextDayStartFloor を使うため、ここでは一旦1に戻すか、
+            // あるいは StartNextDay で上書きされるので気にしないか。
+            // デフォルトは1
+            NextDayStartFloor = 1;
+            CurrentFloor = 1; 
         }
 
         /// <summary>
-        /// 全ラウンド終了かどうか
+        /// 次の日の開始処理（GameManagerから呼ばれる）
+        /// </summary>
+        public void StartNextDay()
+        {
+            CurrentFloor = NextDayStartFloor;
+            Debug.Log($"[GameSessionManager] Starting Day {CurrentDayIndex + 1} at Floor {CurrentFloor}");
+        }
+
+        /// <summary>
+        /// 次の階層へ進む
+        /// </summary>
+        public void ProceedToNextFloor()
+        {
+            CurrentFloor++;
+            Debug.Log($"[GameSessionManager] Proceeding to Floor {CurrentFloor}");
+        }
+
+        /// <summary>
+        /// 全日程終了かどうか
         /// </summary>
         public bool IsSessionFinished()
         {
-            return CurrentRoundIndex >= MaxRounds;
+            return CurrentDayIndex >= MaxDays;
         }
 
         /// <summary>
@@ -75,8 +117,9 @@ namespace UnityJam.Core
         /// </summary>
         public void ResetSession()
         {
-            CurrentRoundIndex = 0;
-            RoundScores.Clear();
+            CurrentDayIndex = 0;
+            CurrentFloor = 1;
+            DayScores.Clear();
             TotalItems.Clear();
             Debug.Log("[GameSessionManager] Session Reset");
         }
@@ -87,21 +130,24 @@ namespace UnityJam.Core
         public int GetTotalScore()
         {
             int total = 0;
-            foreach (var s in RoundScores) total += s;
+            foreach (var s in DayScores) total += s;
             return total;
         }
 
         /// <summary>
-        /// 特定のラウンドのスコアを取得 (1始まりのラウンド番号を指定)
+        /// 特定のラウンド(日)のスコアを取得 (1始まりの日数を指定)
         /// </summary>
-        public int GetRoundScore(int roundNumber)
+        public int GetDayScore(int dayNumber)
         {
-            int index = roundNumber - 1;
-            if (index >= 0 && index < RoundScores.Count)
+            int index = dayNumber - 1;
+            if (index >= 0 && index < DayScores.Count)
             {
-                return RoundScores[index];
+                return DayScores[index];
             }
             return 0;
         }
+
+        // 互換性維持のためのエイリアス（必要なら）
+        public int GetRoundScore(int roundNumber) => GetDayScore(roundNumber);
     }
 }

@@ -5113,6 +5113,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: anm_tresurebox
       objectReference: {fileID: 0}
+    - target: {fileID: 3299358572816030822, guid: 7c64e3e0dba84b84bb9b0796bdcdb93f, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: e863ad254449193409a3abfd06f7be81, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

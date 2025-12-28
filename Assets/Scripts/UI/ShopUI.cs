@@ -5,6 +5,10 @@ using UnityEngine;
 
 public class ShopUI : MonoBehaviour
 {
+    [Header("Audio")]
+    [SerializeField]    AudioSource audioSource;
+    [SerializeField]    AudioClip selectSE;
+    [SerializeField]    AudioClip BuySE;
 
     [Header("BuyLog")]
     [SerializeField]
@@ -76,11 +80,17 @@ public class ShopUI : MonoBehaviour
         {
             --BuyActionFrame;
         }
+        
         //プレイヤーの所持金を表示する
-        HaveManeyText.SetText("$");
+        HaveManeyText.SetText($"{GetTotalScore()}"); // Show actual score
     }
 
-
+    // Helper to get score
+    private int GetTotalScore()
+    {
+         return UnityJam.Core.Inventory.Instance != null ? UnityJam.Core.Inventory.Instance.TotalScore : 0;
+    }
+    
     public void OnBatteryBuy()
     {
         //プレイヤーを参照しつつ最大個数を上回っていたら
@@ -94,7 +104,7 @@ public class ShopUI : MonoBehaviour
                     LogText[i].SetText(LogText[i + 1].GetParsedText());
                 }
             }
-            LogText[LogEnd].SetText("Cant Buy Battery");
+            LogText[LogEnd].SetText("バッテリーはこれ以上買えません");
             LogEnd++;
             return;
         }
@@ -107,10 +117,12 @@ public class ShopUI : MonoBehaviour
                 LogText[i].SetText(LogText[i + 1].GetParsedText()); 
             }
         }
-        LogText[LogEnd].SetText("Buy Battery");
+        LogText[LogEnd].SetText("バッテリーを買いました");
         LogEnd++;
         BuyActionText.rectTransform.localPosition = new Vector3(-200, 70, 0);
         BuyActionFrame = 10;
+
+        audioSource.PlayOneShot(selectSE);
     }
 
     public void OnLightBuy()
@@ -158,10 +170,10 @@ public class ShopUI : MonoBehaviour
                 LogText[i].SetText(LogText[i + 1].GetParsedText());
             }
         }
-        LogText[LogEnd].SetText("Cansel");
+        LogText[LogEnd].SetText("購入をキャンセルしました");
         LogEnd++;
 
-        
+        audioSource.PlayOneShot(selectSE);
     }
 
     public void OnBuy()
@@ -183,19 +195,31 @@ public class ShopUI : MonoBehaviour
         }
         //お金減らす処理
         AllBuyCost = nBatteryBuyCnt * BatteryNowCost + nLightBuyCnt * LightCost;
-        LogText[LogEnd].SetText("Confirm Buy. All Cost:{0}",AllBuyCost);
+        LogText[LogEnd].SetText("購入確定しました. 総費用:${0}",AllBuyCost);
+
+        if(nBatteryBuyCnt > 0)
+            audioSource.PlayOneShot(BuySE);
+        else
+            audioSource.PlayOneShot(selectSE);
 
         nBatteryBuyCnt = 0;
         nLightBuyCnt = 0;
 
         LogEnd++;
+
     }
 
     public void OnShopEnd()
     {
-        ScreenFader.Instance.FadeOut();
+        ScreenFader.Instance.FadeOut(1.0f, () =>
+        {
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.StartNextDay();
+            }
+        });
+        audioSource.PlayOneShot(selectSE);
         //シーン読み込み
-
     }
 
     public void SetCost(int now,int future)

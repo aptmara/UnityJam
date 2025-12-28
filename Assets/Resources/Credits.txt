@@ -6,7 +6,7 @@
 [Programmer]
 進捗管理/タスク管理/Map作成
 グループ1の清楚 浅野勇生
-ゲームフロー/環境構築
+ゲームフロー/環境構築/UI
 グループ1の工場長　山内陽
 プレイヤー/カメラ/MapUI作成/ライト調整
 グループ1の越智晴彦
@@ -22,11 +22,13 @@
 カラス、宝箱、ミミック
 グループ１のかわいいもの好き　藤原朱理
 [Sound Design]
-だれか
+BGM、一部の効果音
+グループ１の甘党　書丹聡真
 [Special Thanks]
 Unity 1 Week Jam
 Lite Dungeon Pack
 Low Poly 3D Art by Gridness
+魔王魂
 You!
 
 [End]

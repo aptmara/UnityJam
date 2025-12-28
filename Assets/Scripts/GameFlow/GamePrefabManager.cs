@@ -14,6 +14,8 @@ public class GamePrefabManager : MonoBehaviour
 
     [SerializeField] private List<GameObject> gameplayPrefabs;
     [SerializeField] private List<GameObject> resultPrefabs;
+    [SerializeField] private List<GameObject> shopPrefabs;
+    [SerializeField] private List<GameObject> finalResultPrefabs;
     [SerializeField] private List<GameObject> gameOverPrefabs;
 
     private List<GameObject> currentPrefabInstances = new List<GameObject>();
@@ -74,6 +76,12 @@ public class GamePrefabManager : MonoBehaviour
                 break;
             case GameState.Result:
                 prefabsToInstantiate = resultPrefabs;
+                break;
+            case GameState.Shop:
+                prefabsToInstantiate = shopPrefabs;
+                break;
+            case GameState.FinalResult:
+                prefabsToInstantiate = finalResultPrefabs;
                 break;
             case GameState.GameOver:
                 prefabsToInstantiate = gameOverPrefabs;
