@@ -800,7 +800,6 @@ MonoBehaviour:
   creditPrefabs:
   - {fileID: 794809863555121371, guid: 85a8afd8ce59ef34d86b8b1f1a21b782, type: 3}
   gameplayPrefabs:
-  - {fileID: 5777296883719665468, guid: 5f2ac75f6c3a4a743bd3d54cf1539ba3, type: 3}
   - {fileID: 856708604392802615, guid: 7e50c34b28bcdf044892ea9fdaee8826, type: 3}
   - {fileID: 1229574884394458299, guid: 8be63f7961e22214eb706101f46bc7cb, type: 3}
   resultPrefabs:
