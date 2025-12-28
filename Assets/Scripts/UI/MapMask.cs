@@ -47,8 +47,22 @@ namespace UnityJam.UI
         public void CameraSetting(MapCamera camera)
         {
             mapCamera = camera.GetComponent<Camera>();
-            targetCameraComponents = camera; 
-            
+            targetCameraComponents = camera;
+
+
+            float halfHeight = mapCamera.orthographicSize;
+            float halfWidth = mapCamera.orthographicSize * mapCamera.aspect;
+
+            Vector3 camPos = mapCamera.transform.position;
+
+            mapMinX = camPos.x - halfWidth;
+            mapMaxX = camPos.x + halfWidth;
+
+            mapMinZ = camPos.z - halfHeight;
+            mapMaxZ = camPos.z + halfHeight;
+
+            Debug.Log("CamPos = " + camPos);
+
         }
 
 
@@ -132,6 +146,11 @@ namespace UnityJam.UI
             timer += Time.deltaTime;
             if (timer > 0.1f)
             {
+                if(mapCamera == null)
+                {
+
+                }
+
                 Reveal(targetCameraComponents.targetTransform.position);
                 timer = 0.0f;
 
