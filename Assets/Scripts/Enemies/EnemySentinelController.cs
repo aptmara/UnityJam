@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityJam.Core;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -104,6 +105,9 @@ namespace UnityJam.Enemies
         [SerializeField, Range(0f, 360f)] private float viewAngle = 90.0f;
         [Tooltip("目の高さ（地面すれすれではなく、少し高い位置から見る）")]
         [SerializeField, Range(0.1f, 2.0f)] private float eyeHeight = 1.0f;
+        [Tooltip("重量感度：総重量1kgにつき視界が何メートル広がるか (例: 0.5なら10kgで+5m)")]
+        [SerializeField] private float weightSensitivity = 0.5f;
+
 
         // --- 攻撃設定 ---
         [Header("--- Settings: Attack ---")]
@@ -157,6 +161,20 @@ namespace UnityJam.Enemies
         // ライト用
         private float initialLightIntensity;
         private float lightNoiseOffset;
+
+        public float CurrentViewRadius
+        {
+            get
+            {
+                float r = viewRadius;
+                // ゲーム中活インベントリがある場合、重量分を加算
+                if (Application.isPlaying && Inventory.Instance != null)
+                {
+                    r += Inventory.Instance.TotalWeight * weightSensitivity;
+                }
+                return r;
+            }
+        }
 
         // Unity イベント関数
         // ============================================================
@@ -218,11 +236,25 @@ namespace UnityJam.Enemies
         void UpdateLightEffect()
         {
             if (viewLight == null) return;
+
+            // 現在の視界半径（重量加算済み）を取得
+            float currentR = CurrentViewRadius;
+
+            // 1. ライトの届く距離を更新
+            viewLight.range = currentR;
+            viewLight.spotAngle = viewAngle;
+
+            // 2. 距離が伸びた分だけ、光の強さ(Intensity)も補正する
+            // (現在の距離 / 基本距離) の倍率を計算
+            float ratio = currentR / viewRadius;
+
+            float targetIntensity = initialLightIntensity * ratio;
+
             switch (lightMode)
             {
                 case LightMode.Steady:
                     viewLight.enabled = true;
-                    viewLight.intensity = initialLightIntensity;
+                    viewLight.intensity = targetIntensity;
                     break;
                 case LightMode.Off:
                     viewLight.enabled = false;
@@ -230,12 +262,12 @@ namespace UnityJam.Enemies
                 case LightMode.Flicker:
                     viewLight.enabled = true;
                     float flicker = Mathf.PingPong(Time.time * flickerSpeed, 1.0f);
-                    viewLight.intensity = initialLightIntensity * (0.5f + flicker * 0.5f);
+                    viewLight.intensity = targetIntensity * (0.5f + flicker * 0.5f);
                     break;
                 case LightMode.Malfunction:
                     viewLight.enabled = true;
                     float noise = Mathf.PerlinNoise(Time.time * flickerSpeed, lightNoiseOffset);
-                    viewLight.intensity = initialLightIntensity * (noise > 0.6f ? 1f : 0.1f);
+                    viewLight.intensity = targetIntensity * (noise > 0.6f ? 1f : 0.1f);
                     break;
             }
         }
@@ -499,9 +531,10 @@ namespace UnityJam.Enemies
         void DetectPlayer()
         {
             // 範囲内のコライダーを全て取得
-            Collider[] targetsInViewRadius = Physics.OverlapSphere(transform.position, viewRadius);
+            float effectiveRadius = CurrentViewRadius;
 
             // 目の位置（足元 + EyeHeight）
+            Collider[] targetsInViewRadius = Physics.OverlapSphere(transform.position, effectiveRadius);
             Vector3 eyePos = transform.position + Vector3.up * eyeHeight;
 
             foreach(Collider target in targetsInViewRadius)
@@ -518,7 +551,7 @@ namespace UnityJam.Enemies
                     float distToTarget = Vector3.Distance(eyePos, targetPos);
 
                     // 1. 距離チェック
-                    if (distToTarget > viewRadius) continue;
+                    if (distToTarget > effectiveRadius) continue;
 
                     // 2. 角度判定（扇型の範囲内か）
                     if (Vector3.Angle(transform.forward, dirToTarget) < viewAngle / 2)
@@ -663,12 +696,14 @@ namespace UnityJam.Enemies
         {
             Vector3 center = transform.position;
 
+            float r = Application.isPlaying ? CurrentViewRadius : viewRadius;
+
             // 1. 視界の描画
             Vector3 eye = center + Vector3.up * eyeHeight;
             Color fovColor = isAttacking ? Color.red : new Color(0, 1, 0, 0.2f);
             Handles.color = fovColor;
             Vector3 angleA = DirFromAngle(-viewAngle / 2);
-            Handles.DrawSolidArc(eye, Vector3.up, angleA, viewAngle, viewRadius);
+            Handles.DrawSolidArc(eye, Vector3.up, angleA, viewAngle, r);
 
             // 2. 移動パスの描画
             Gizmos.color = new Color(1, 1, 0, 0.5f); // 薄い黄色

@@ -6,9 +6,19 @@ namespace UnityJam.Gimmicks
 {
     public class MimicChestController : InteractableBase
     {
-        [Header("--- 演出 ---")]
+        [Header("--- 演出 (モデル) ---")]
         [SerializeField] private GameObject monsterModel;
         [SerializeField] private GameObject boxModel;
+
+        [Header("--- 演出（待機中の揺れ） ---")]
+        [Tooltip("揺れる間隔（秒）。この秒数ごとにガタガタします")]
+        [SerializeField] private float shakeInterval = 3.0f;
+
+        [Tooltip("一度の揺れの長さ（秒）")]
+        [SerializeField] private float shakeDuration = 0.5f;
+
+        [Tooltip("揺れの強さ（角度）")]
+        [SerializeField] private float shakeStrength = 2.0f;
 
         [Header("--- アニメーション ---")]
         [SerializeField] private Animator animator;
@@ -22,6 +32,8 @@ namespace UnityJam.Gimmicks
         private Vector3 burstLightOffset = new Vector3(0f, 1.0f, 0f);
 
         private bool activated;
+        private Quaternion initialRotation; // 元の角度を保存
+        private Coroutine shakeCoroutine;
 
         protected override void OnInteractCompleted()
         {
@@ -36,10 +48,55 @@ namespace UnityJam.Gimmicks
             }
         }
 
+        private void Start()
+        {
+            // 初期角度を保存
+            initialRotation = transform.localRotation;
+
+            // 揺れ演出を開始
+            shakeCoroutine = StartCoroutine(IdleShakeRoutine());
+        }
+
+        // 待機中の揺れループ
+        private IEnumerator IdleShakeRoutine()
+        {
+            while (!activated)
+            {
+                // 次の揺れまで待機
+                yield return new WaitForSeconds(shakeInterval);
+
+                if (activated) yield break;
+
+                // ガタガタ揺らす
+                float elapsed = 0f;
+                while (elapsed < shakeDuration)
+                {
+                    if (activated) yield break;
+
+                    // ランダムに少し傾ける
+                    float x = Random.Range(-1f, 1f) * shakeStrength;
+                    float z = Random.Range(-1f, 1f) * shakeStrength;
+
+                    // Y軸（向き）は変えず、XとZでガタつかせる
+                    transform.localRotation = initialRotation * Quaternion.Euler(x, 0, z);
+
+                    elapsed += Time.deltaTime;
+                    yield return null;
+                }
+
+                // 揺れ終わったらピタッと戻す
+                transform.localRotation = initialRotation;
+            }
+        }
+
         private void ActivateTrap()
         {
             if (activated) return;
             activated = true;
+
+            // 揺れを停止して角度をリセット
+            if (shakeCoroutine != null) StopCoroutine(shakeCoroutine);
+            transform.localRotation = initialRotation;
 
             // 1. 見た目切替
             if (boxModel != null) boxModel.SetActive(false);

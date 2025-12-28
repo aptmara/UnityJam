@@ -223,6 +223,9 @@ MonoBehaviour:
   requiredHoldTime: 1
   monsterModel: {fileID: 919132149155446097, guid: 6c109800e9b00d549a0e2211f5dee00e, type: 3}
   boxModel: {fileID: 0}
+  shakeInterval: 3
+  shakeDuration: 0.5
+  shakeStrength: 10
   animator: {fileID: 4595698490271103377}
   activateTriggerName: Activate
   gameOverDelay: 0
