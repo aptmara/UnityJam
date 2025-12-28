@@ -10,6 +10,7 @@ public enum GameState
     Gameplay,
     ScoreCalc,
     Result,
+    Shop, // Shop added
     FinalResult,
     GameOver
 }
@@ -71,8 +72,13 @@ public class GameManager : MonoBehaviour
                 ChangeState(GameState.Result);
                 break;
             case GameState.Result:
-                // Result (Round End)
+                // Result (Day End)
                 HandleRoundEnd();
+                break;
+            case GameState.Shop:
+                // Shop Entry
+                Debug.Log("Entered Shop State");
+                 if (ScreenFader.Instance != null) ScreenFader.Instance.FadeIn();
                 break;
             case GameState.FinalResult:
                 // Final Result (Session End)
@@ -132,19 +138,31 @@ public class GameManager : MonoBehaviour
             // 3回(日)終わったかチェック
             if (UnityJam.Core.GameSessionManager.Instance.IsSessionFinished())
             {
-                // 全ラウンド終了 -> 最終リザルトへ
+                // 全日程終了 -> 最終リザルトへ
                 ChangeState(GameState.FinalResult);
             }
             else
             {
-                // まだ続く -> 次のラウンド(日)へ
-                Debug.Log("Day Finished. Proceeding to next day...");
+                // まだ続く -> ショップへ遷移
+                Debug.Log("Day Finished. Proceeding to Shop...");
+                ChangeState(GameState.Shop);
             }
         }
     }
 
-    public void StartNextRound()
+    /// <summary>
+    /// 次の日(Day)を開始する
+    /// </summary>
+    public void StartNextDay()
     {
+        Debug.Log("Starting Next Day...");
+
+        // セッションマネージャーの開始処理（階層設定など）
+        if (UnityJam.Core.GameSessionManager.Instance != null)
+        {
+            UnityJam.Core.GameSessionManager.Instance.StartNextDay();
+        }
+
         // インベントリのクリア
         if (UnityJam.Core.Inventory.Instance != null)
         {
