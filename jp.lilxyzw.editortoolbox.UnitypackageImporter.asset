@@ -15,3 +15,10 @@ MonoBehaviour:
   importedAssets:
   - name: None
     guids: []
+  - name: vfx_battery.unitypackage
+    guids:
+    - 001eed378ff10c142ac03322423c0166
+    - 877089868e2089243897ed63690091e6
+    - 476cc7d7cd9874016adc216baab94a0a
+    - fcf7219bab7fe46a1ad266029b2fee19
+    - 8162b9aff1a844244bd2a7bba3e5c2f9
