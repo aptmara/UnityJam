@@ -30,6 +30,9 @@ public class GameManager : MonoBehaviour
 
     // 重複呼び出し防止フラグ
     private bool isProcessingDayEnd = false;
+    
+    // 日の失敗フラグ（ペナルティ適用用）
+    private bool isDayFailed = false;
 
     private void Awake()
     {
@@ -63,15 +66,64 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        UnityEngine.SceneManagement.SceneManager.sceneLoaded += OnSceneLoaded;
+        SubscribeToEscapeEvent();
+    }
+
+    private void OnDisable()
+    {
+        UnityEngine.SceneManagement.SceneManager.sceneLoaded -= OnSceneLoaded;
+        if (UnityJam.Core.EscapeState.Instance != null)
+        {
+            UnityJam.Core.EscapeState.Instance.OnEscaped -= HandleEscape;
+        }
+    }
+
     private void Start()
     {
         // 初期状態はTitleと仮定
         ChangeState(GameState.Title);
+        // Startでも念のため購読試行（OnEnableで済んでいるはずだが）
+        SubscribeToEscapeEvent();
+    }
+    
+    private void OnSceneLoaded(UnityEngine.SceneManagement.Scene scene, UnityEngine.SceneManagement.LoadSceneMode mode)
+    {
+        Debug.Log($"[GameManager] Scene Loaded: {scene.name}");
+        SubscribeToEscapeEvent();
+        CleanupAudioListeners();
+        
+        // Gameplay状態なら日数を表示
+        if (CurrentState == GameState.Gameplay)
+        {
+             // シーンリロード後などはここを通る可能性がある
+             // ただしHandleStateEnterで処理されている場合もあるので注意
+        }
+    }
 
-        // 脱出イベント購読
+    private void SubscribeToEscapeEvent()
+    {
         if (UnityJam.Core.EscapeState.Instance != null)
         {
+            // 一度解除して重複を防ぐ
+            UnityJam.Core.EscapeState.Instance.OnEscaped -= HandleEscape;
             UnityJam.Core.EscapeState.Instance.OnEscaped += HandleEscape;
+            Debug.Log("[GameManager] Subscribed to EscapeState.OnEscaped event.");
+        }
+    }
+
+    private void CleanupAudioListeners()
+    {
+        var listeners = FindObjectsOfType<AudioListener>();
+        if (listeners.Length > 1)
+        {
+            Debug.LogWarning($"Found {listeners.Length} AudioListeners. Keeping one and disabling others.");
+            for (int i = 1; i < listeners.Length; i++)
+            {
+                Destroy(listeners[i]); // コンポーネントのみ削除、あるいはGameObjectごと？コンポーネントのみが無難
+            }
         }
     }
 
@@ -236,14 +288,29 @@ public class GameManager : MonoBehaviour
 
     private void HandleRoundEnd(bool directToFinal)
     {
-        if (UnityJam.Core.Inventory.Instance != null && UnityJam.Core.GameSessionManager.Instance != null)
+        if (UnityJam.Core.GameSessionManager.Instance != null)
         {
             // FinalResultから呼ばれた場合は登録済みなのでスキップ
             if (!directToFinal)
             {
-                // 結果をセッションマネージャーに登録
-                int score = UnityJam.Core.Inventory.Instance.TotalScore;
-                var items = UnityJam.Core.Inventory.Instance.GetAllItems();
+                int score;
+                System.Collections.Generic.Dictionary<UnityJam.Items.ItemMaster, int> items;
+                
+                if (isDayFailed)
+                {
+                    // 失敗時はスコア0、アイテムなし
+                    score = 0;
+                    items = new System.Collections.Generic.Dictionary<UnityJam.Items.ItemMaster, int>();
+                    isDayFailed = false; // フラグをリセット
+                }
+                else
+                {
+                    // 通常成功時は現在のスコアとアイテム
+                    score = UnityJam.Core.Inventory.Instance != null ? UnityJam.Core.Inventory.Instance.TotalScore : 0;
+                    items = UnityJam.Core.Inventory.Instance != null 
+                        ? UnityJam.Core.Inventory.Instance.GetAllItems() 
+                        : new System.Collections.Generic.Dictionary<UnityJam.Items.ItemMaster, int>();
+                }
                 
                 // 1日の結果として登録
                 UnityJam.Core.GameSessionManager.Instance.RegisterDayResult(score, items);
@@ -270,27 +337,19 @@ public class GameManager : MonoBehaviour
             return;
         }
         isProcessingDayEnd = true;
+        isDayFailed = true; // ペナルティフラグを立てる
         
         Debug.Log("Day Failed! Penalty applied.");
 
-        if (UnityJam.Core.Inventory.Instance != null && UnityJam.Core.GameSessionManager.Instance != null)
+        if (UnityJam.Core.Inventory.Instance != null)
         {
             // インベントリ全没収
             UnityJam.Core.Inventory.Instance.Clear();
-
-            // スコア0、アイテムなしで登録
-            UnityJam.Core.GameSessionManager.Instance.RegisterDayResult(0, new System.Collections.Generic.Dictionary<UnityJam.Items.ItemMaster, int>());
-
-            // 3日目終了なら直接FinalResultへ、そうでなければResultへ
-            if (UnityJam.Core.GameSessionManager.Instance.IsSessionFinished())
-            {
-                ChangeState(GameState.FinalResult);
-            }
-            else
-            {
-                ChangeState(GameState.Result);
-            }
         }
+
+        // Result画面へ遷移（RegisterDayResultはHandleRoundEnd内で行う）
+        // 3日目終了判定はHandleRoundEnd内で行われる
+        ChangeState(GameState.Result);
     }
 
 

@@ -35,9 +35,11 @@ namespace UnityJam.Core
         {
             if (HasEscaped)
             {
+                Debug.LogWarning("[EscapeState] SetEscaped called but HasEscaped is already true. Ignoring.");
                 return;
             }
 
+            Debug.Log("[EscapeState] SetEscaped: Escape confirmed! Invoking OnEscaped event.");
             HasEscaped = true;
             OnEscaped?.Invoke();
         }
@@ -47,6 +49,7 @@ namespace UnityJam.Core
         /// </summary>
         public void ResetState()
         {
+            Debug.Log("[EscapeState] ResetState: Resetting HasEscaped flag to false.");
             HasEscaped = false;
         }
     }
