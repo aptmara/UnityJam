@@ -2,7 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
-using UnityJam.Core; // TreasureDropTableのnamespace
+using UnityJam.Core;
+using PlasticGui; // TreasureDropTableのnamespace
 
 namespace UnityJam.Editors
 {
@@ -12,6 +13,8 @@ namespace UnityJam.Editors
         // 固定のカラー配列を削除し、関数で生成するようにしました
         public override void OnInspectorGUI()
         {
+            serializedObject.Update();
+
             TreasureDropTable table = (TreasureDropTable)target;
 
             EditorGUILayout.Space();
@@ -36,6 +39,8 @@ namespace UnityJam.Editors
 
             // 2. スライダー付きリストの描画
             DrawListWithSliders(table);
+
+            serializedObject.ApplyModifiedProperties();
 
             if (GUI.changed)
             {
@@ -105,7 +110,6 @@ namespace UnityJam.Editors
                 foreach (var entry in table.dropList) totalWeight += entry.weight;
             }
 
-            serializedObject.Update();
             SerializedProperty listProp = serializedObject.FindProperty("dropList");
 
             // ▼リストの折りたたみヘッダー

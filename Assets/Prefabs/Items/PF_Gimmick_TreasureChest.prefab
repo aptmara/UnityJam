@@ -123,6 +123,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   requiredHoldTime: 0.8
   dropTable: {fileID: 11400000, guid: 7747a07a3b7f7954bae3e776873e4fef, type: 2}
+  floorDropTables: []
   chestAnimator: {fileID: 1774389180717080807}
   innerGlowParticles: {fileID: 2270082512324040483}
   baseVfxPrefab: {fileID: 2747732066291226005, guid: 707ba6916b2f040448bdf3083cc12e39, type: 3}
@@ -130,7 +131,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 549805529714841192, guid: 4b96de88314e1ef4da0563c3240c1198, type: 3}
   - {fileID: 3661358691170469583, guid: 4509756a5b1440e44a548a082fdddd3c, type: 3}
-  openSound: {fileID: 0}
+  openSound: {fileID: 8300000, guid: 40d27d0e231d73d4ea0fc9582e939b36, type: 3}
   audioSource: {fileID: 0}
   cameraShakeStrength: 0.1
   cameraShakeDuration: 0.2

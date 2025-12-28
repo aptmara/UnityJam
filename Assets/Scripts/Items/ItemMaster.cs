@@ -26,7 +26,7 @@ namespace UnityJam.Items
         // ============================================================
         [Header("--- パラメータ ---")]
         [Tooltip("価値（スコアや通貨換算用）")]
-        [Min(0)] public int value = 100;
+        [Min(-100)] public int value = 100;
 
         [Tooltip("重さ（持ち運び制限用など）")]
         [Min(0)] public float weight = 1.0f;

@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23a3e46a35291db44b4d21ac75b320bb, type: 3}
+  m_Name: Item_Zugaikotsu
+  m_EditorClassIdentifier: 
+  itemName: "\u9AD1\u9ACF"
+  icon: {fileID: 21300000, guid: 26655969303b98949ac74a189d17d6b1, type: 3}
+  description: "\u546A\u308F\u308C\u305F\u30A2\u30A4\u30C6\u30E0\u3002\n\u7279\u6B8A\u306A\u529B\u3067\u6368\u3066\u3089\u308C\u306A\u3044\u3002\u4F53\u3092\u91CD\u304F\u3059\u308B\u3002"
+  value: -80
+  weight: 10
+  consumptionRate: -2
+  isDiscardable: 0
+  rarity: 3

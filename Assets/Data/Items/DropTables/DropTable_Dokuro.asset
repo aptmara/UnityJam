@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed18c1395a5b5e04999e80c90dd95b4b, type: 3}
+  m_Name: DropTable_Dokuro
+  m_EditorClassIdentifier: 
+  batteryPenaltyPercent: 15
+  dropList:
+  - item: {fileID: 11400000, guid: 8751021e965567640830dc33dd1e1a50, type: 2}
+    weight: 1

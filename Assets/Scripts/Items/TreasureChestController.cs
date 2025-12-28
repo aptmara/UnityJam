@@ -76,6 +76,8 @@ namespace UnityJam.Gimmicks
             if (audioSource == null && openSound != null)
             {
                 audioSource = gameObject.AddComponent<AudioSource>();
+                audioSource.volume = 0.5f; // 音量調整
+                audioSource.spatialBlend = 1.0f; // 1.0にすると3Dサウンド
             }
         }
 
