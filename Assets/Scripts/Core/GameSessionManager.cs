@@ -177,6 +177,46 @@ namespace UnityJam.Core
             return false;
         }
 
+        /// <summary>
+        /// 全日程の合計スコアから消費する（最新の日から順に遡って消費）
+        /// </summary>
+        /// <param name="amount">消費額</param>
+        /// <returns>消費に成功したらtrue</returns>
+        public bool SpendTotalScore(int amount)
+        {
+            int total = GetTotalScore();
+            if (total < amount)
+            {
+                Debug.Log($"[GameSessionManager] Not enough total score. Have: {total}, Need: {amount}");
+                return false;
+            }
+
+            Debug.Log($"[GameSessionManager] Spending {amount} from total score...");
+
+            int remainingToSpend = amount;
+
+            // 最新の日（後ろ）から順に消費
+            for (int i = DayScores.Count - 1; i >= 0; i--)
+            {
+                if (remainingToSpend <= 0) break;
+
+                if (DayScores[i] >= remainingToSpend)
+                {
+                    // この日のスコアだけで足りる場合
+                    DayScores[i] -= remainingToSpend;
+                    remainingToSpend = 0;
+                }
+                else
+                {
+                    // この日のスコアすべて使っても足りない場合 -> 全額没収して次へ
+                    remainingToSpend -= DayScores[i];
+                    DayScores[i] = 0;
+                }
+            }
+
+            return remainingToSpend == 0;
+        }
+
         // 互換性維持のためのエイリアス（必要なら）
         public int GetRoundScore(int roundNumber) => GetDayScore(roundNumber);
     }

@@ -133,11 +133,8 @@ public class ShopUI : MonoBehaviour
     {
         if (UnityJam.Core.GameSessionManager.Instance != null)
         {
-            int dayIndex = UnityJam.Core.GameSessionManager.Instance.CurrentDayIndex;
-            if (dayIndex > 0)
-            {
-                return UnityJam.Core.GameSessionManager.Instance.GetDayScore(dayIndex);
-            }
+            // セッションマネージャーから全日程の合計スコアを取得（これが残高）
+            return UnityJam.Core.GameSessionManager.Instance.GetTotalScore();
         }
         
         return UnityJam.Core.Inventory.Instance != null ? UnityJam.Core.Inventory.Instance.TotalScore : 0;
@@ -198,6 +195,7 @@ public class ShopUI : MonoBehaviour
             return;
         }
 
+        // 所持金（全合計スコア）チェック
         int currentScore = GetTotalScore();
         if (currentScore < AllBuyCost)
         {
@@ -205,13 +203,10 @@ public class ShopUI : MonoBehaviour
             return;
         }
 
-        int dayIndex = UnityJam.Core.GameSessionManager.Instance != null 
-            ? UnityJam.Core.GameSessionManager.Instance.CurrentDayIndex 
-            : 0;
-        
-        if (dayIndex > 0 && UnityJam.Core.GameSessionManager.Instance != null)
+        if (UnityJam.Core.GameSessionManager.Instance != null)
         {
-            bool success = UnityJam.Core.GameSessionManager.Instance.SpendFromDayScore(dayIndex, AllBuyCost);
+            // 全合計から消費（新しい日から順に）
+            bool success = UnityJam.Core.GameSessionManager.Instance.SpendTotalScore(AllBuyCost);
             if (!success)
             {
                 AddLog("スコアが足りません！");

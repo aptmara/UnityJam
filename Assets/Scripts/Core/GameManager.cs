@@ -337,19 +337,42 @@ public class GameManager : MonoBehaviour
             return;
         }
         isProcessingDayEnd = true;
-        isDayFailed = true; // ペナルティフラグを立てる
+        isDayFailed = true; // ペナルティフラグを立てる (が、今回は当日分は確保する方針)
         
-        Debug.Log("Day Failed! Penalty applied.");
+        Debug.Log("Day Failed! Penalty applied (Future days zeroed out).");
+
+        // 1. 当日分のスコアを確保して登録
+        int currentScore = 0;
+        var currentItems = new System.Collections.Generic.Dictionary<UnityJam.Items.ItemMaster, int>();
 
         if (UnityJam.Core.Inventory.Instance != null)
         {
-            // インベントリ全没収
-            UnityJam.Core.Inventory.Instance.Clear();
+            currentScore = UnityJam.Core.Inventory.Instance.TotalScore;
+            currentItems = UnityJam.Core.Inventory.Instance.GetAllItems();
+            // Inventory.Clear() はしない（スコア確保のため）
         }
 
-        // Result画面へ遷移（RegisterDayResultはHandleRoundEnd内で行う）
-        // 3日目終了判定はHandleRoundEnd内で行われる
-        ChangeState(GameState.Result);
+        if (UnityJam.Core.GameSessionManager.Instance != null)
+        {
+            // 当日の結果登録
+            UnityJam.Core.GameSessionManager.Instance.RegisterDayResult(currentScore, currentItems);
+
+            // 2. 残りの日程を全て0点で埋める
+            while (!UnityJam.Core.GameSessionManager.Instance.IsSessionFinished())
+            {
+                Debug.Log("[GameManager] Skipping future day with 0 score due to failure.");
+                UnityJam.Core.GameSessionManager.Instance.RegisterDayResult(0, new System.Collections.Generic.Dictionary<UnityJam.Items.ItemMaster, int>());
+            }
+
+            // 3. FinalResultへ遷移
+            ChangeState(GameState.FinalResult);
+        }
+        else
+        {
+            Debug.LogError("[GameManager] GameSessionManager is null! Cannot proceed with fail sequence correctly.");
+            // フォールバック
+             ChangeState(GameState.Result);
+        }
     }
 
 
