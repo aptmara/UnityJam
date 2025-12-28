@@ -153,18 +153,42 @@ public class GameManager : MonoBehaviour
             // 1日の結果として登録
             UnityJam.Core.GameSessionManager.Instance.RegisterDayResult(score, items);
 
-            // 3回(日)終わったかチェック
-            if (UnityJam.Core.GameSessionManager.Instance.IsSessionFinished())
-            {
-                // 全日程終了 -> 最終リザルトへ
-                ChangeState(GameState.FinalResult);
-            }
-            else
-            {
-                // まだ続く -> DailyResultへ遷移 (そこでショートカット選択 -> Shopへ)
-                Debug.Log("Day Finished. Proceeding to DailyResult...");
-                ChangeState(GameState.Result);
-            }
+            CheckSessionProgress();
+        }
+    }
+
+    /// <summary>
+    /// 敵に食べられたりして失敗した場合の処理
+    /// </summary>
+    public void HandleDayFailed()
+    {
+        Debug.Log("Day Failed! Penalty applied.");
+
+        if (UnityJam.Core.Inventory.Instance != null && UnityJam.Core.GameSessionManager.Instance != null)
+        {
+            // インベントリ全没収
+            UnityJam.Core.Inventory.Instance.Clear();
+
+            // スコア0、アイテムなしで登録
+            UnityJam.Core.GameSessionManager.Instance.RegisterDayResult(0, new System.Collections.Generic.Dictionary<UnityJam.Items.ItemMaster, int>());
+
+            CheckSessionProgress();
+        }
+    }
+
+    private void CheckSessionProgress()
+    {
+        // 3回(日)終わったかチェック
+        if (UnityJam.Core.GameSessionManager.Instance.IsSessionFinished())
+        {
+            // 全日程終了 -> 最終リザルトへ
+            ChangeState(GameState.FinalResult);
+        }
+        else
+        {
+            // まだ続く -> DailyResultへ遷移 (そこでショートカット選択 -> Shopへ)
+            Debug.Log("Day Finished (Goal or Fail). Proceeding to DailyResult...");
+            ChangeState(GameState.Result);
         }
     }
 

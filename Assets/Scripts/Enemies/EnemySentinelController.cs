@@ -651,7 +651,7 @@ namespace UnityJam.Enemies
             // ゲームオーバー画面への遷移などをここに書く
             if (GameManager.Instance != null)
             {
-                GameManager.Instance.ChangeState(GameState.GameOver);
+                GameManager.Instance.HandleDayFailed();
             }
         }
 
