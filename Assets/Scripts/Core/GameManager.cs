@@ -27,14 +27,27 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
+        Debug.Log($"[GameManager] Awake called on {gameObject.name} (ID: {GetInstanceID()}). Current Instance: {(Instance != null ? Instance.gameObject.name : "null")}");
         if (Instance == null)
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            Debug.Log($"[GameManager] Set as Instance and DDOL. (ID: {GetInstanceID()})");
         }
         else
         {
+            Debug.Log($"[GameManager] Instance already exists (ID: {Instance.GetInstanceID()}). Destroying this duplicate. (ID: {GetInstanceID()})");
             Destroy(gameObject);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        Debug.Log($"[GameManager] OnDestroy called on {gameObject.name} (ID: {GetInstanceID()})");
+        if (Instance == this)
+        {
+            Debug.LogWarning("[GameManager] Instance is being destroyed! This should only happen on application quit.");
+             // Instance = null; // Usually Unity handles this, but good to know.
         }
     }
 

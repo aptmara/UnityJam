@@ -12,7 +12,7 @@ namespace UnityJam.Core
         public static GameSessionManager Instance { get; private set; }
 
         public const int MaxDays = 3; // 3日間
-        public const int MaxFloors = 5; // 各日5階層
+        public const int MaxFloors = 4; // 各日4階層
 
         // 現在の日数（0始まり: 0=1日目, 1=2日目...）
         public int CurrentDayIndex { get; private set; } = 0;

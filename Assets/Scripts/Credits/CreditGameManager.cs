@@ -42,6 +42,9 @@ namespace UnityJam.Credits
         private GameObject returnButtonObj;
         private TextMeshProUGUI gameOverText;
 
+        // Auto-cleanup list
+        private List<GameObject> garbageCollection = new List<GameObject>();
+
         private void Awake()
         {
             if (Instance != null && Instance != this)
@@ -50,6 +53,19 @@ namespace UnityJam.Credits
                 return;
             }
             Instance = this;
+        }
+
+        private void OnDestroy()
+        {
+            if (garbageCollection != null)
+            {
+                foreach (var obj in garbageCollection)
+                {
+                    if (obj != null) Destroy(obj);
+                }
+                garbageCollection.Clear();
+            }
+            if (Instance == this) Instance = null; // Clear static instance
         }
 
         private void Start()
@@ -71,6 +87,8 @@ namespace UnityJam.Credits
                     camObj.transform.position = new Vector3(0, 0, -10f);
                     camObj.AddComponent<AudioListener>();
                     railCamera = camObj.AddComponent<CyberRailCamera>();
+                    
+                    garbageCollection.Add(camObj); // Track for cleanup
                 }
             }
 
@@ -101,7 +119,8 @@ namespace UnityJam.Credits
 
             if (FindFirstObjectByType<Starfield>() == null)
             {
-                new GameObject("Starfield").AddComponent<Starfield>();
+                var starfield = new GameObject("Starfield").AddComponent<Starfield>();
+                garbageCollection.Add(starfield.gameObject); // Track for cleanup
             }
 
             SetupUI();
@@ -286,6 +305,8 @@ namespace UnityJam.Credits
                 scaler.uiScaleMode = UnityEngine.UI.CanvasScaler.ScaleMode.ScaleWithScreenSize;
                 scaler.referenceResolution = new Vector2(1920, 1080);
                 cObj.AddComponent<UnityEngine.UI.GraphicRaycaster>();
+                
+                garbageCollection.Add(cObj); // Track UI for cleanup
             }
 
 
