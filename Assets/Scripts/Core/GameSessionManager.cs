@@ -147,6 +147,25 @@ namespace UnityJam.Core
             return 0;
         }
 
+        /// <summary>
+        /// 指定日のスコアから消費する（ショップ購入用）
+        /// </summary>
+        public bool SpendFromDayScore(int dayNumber, int amount)
+        {
+            int index = dayNumber - 1;
+            if (index >= 0 && index < DayScores.Count)
+            {
+                if (DayScores[index] >= amount)
+                {
+                    DayScores[index] -= amount;
+                    Debug.Log($"[GameSessionManager] Spent {amount} from Day {dayNumber}. Remaining: {DayScores[index]}");
+                    return true;
+                }
+                Debug.Log($"[GameSessionManager] Not enough score to spend. Have: {DayScores[index]}, Need: {amount}");
+            }
+            return false;
+        }
+
         // 互換性維持のためのエイリアス（必要なら）
         public int GetRoundScore(int roundNumber) => GetDayScore(roundNumber);
     }
