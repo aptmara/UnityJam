@@ -51,6 +51,13 @@ namespace UnityJam.Core
         /// </summary>
         public void RegisterDayResult(int score, Dictionary<ItemMaster, int> items)
         {
+            // 重複登録チェック: 既に今日のスコアが登録済みなら無視
+            if (DayScores.Count > CurrentDayIndex)
+            {
+                Debug.LogWarning($"[GameSessionManager] Day {CurrentDayIndex + 1} result already registered. Ignoring duplicate call.");
+                return;
+            }
+            
             Debug.Log($"[GameSessionManager] Registering Day {CurrentDayIndex + 1} Result. Score: {score}");
 
             // スコア記録

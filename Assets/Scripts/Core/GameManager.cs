@@ -28,6 +28,9 @@ public class GameManager : MonoBehaviour
     // イベント
     public event Action<GameState> OnStateChanged;
 
+    // 重複呼び出し防止フラグ
+    private bool isProcessingDayEnd = false;
+
     private void Awake()
     {
         Debug.Log($"[GameManager] Awake called on {gameObject.name} (ID: {GetInstanceID()}). Current Instance: {(Instance != null ? Instance.gameObject.name : "null")}");
@@ -77,6 +80,14 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private void HandleEscape()
     {
+        // 重複防止
+        if (isProcessingDayEnd)
+        {
+            Debug.LogWarning("[GameManager] HandleEscape called but already processing day end. Ignoring.");
+            return;
+        }
+        isProcessingDayEnd = true;
+        
         Debug.Log("Escape triggered! Transitioning to DayResult with current score.");
 
         if (ScreenFader.Instance != null)
@@ -124,6 +135,9 @@ public class GameManager : MonoBehaviour
                 break;
 
             case GameState.Gameplay:
+                // 新しい日の開始時にフラグリセット
+                isProcessingDayEnd = false;
+                
                 // Gameplay - 日数表示付きフェードイン
                 int currentDay = 1;
                 if (UnityJam.Core.GameSessionManager.Instance != null)
@@ -140,9 +154,9 @@ public class GameManager : MonoBehaviour
                 ChangeState(GameState.Result);
                 break;
             case GameState.Result:
-                // Result (Day End)
+                // Result (Day End) - 3日目終了なら直接FinalResultへ
+                HandleRoundEnd(directToFinal: false);
                 if (ScreenFader.Instance != null) ScreenFader.Instance.FadeIn();
-                HandleRoundEnd();
                 break;
             case GameState.Shop:
                 // Shop Entry
@@ -151,6 +165,8 @@ public class GameManager : MonoBehaviour
                 break;
             case GameState.FinalResult:
                 // Final Result (Session End)
+                HandleRoundEnd(directToFinal: true);
+                if (ScreenFader.Instance != null) ScreenFader.Instance.FadeIn();
                 break;
             case GameState.GameOver:
                 // Game Over
@@ -177,6 +193,14 @@ public class GameManager : MonoBehaviour
         }
         else
         {
+            // 重複防止
+            if (isProcessingDayEnd)
+            {
+                Debug.LogWarning("[GameManager] HandleGoalReached (day end) called but already processing. Ignoring.");
+                return;
+            }
+            isProcessingDayEnd = true;
+            
             // 1日の終了（5階層クリア）
             ChangeState(GameState.Result);
         }
@@ -210,18 +234,27 @@ public class GameManager : MonoBehaviour
         ChangeState(GameState.Gameplay);
     }
 
-    private void HandleRoundEnd()
+    private void HandleRoundEnd(bool directToFinal)
     {
         if (UnityJam.Core.Inventory.Instance != null && UnityJam.Core.GameSessionManager.Instance != null)
         {
-            // 結果をセッションマネージャーに登録
-            int score = UnityJam.Core.Inventory.Instance.TotalScore;
-            var items = UnityJam.Core.Inventory.Instance.GetAllItems();
-            
-            // 1日の結果として登録
-            UnityJam.Core.GameSessionManager.Instance.RegisterDayResult(score, items);
+            // FinalResultから呼ばれた場合は登録済みなのでスキップ
+            if (!directToFinal)
+            {
+                // 結果をセッションマネージャーに登録
+                int score = UnityJam.Core.Inventory.Instance.TotalScore;
+                var items = UnityJam.Core.Inventory.Instance.GetAllItems();
+                
+                // 1日の結果として登録
+                UnityJam.Core.GameSessionManager.Instance.RegisterDayResult(score, items);
 
-            CheckSessionProgress();
+                // 3日目終了なら直接FinalResultへ
+                if (UnityJam.Core.GameSessionManager.Instance.IsSessionFinished())
+                {
+                    ChangeState(GameState.FinalResult);
+                }
+            }
+            // directToFinal=trueの場合、FinalResultUI表示のみ（登録は済んでいる）
         }
     }
 
@@ -230,6 +263,14 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void HandleDayFailed()
     {
+        // 重複防止
+        if (isProcessingDayEnd)
+        {
+            Debug.LogWarning("[GameManager] HandleDayFailed called but already processing day end. Ignoring.");
+            return;
+        }
+        isProcessingDayEnd = true;
+        
         Debug.Log("Day Failed! Penalty applied.");
 
         if (UnityJam.Core.Inventory.Instance != null && UnityJam.Core.GameSessionManager.Instance != null)
@@ -240,25 +281,18 @@ public class GameManager : MonoBehaviour
             // スコア0、アイテムなしで登録
             UnityJam.Core.GameSessionManager.Instance.RegisterDayResult(0, new System.Collections.Generic.Dictionary<UnityJam.Items.ItemMaster, int>());
 
-            CheckSessionProgress();
+            // 3日目終了なら直接FinalResultへ、そうでなければResultへ
+            if (UnityJam.Core.GameSessionManager.Instance.IsSessionFinished())
+            {
+                ChangeState(GameState.FinalResult);
+            }
+            else
+            {
+                ChangeState(GameState.Result);
+            }
         }
     }
 
-    private void CheckSessionProgress()
-    {
-        // 3回(日)終わったかチェック
-        if (UnityJam.Core.GameSessionManager.Instance.IsSessionFinished())
-        {
-            // 全日程終了 -> 最終リザルトへ
-            ChangeState(GameState.FinalResult);
-        }
-        else
-        {
-            // まだ続く -> DailyResultへ遷移 (そこでショートカット選択 -> Shopへ)
-            Debug.Log("Day Finished (Goal or Fail). Proceeding to DailyResult...");
-            ChangeState(GameState.Result);
-        }
-    }
 
     /// <summary>
     /// 次の日(Day)を開始する
