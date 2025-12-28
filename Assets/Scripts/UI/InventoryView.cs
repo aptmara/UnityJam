@@ -32,6 +32,9 @@ namespace UnityJam.UI
         [Tooltip("総重量を表示するテキスト")]
         [SerializeField] private TextMeshProUGUI totalWeightText;
 
+        [Tooltip("総稼働率を表示するテキスト")]
+        [SerializeField] private TextMeshProUGUI totalConsumptionText;
+
         [Tooltip("宝箱の気配ヒントを表示するテキスト")]
         [SerializeField] private TextMeshProUGUI treasureHintText;
 
@@ -47,7 +50,7 @@ namespace UnityJam.UI
         private InventorySlot currentSelectedSlot;
 
         private List<InventorySlot> spawnedSlots = new List<InventorySlot>();
-        private const int MAX_SLOTS = 15;
+        private const int MAX_SLOTS = 18;
 
         // 初期化フラグ
         private bool isInitialized = false;
@@ -66,6 +69,7 @@ namespace UnityJam.UI
                 // Inventory.Instance.OnInventoryUnlocked += ForceOpenInventory;   // 初回アンロック時は強制的に開く
                 Inventory.Instance.OnItemCountChanged += RefreshInventory;
                 Inventory.Instance.OnWeightChanged += UpdateWeightUI;           // 重量更新イベント購読
+                Inventory.Instance.OnConsumptionRateChanged += UpdateConsumptionUI; // 総稼働率変更イベント
             }
 
             // 宝箱カウント更新イベント購読
@@ -79,6 +83,17 @@ namespace UnityJam.UI
             {
                 discardButton.onClick.AddListener(OnDiscardPressed);
                 discardButton.gameObject.SetActive(false);  // 最初は非表示
+            }
+        }
+
+        void OnDestroy()
+        {
+            // イベント解除（念のため）
+            if (Inventory.Instance != null)
+            {
+                Inventory.Instance.OnItemCountChanged -= RefreshInventory;
+                Inventory.Instance.OnWeightChanged -= UpdateWeightUI;
+                Inventory.Instance.OnConsumptionRateChanged -= UpdateConsumptionUI;
             }
         }
 
@@ -114,7 +129,14 @@ namespace UnityJam.UI
         {
             inventoryPanel.SetActive(true);
             RefreshInventory(null, 0); // データ更新
-            UpdateWeightUI(Inventory.Instance.TotalWeight); // 開いた時に重量更新
+
+            // 開いた瞬間に最新の値を反映
+            if (Inventory.Instance != null)
+            {
+                UpdateWeightUI(Inventory.Instance.TotalWeight);
+                UpdateConsumptionUI(Inventory.Instance.TotalConsumptionRate);
+            }
+
             UpdateTreasureHintUI();                         // 開いた時にヒント更新
 
             // カーソルを表示して操作できるようにする
@@ -219,7 +241,7 @@ namespace UnityJam.UI
             }
 
             nameText.text = item.itemName;
-            descriptionText.text = item.description;
+            descriptionText.text = $"重量: {item.weight}kg\n価値: {item.value}\n\n{item.description}";
             descriptionIcon.sprite = item.icon;
             descriptionIcon.enabled = true;
 
@@ -256,7 +278,18 @@ namespace UnityJam.UI
         {
             if(totalWeightText != null)
             {
-                totalWeightText.text = $"Weight: {weight:F2}kg";    // 小数点1桁まで
+                totalWeightText.text = $"総重量: {weight:F2}kg";    // 小数点1桁まで
+            }
+        }
+
+        // 稼働率UI更新
+        void UpdateConsumptionUI(float rate)
+        {
+            if (totalConsumptionText != null)
+            {
+                float percent = rate * 100f;
+
+                totalConsumptionText.text = $"総稼働率: {percent:F0}%";
             }
         }
 
