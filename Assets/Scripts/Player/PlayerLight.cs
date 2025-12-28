@@ -137,7 +137,7 @@ public class PlayerLight : MonoBehaviour
 
 
 
-                while (LightBattery <= 0.0f && isLighting)
+                while (LightBattery < 0.0f)
                 { 
                     if (BatteryAdditionPieces > 0)
                     {
@@ -161,8 +161,10 @@ public class PlayerLight : MonoBehaviour
                     }
                     else
                     {
+                        float damage = 
 
-                        LightBattery += 1.0f;
+                        LightBattery = 1.0f + ReducedLight;
+                        ReducedLight = ReducedLight + LightBattery;
                         
                     }
                 }
@@ -234,7 +236,7 @@ public class PlayerLight : MonoBehaviour
 
     public void ReduceBatteryByPercent(float percent)
     {
-        damageAmount += percent * 100.0f;
+        damageAmount += percent / 100.0f;
 
     }
 }
