@@ -233,6 +233,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fdc6b4f55977fce4aaa7cc3ddf813ac8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  dayDisplayPrefab: {fileID: 0}
 --- !u!4 &113211293
 Transform:
   m_ObjectHideFlags: 0
