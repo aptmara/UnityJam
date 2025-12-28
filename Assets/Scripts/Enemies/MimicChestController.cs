@@ -90,7 +90,7 @@ namespace UnityJam.Gimmicks
                     1.25f,
                     () =>
                     {
-                        GameManager.Instance?.ChangeState(GameState.GameOver);
+                GameManager.Instance?.HandleDayFailed();
                     });
             }
             else
