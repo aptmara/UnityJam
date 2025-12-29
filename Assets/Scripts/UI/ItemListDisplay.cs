@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI; // For Layout Components
 using UnityJam.Core;
 using UnityJam.Items;
 
@@ -11,12 +12,24 @@ namespace UnityJam.UI
         [SerializeField] private Transform listContainer;
         [SerializeField] private GameObject itemSlotPrefab;
 
+        [Header("Layout Settings")]
+        [SerializeField] private bool useAutoLayout = true;
+        [SerializeField] private Vector2 cellSize = new Vector2(100, 100);
+        [SerializeField] private Vector2 spacing = new Vector2(10, 10);
+        [SerializeField] private GridLayoutGroup.Constraint constraint = GridLayoutGroup.Constraint.Flexible;
+        [SerializeField] private int constraintCount = 0;
+
         [SerializeField] private bool autoBindInventory = true; // Inventoryを自動で監視するか
 
         private Dictionary<ItemMaster, ItemSlotUI> _currentSlots = new();
 
         private void Start()
         {
+            if (useAutoLayout && listContainer != null)
+            {
+                SetupLayout();
+            }
+
             if (autoBindInventory && Inventory.Instance != null)
             {
                 // イベント購読
@@ -35,6 +48,34 @@ namespace UnityJam.UI
             }
         }
 
+        private void SetupLayout()
+        {
+            // GridLayoutGroupの取得または追加
+            GridLayoutGroup grid = listContainer.GetComponent<GridLayoutGroup>();
+            if (grid == null)
+            {
+                grid = listContainer.gameObject.AddComponent<GridLayoutGroup>();
+            }
+
+            grid.cellSize = cellSize;
+            grid.spacing = spacing;
+            grid.constraint = constraint;
+            grid.constraintCount = constraintCount;
+            // 必要に応じてAlignmentなども設定
+            grid.childAlignment = TextAnchor.UpperLeft; 
+
+            // ContentSizeFitterの取得または追加
+            ContentSizeFitter fitter = listContainer.GetComponent<ContentSizeFitter>();
+            if (fitter == null)
+            {
+                fitter = listContainer.gameObject.AddComponent<ContentSizeFitter>();
+            }
+
+            // 縦方向に伸びる設定（スクロールビューの中身想定）
+            fitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
+            fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+        }
+
         /// <summary>
         /// 外部からアイテムリストを指定して表示する（リザルト画面用など）
         /// </summary>
@@ -42,6 +83,13 @@ namespace UnityJam.UI
         {
             // 自動監視を切る（念のため）
             autoBindInventory = false; 
+            
+            // レイアウト設定（Startで呼ばれてない場合のため）
+            if (useAutoLayout && listContainer != null)
+            {
+                SetupLayout();
+            }
+
             RefreshAll(items);
         }
 

@@ -50,7 +50,8 @@ MonoBehaviour:
   - {fileID: 4137068318238827325, guid: db5f9f43f30e0bc4eb278eec39f8ff85, type: 3}
   resultPrefabs:
   - {fileID: 5782638784182654784, guid: cc3d9bd02c001d5468a648000c2ffe12, type: 3}
+  shopPrefabs: []
+  finalResultPrefabs: []
   gameOverPrefabs:
   - {fileID: 4235637671273805575, guid: c7170514ddae5c648a9d93b0a3ba163c, type: 3}
-  mapPrefabs:
-  - {fileID: 4137068318238827325, guid: db5f9f43f30e0bc4eb278eec39f8ff85, type: 3}
+  creditPrefabs: []

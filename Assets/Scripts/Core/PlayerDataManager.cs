@@ -12,6 +12,14 @@ public class PlayerDataManager : MonoBehaviour
     public int CurrentStageIndex { get; set; } = 0;
     public int CurrentPlayerIndex { get; set; } = 0;
 
+    // バッテリー永続化 (初期値はPlayerLightのInspector値に依存するが、ここで保持)
+    // 初期化は初回Start時にPlayerLightから書き込むか、ここで定義するか。
+    // PlayerLightのInspector値を優先するため、最初は未設定(-1など)にしておく手もあるが、
+    // ここでは単純に保持用変数として定義。
+    public int BatteryPieces { get; set; } = -1; // -1 indicates not initialized
+    public int BatteryAdditionPieces { get; set; } = 0;
+    public float LightBattery { get; set; } = 1.0f;
+
     public void AdvanceStage()
     {
         CurrentStageIndex++;

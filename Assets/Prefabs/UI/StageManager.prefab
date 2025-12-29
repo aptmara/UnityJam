@@ -50,5 +50,6 @@ MonoBehaviour:
   - {fileID: 387512457568872783, guid: a32e0aae6facb2b43a9ca6f91ae6bcdd, type: 3}
   - {fileID: 9201281079708591850, guid: c0b765f6d956ee640bf310fa7e1b1a52, type: 3}
   - {fileID: 1790745973890942424, guid: 932886849ce07ec4ea65694dfe36dc30, type: 3}
+  - {fileID: 6429377364606628326, guid: b4c5218bb2008fd419dcb3a706bb39d8, type: 3}
   systemPrefabs: []
   stageTimeLimit: 300

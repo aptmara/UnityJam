@@ -33,11 +33,15 @@ namespace UnityJam.UI
             MapUIEvents.OnUIRequested += Register;
             MapTargetRegister.OnTargetRegistered += SetTransform;
 
+
+            Debug.Log("MapCamera Enable");
+
         }
 
         private void OnDisable()
         {
             MapUIEvents.OnUIRequested -= Register;
+            MapTargetRegister.OnTargetRegistered -= SetTransform;
         }
 
         void Register(MapMask mask)
@@ -48,6 +52,7 @@ namespace UnityJam.UI
         void SetTransform(Transform a_targetTransform)
         {
             targetTransform = a_targetTransform;
+
 
         }
     }

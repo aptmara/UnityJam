@@ -76,6 +76,8 @@ namespace UnityJam.Gimmicks
             if (audioSource == null && openSound != null)
             {
                 audioSource = gameObject.AddComponent<AudioSource>();
+                audioSource.volume = 0.5f; // 音量調整
+                audioSource.spatialBlend = 1.0f; // 1.0にすると3Dサウンド
             }
         }
 
@@ -142,12 +144,12 @@ namespace UnityJam.Gimmicks
                 // ※ "PlayerBattery" の部分は実際のクラス名に合わせてください。
 
 
-                //var playerBattery = FindObjectOfType<PlayerBattery>();
+                var playerBattery = FindObjectOfType<PlayerLight>();
 
-                //if (playerBattery != null)
-                //{
-                //    playerBattery.ReduceBatteryByPercent(dropTable.batteryPenaltyPercent);
-                //}
+                if (playerBattery != null)
+                {
+                    playerBattery.ReduceBatteryByPercent(dropTable.batteryPenaltyPercent);
+                }
             }
 
             // B. インベントリに追加

@@ -42,11 +42,30 @@ namespace UnityJam.Core
         {
             if (Instance != null && Instance != this)
             {
+                // 重複排除時のログ
+                Debug.Log($"[Inventory] Duplicate instance found on '{gameObject.name}'. Destroying new one.");
                 Destroy(this.gameObject);
                 return;
             }
+
+            // 親がいるとDontDestroyOnLoadが効かないため、切り離す
+            if (transform.parent != null)
+            {
+                Debug.Log($"[Inventory] Detaching from parent '{transform.parent.name}' to ensure persistence.");
+                transform.SetParent(null);
+            }
+
             Instance = this;
             DontDestroyOnLoad(this.gameObject);
+            Debug.Log("[Inventory] Initialized and set to DontDestroyOnLoad.");
+        }
+
+        private void OnDestroy()
+        {
+            if (Instance == this)
+            {
+                Debug.LogWarning("[Inventory] The persistent Inventory instance is being destroyed! This should only happen when Application quits or explicit clearing.");
+            }
         }
 
         // アイテムを追加する

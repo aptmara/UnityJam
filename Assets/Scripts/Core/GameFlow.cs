@@ -122,13 +122,22 @@ namespace UnityJam.Core
                 goalMessageView.Show(goalMessage);
             }
 
-            StartCoroutine(WaitAndFinishStage());
+            if (goalMessageView != null)
+            {
+                goalMessageView.Show(goalMessage);
+            }
+            
+            // 遷移処理は StageManager に任せるため、ここではメッセージ表示のみ行い、遷移コールはしない。
+            // StartCoroutine(WaitAndFinishStage());
         }
 
+        /*
         private System.Collections.IEnumerator WaitAndFinishStage()
         {
             yield return new WaitForSeconds(2.0f);
-            GameManager.Instance.ChangeState(GameState.ScoreCalc);
+            // Use HandleGoalReached to respect multi-floor logic
+            GameManager.Instance.HandleGoalReached(); 
         }
+        */
     }
 }

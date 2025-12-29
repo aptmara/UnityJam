@@ -21,10 +21,17 @@ namespace UnityJam.UI
         [Header("Navigation")]
         [SerializeField] private Button goToShopButton;
 
+        [Header("Feedback")]
+        [SerializeField] private TMP_Text feedbackText;
+        [SerializeField] private Color successColor = Color.cyan;
+        [SerializeField] private Color failColor = Color.red;
+
         private void Start()
         {
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
+
+            if (feedbackText != null) feedbackText.text = "";
 
             // スコア表示
             if (GameSessionManager.Instance != null)
@@ -39,11 +46,11 @@ namespace UnityJam.UI
                 if (finishedDay < 1) finishedDay = 1;
 
                 int dayScore = GameSessionManager.Instance.GetDayScore(finishedDay);
-                if (dayScoreText != null) dayScoreText.text = $"Day {finishedDay} Score: {dayScore:N0}";
+                if (dayScoreText != null) dayScoreText.text = $"{finishedDay}日目 スコア: {dayScore:N0}";
 
                 if (totalScoreText != null)
                 {
-                    totalScoreText.text = $"Total Score: {GameSessionManager.Instance.GetTotalScore():N0}";
+                    totalScoreText.text = $"合計スコア: {GameSessionManager.Instance.GetTotalScore():N0}";
                 }
 
                 UpdateShortcutUI();
@@ -77,7 +84,7 @@ namespace UnityJam.UI
 
             if (lastReached > 1)
             {
-                shortcutInfoText.text = $"{lastReached}Fから開始 (Cost:{cost})";
+                shortcutInfoText.text = $"{lastReached}Fから開始 (費用:{cost})";
                 if (shortcutButton != null) shortcutButton.interactable = true;
             }
             else
@@ -90,7 +97,6 @@ namespace UnityJam.UI
         private void OnShortcutBuy()
         {
             if (GameSessionManager.Instance == null) return;
-            if (Inventory.Instance == null) return;
 
             int lastReached = GameSessionManager.Instance.LastReachedFloor;
             if (lastReached <= 1) return;
@@ -99,12 +105,18 @@ namespace UnityJam.UI
             int baseCost = 200;
             int cost = baseCost + (Mathf.Max(0, currentDayIndex - 1) * 50);
 
-            int currentScore = Inventory.Instance.TotalScore;
+            // GameSessionManagerから現在のスコアを取得
+            int currentScore = GameSessionManager.Instance.GetDayScore(currentDayIndex);
 
             if (currentScore >= cost)
             {
-                // Pay
-                Inventory.Instance.SpendScore(cost);
+                // スコア消費（GameSessionManagerから）
+                bool success = GameSessionManager.Instance.SpendFromDayScore(currentDayIndex, cost);
+                if (!success)
+                {
+                    StartCoroutine(ShowErrorFeedback("スコアが足りません！"));
+                    return;
+                }
                 
                 // Set Start Floor
                 GameSessionManager.Instance.NextDayStartFloor = lastReached;
@@ -113,24 +125,44 @@ namespace UnityJam.UI
                 if (shortcutButton != null)
                 {
                     shortcutButton.interactable = false;
-                    if(shortcutButtonText != null) shortcutButtonText.text = "Purchased";
+                    if(shortcutButtonText != null) shortcutButtonText.text = "購入済み";
                 }
                 
-                // Update Total Score Display
+                // Update Score Display (remaining after purchase)
+                if (dayScoreText != null)
+                {
+                    int remainingScore = GameSessionManager.Instance.GetDayScore(currentDayIndex);
+                    dayScoreText.text = $"{currentDayIndex}日目 スコア: {remainingScore:N0}";
+                }
+                
                 if (totalScoreText != null)
                 {
-                    // Total Score (Record) remains the same even if money is spent
-                    totalScoreText.text = $"Total Score: {GameSessionManager.Instance.GetTotalScore():N0}";
-                    
-                    // If we want to show 'Current Funds' explicitly, we should add another text field.
-                    // But 'Total Score' usually implies Record.
+                    totalScoreText.text = $"合計スコア: {GameSessionManager.Instance.GetTotalScore():N0}";
+                }
+
+                // Success Feedback
+                if (feedbackText != null)
+                {
+                    feedbackText.text = "購入しました！";
+                    feedbackText.color = successColor;
                 }
             }
             else
             {
                 // Not enough score feedback
                 Debug.Log("Not enough score");
-                // Optional: visual feedback
+                StartCoroutine(ShowErrorFeedback("スコアが足りません！"));
+            }
+        }
+
+        private IEnumerator ShowErrorFeedback(string message)
+        {
+            if (feedbackText != null)
+            {
+                feedbackText.text = message;
+                feedbackText.color = failColor;
+                yield return new WaitForSeconds(2.0f);
+                feedbackText.text = "";
             }
         }
 

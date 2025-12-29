@@ -1,216 +1,280 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ShopUI : MonoBehaviour
 {
+    // 静的コスト管理（セッション間で保持）
+    private static int s_BatteryNowCost = 10;
+    private static int s_BatteryNextCost = 15;
+    private static float s_CostMultiplier = 1.5f;
+    
+    // 確定済みコスト（購入確定後のコスト、キャンセル時に戻る基準）
+    private static int s_CommittedNowCost = 10;
+    private static int s_CommittedNextCost = 15;
+    
+    /// <summary>
+    /// コストを初期値にリセット（ゲームリセット時に呼ぶ）
+    /// </summary>
+    public static void ResetCost()
+    {
+        s_BatteryNowCost = 10;
+        s_BatteryNextCost = 15;
+        s_CommittedNowCost = 10;
+        s_CommittedNextCost = 15;
+        Debug.Log("[ShopUI] Cost Reset to initial values");
+    }
+
     [Header("Audio")]
-    [SerializeField]    AudioSource audioSource;
-    [SerializeField]    AudioClip selectSE;
-    [SerializeField]    AudioClip BuySE;
+    [SerializeField] AudioSource audioSource;
+    [SerializeField] AudioClip BuySE;
+
+    [Header("Buttons")]
+    [SerializeField] Button batteryBuyButton;
+    [SerializeField] Button cancelButton;
+    [SerializeField] Button buyButton;
+    [SerializeField] Button shopEndButton;
 
     [Header("BuyLog")]
-    [SerializeField]
-    TMPro.TMP_Text[] LogText;
-    [SerializeField]
-    TMPro.TMP_Text BuyActionText;
-    [SerializeField]
-    TMPro.TMP_Text HaveManeyText;
+    [SerializeField] TMPro.TMP_Text[] LogText;
+    [SerializeField] TMPro.TMP_Text BuyActionText;
+    [SerializeField] TMPro.TMP_Text HaveManeyText;
 
     int BuyActionFrame;
 
     [Header("BatteryBuyText")]
-    [SerializeField]
-    TMPro.TMP_Text BatteryTMP;
-    [SerializeField, Tooltip("BatteryCost")]
-    int BatteryNowCost = 100;
-    int BatteryNextCost = 110;
-    [SerializeField]
-    int MaxBuyBattery = 0;
+    [SerializeField] TMPro.TMP_Text BatteryTMP;
+    [SerializeField] int MaxBuyBattery = 10;
     int LogEnd;
-    [SerializeField]
-    TMPro.TMP_Text BatteryNowCostTMP;
-    [SerializeField]
-    TMPro.TMP_Text BatteryNextCostTMP;
+    [SerializeField] TMPro.TMP_Text BatteryNowCostTMP;
+    [SerializeField] TMPro.TMP_Text BatteryNextCostTMP;
 
     int nBatteryBuyCnt;
-
-    [Header("LightBuyText")]
-    //[SerializeField]
-    //TMPro.TMP_Text LightTMP;
-    [SerializeField, Tooltip("LightCost")]
-    int LightCost = 200;
-    [SerializeField]
-    int MaxUpgrade = 0;
-
-    int nLightBuyCnt;
+    int nBatteryCartCost;
 
     int AllBuyCost;
 
-
-    // Start is called before the first frame update
     void Start()
     {
+        Debug.Log("[ShopUI] Start called");
+        
+        // ショップ入店時にコストと購入済み追加バッテリー数をリセット（その日限りの強化とするため）
+        ResetCost();
+        if (PlayerDataManager.Instance != null)
+        {
+            PlayerDataManager.Instance.BatteryAdditionPieces = 0;
+            Debug.Log("[ShopUI] Reset BatteryAdditionPieces to 0.");
+        }
+
+        // ボタンイベント登録
+        if (batteryBuyButton != null) batteryBuyButton.onClick.AddListener(OnBatteryBuy);
+        if (cancelButton != null) cancelButton.onClick.AddListener(OnCansel);
+        if (buyButton != null) buyButton.onClick.AddListener(OnBuy);
+        if (shopEndButton != null) shopEndButton.onClick.AddListener(OnShopEnd);
+        
         for (int i = 0; i < 4; ++i)
         {
-            LogText[i].SetText("");
+            if (LogText != null && i < LogText.Length && LogText[i] != null)
+                LogText[i].SetText("");
         }
         LogEnd = 0;
-        BuyActionText = BuyActionText.GetComponent<TMPro.TMP_Text>();
+        
         ScreenFader.Instance.FadeIn();
+
+        // ショップ入店時のコストを確定コストとして記録（ResetCost後の値を採用）
+        s_CommittedNowCost = s_BatteryNowCost;
+        s_CommittedNextCost = s_BatteryNextCost;
+        
+        RefreshCostLabels();
+        
+        int score = GetTotalScore();
+        Debug.Log($"[ShopUI] Initial Score: {score}, BatteryNowCost: {s_BatteryNowCost}, BatteryNextCost: {s_BatteryNextCost}");
+        
+        if (HaveManeyText != null)
+        {
+            HaveManeyText.text = score.ToString();
+        }
     }
 
-    // Update is called once per frame
     void FixedUpdate()
     {
-        int BuyCost = nBatteryBuyCnt * BatteryNowCost;
-        BatteryTMP.SetText("×{0} Cost:{1}", nBatteryBuyCnt,BuyCost);
-        BuyCost = nLightBuyCnt * LightCost;
-        //LightTMP.SetText("×{0} Cost:{1}", nLightBuyCnt,BuyCost);
-
-        BatteryNowCostTMP.SetText("{0}", BatteryNowCost);
-        BatteryNextCostTMP.SetText("{0}", BatteryNextCost);
-
-        if(BuyActionFrame <= 0)
+        if (BatteryTMP != null)
         {
-            BuyActionText.rectTransform.localPosition = new Vector3(0, 1000, 0);
-        }
-        else
-        {
-            --BuyActionFrame;
+            BatteryTMP.text = $"×{nBatteryBuyCnt} Cost:{nBatteryCartCost}";
         }
         
-        //プレイヤーの所持金を表示する
-        HaveManeyText.SetText($"{GetTotalScore()}"); // Show actual score
+        RefreshCostLabels();
+
+        if (BuyActionText != null)
+        {
+            if (BuyActionFrame <= 0)
+            {
+                BuyActionText.rectTransform.localPosition = new Vector3(0, 1000, 0);
+            }
+            else
+            {
+                --BuyActionFrame;
+            }
+        }
+        
+        if (HaveManeyText != null)
+        {
+            HaveManeyText.text = GetTotalScore().ToString();
+        }
     }
 
-    // Helper to get score
+    void RefreshCostLabels()
+    {
+        if (BatteryNowCostTMP != null)
+        {
+            BatteryNowCostTMP.text = s_BatteryNowCost.ToString();
+        }
+
+        if (BatteryNextCostTMP != null)
+        {
+            BatteryNextCostTMP.text = s_BatteryNextCost.ToString();
+        }
+    }
+
     private int GetTotalScore()
     {
-         return UnityJam.Core.Inventory.Instance != null ? UnityJam.Core.Inventory.Instance.TotalScore : 0;
+        if (UnityJam.Core.GameSessionManager.Instance != null)
+        {
+            // セッションマネージャーから全日程の合計スコアを取得（これが残高）
+            return UnityJam.Core.GameSessionManager.Instance.GetTotalScore();
+        }
+        
+        return UnityJam.Core.Inventory.Instance != null ? UnityJam.Core.Inventory.Instance.TotalScore : 0;
     }
     
     public void OnBatteryBuy()
     {
-        //プレイヤーを参照しつつ最大個数を上回っていたら
-        if(MaxBuyBattery <= nBatteryBuyCnt)
+        Debug.Log("[ShopUI] OnBatteryBuy clicked");
+        
+        if (MaxBuyBattery <= nBatteryBuyCnt)
         {
-            if (LogEnd >= 4)
-            {
-                LogEnd = 3;
-                for (int i = 0; i < 3; ++i)
-                {
-                    LogText[i].SetText(LogText[i + 1].GetParsedText());
-                }
-            }
-            LogText[LogEnd].SetText("バッテリーはこれ以上買えません");
-            LogEnd++;
+            AddLog("バッテリーはこれ以上買えません");
             return;
         }
+        
+        // カートに現在のコストで追加
+        nBatteryCartCost += s_BatteryNowCost;
         nBatteryBuyCnt++;
-        if (LogEnd >= 4)
-        {
-            LogEnd = 3;
-            for (int i = 0; i < 3; ++i)
-            {
-                LogText[i].SetText(LogText[i + 1].GetParsedText()); 
-            }
-        }
-        LogText[LogEnd].SetText("バッテリーを買いました");
-        LogEnd++;
-        BuyActionText.rectTransform.localPosition = new Vector3(-200, 70, 0);
+        
+        // 次回のコストを計算（表示用）
+        s_BatteryNowCost = s_BatteryNextCost;
+        s_BatteryNextCost = Mathf.RoundToInt(s_BatteryNowCost * s_CostMultiplier);
+        
+        AddLog($"バッテリーをカートに追加 (Cost: {nBatteryCartCost})");
+        
+        if (BuyActionText != null)
+            BuyActionText.rectTransform.localPosition = new Vector3(-200, 70, 0);
         BuyActionFrame = 10;
 
-        audioSource.PlayOneShot(selectSE);
-    }
-
-    public void OnLightBuy()
-    {
-        //プレイヤーを参照しつつ最大個数を上回っていたら
-        if(MaxUpgrade <= nLightBuyCnt)
-        {
-            if (LogEnd >= 4)
-            {
-                LogEnd = 3;
-                for (int i = 0; i < 3; ++i)
-                {
-                    LogText[i].SetText(LogText[i + 1].GetParsedText());
-                }
-            }
-            LogText[LogEnd].SetText("Cant Buy Light");
-            LogEnd++;
-            return;
-        }
-
-        nLightBuyCnt++;
-        if (LogEnd >= 4)
-        {
-            LogEnd = 3;
-            for (int i = 0; i < 3; ++i)
-            {
-                LogText[i].SetText(LogText[i + 1].GetParsedText());
-            }
-        }
-        LogText[LogEnd].SetText("Buy Light");
-        LogEnd++;
-        BuyActionText.rectTransform.localPosition = new Vector3(-280, 200, 0);
-        BuyActionFrame = 10;
+        if (audioSource != null && BuySE != null)
+            audioSource.PlayOneShot(BuySE);
     }
 
     public void OnCansel()
     {
+        Debug.Log("[ShopUI] OnCansel clicked");
         nBatteryBuyCnt = 0;
-        nLightBuyCnt = 0;
-        if (LogEnd >= 4)
-        {
-            LogEnd = 3;
-            for (int i = 0; i < 3; ++i)
-            {
-                LogText[i].SetText(LogText[i + 1].GetParsedText());
-            }
-        }
-        LogText[LogEnd].SetText("購入をキャンセルしました");
-        LogEnd++;
-
-        audioSource.PlayOneShot(selectSE);
+        nBatteryCartCost = 0;
+        
+        // コストをショップ入店時（または最後の購入確定時）の値に戻す
+        s_BatteryNowCost = s_CommittedNowCost;
+        s_BatteryNextCost = s_CommittedNextCost;
+        
+        AddLog("購入をキャンセルしました");
     }
 
     public void OnBuy()
     {
-        //プレイヤー情報を参照して追加バッテリーの個数を増やす
-        //MaxBuyBatteryにも格納
+        Debug.Log("[ShopUI] OnBuy clicked");
 
-        //プレイヤー情報を参照してライトの角度を強化(仮)
-        //MaxUpgradeにも格納
+        AllBuyCost = nBatteryCartCost;
+        
+        Debug.Log($"[ShopUI] OnBuy: AllBuyCost={AllBuyCost}, BatteryCart={nBatteryCartCost}");
 
-
-        if (LogEnd >= 4)
+        if (AllBuyCost <= 0)
         {
-            LogEnd = 3;
-            for (int i = 0; i < 3; ++i)
+            AddLog("購入するアイテムがありません");
+            return;
+        }
+
+        // 所持金（全合計スコア）チェック
+        int currentScore = GetTotalScore();
+        if (currentScore < AllBuyCost)
+        {
+            AddLog("スコアが足りません！");
+            return;
+        }
+
+        if (UnityJam.Core.GameSessionManager.Instance != null)
+        {
+            // 全合計から消費（新しい日から順に）
+            bool success = UnityJam.Core.GameSessionManager.Instance.SpendTotalScore(AllBuyCost);
+            if (!success)
             {
-                LogText[i].SetText(LogText[i + 1].GetParsedText());
+                AddLog("スコアが足りません！");
+                return;
             }
         }
-        //お金減らす処理
-        AllBuyCost = nBatteryBuyCnt * BatteryNowCost + nLightBuyCnt * LightCost;
-        LogText[LogEnd].SetText("購入確定しました. 総費用:${0}",AllBuyCost);
-
-        if(nBatteryBuyCnt > 0)
-            audioSource.PlayOneShot(BuySE);
         else
-            audioSource.PlayOneShot(selectSE);
+        {
+            AddLog("スコアデータがありません");
+            return;
+        }
+
+        AddLog($"購入確定しました. 総費用:{AllBuyCost}");
+
+        if (nBatteryBuyCnt > 0)
+        {
+            if (PlayerDataManager.Instance != null)
+            {
+                PlayerDataManager.Instance.BatteryAdditionPieces += nBatteryBuyCnt;
+                Debug.Log($"[ShopUI] Added {nBatteryBuyCnt} batteries. Total: {PlayerDataManager.Instance.BatteryAdditionPieces}");
+            }
+            else
+            {
+                Debug.LogError("[ShopUI] PlayerDataManager.Instance is NULL! Cannot save battery purchase.");
+            }
+        }
+
+        if (nBatteryBuyCnt > 0 && audioSource != null && BuySE != null)
+            audioSource.PlayOneShot(BuySE);
+
+        // 購入確定：現在のコストを確定コストとして記録
+        s_CommittedNowCost = s_BatteryNowCost;
+        s_CommittedNextCost = s_BatteryNextCost;
 
         nBatteryBuyCnt = 0;
-        nLightBuyCnt = 0;
+        nBatteryCartCost = 0;
+    }
 
+    private void AddLog(string message)
+    {
+        if (LogText == null || LogText.Length == 0) return;
+        
+        if (LogEnd >= LogText.Length)
+        {
+            LogEnd = LogText.Length - 1;
+            for (int i = 0; i < LogText.Length - 1; ++i)
+            {
+                if (LogText[i] != null && LogText[i + 1] != null)
+                    LogText[i].SetText(LogText[i + 1].GetParsedText());
+            }
+        }
+        
+        if (LogText[LogEnd] != null)
+            LogText[LogEnd].SetText(message);
         LogEnd++;
-
     }
 
     public void OnShopEnd()
     {
+        Debug.Log("[ShopUI] OnShopEnd clicked");
         ScreenFader.Instance.FadeOut(1.0f, () =>
         {
             if (GameManager.Instance != null)
@@ -218,13 +282,12 @@ public class ShopUI : MonoBehaviour
                 GameManager.Instance.StartNextDay();
             }
         });
-        audioSource.PlayOneShot(selectSE);
-        //シーン読み込み
     }
 
-    public void SetCost(int now,int future)
+    public void SetCost(int now, int future)
     {
-        BatteryNowCost = now;
-        BatteryNextCost = future;
+        s_BatteryNowCost = now;
+        s_BatteryNextCost = future;
+        RefreshCostLabels();
     }
 }

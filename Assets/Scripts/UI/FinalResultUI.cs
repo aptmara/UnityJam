@@ -15,8 +15,7 @@ namespace UnityJam.UI
         [SerializeField] private TMP_Text day3ScoreText;
         [SerializeField] private TMP_Text totalScoreText;
 
-        [Header("Item List")]
-        [SerializeField] private ItemListDisplay totalItemListDisplay;
+
 
         [Header("Buttons")]
         [SerializeField] private Button quitButton;
@@ -40,17 +39,13 @@ namespace UnityJam.UI
             if (GameSessionManager.Instance != null)
             {
                 // スコア表示
-                SetScoreText(day1ScoreText, GameSessionManager.Instance.GetDayScore(1));
-                SetScoreText(day2ScoreText, GameSessionManager.Instance.GetDayScore(2));
-                SetScoreText(day3ScoreText, GameSessionManager.Instance.GetDayScore(3));
+                SetScoreText(day1ScoreText, "Day 1 Score : ", GameSessionManager.Instance.GetDayScore(1));
+                SetScoreText(day2ScoreText, "Day 2 Score : ", GameSessionManager.Instance.GetDayScore(2));
+                SetScoreText(day3ScoreText, "Day 3 Score : ", GameSessionManager.Instance.GetDayScore(3));
                 
                 int totalScore = GameSessionManager.Instance.GetTotalScore();
-                SetScoreText(totalScoreText, totalScore);
+                SetScoreText(totalScoreText, "Total Score : ", totalScore);
 
-                 if (totalItemListDisplay != null)
-                 {
-                     totalItemListDisplay.ShowItems(GameSessionManager.Instance.TotalItems);
-                 }
 
                  // unityroomへスコア送信
                  if (UnityroomApiClient.Instance != null)
@@ -70,11 +65,11 @@ namespace UnityJam.UI
             }
         }
 
-        private void SetScoreText(TMP_Text text, int score)
+        private void SetScoreText(TMP_Text text, string label, int score)
         {
             if (text != null)
             {
-                text.text = $"{score:N0}";
+                text.text = $"{label}{score:N0}";
             }
         }
 

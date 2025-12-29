@@ -12,7 +12,7 @@ namespace UnityJam.Core
         public static GameSessionManager Instance { get; private set; }
 
         public const int MaxDays = 3; // 3日間
-        public const int MaxFloors = 5; // 各日5階層
+        public const int MaxFloors = 4; // 各日4階層
 
         // 現在の日数（0始まり: 0=1日目, 1=2日目...）
         public int CurrentDayIndex { get; private set; } = 0;
@@ -51,6 +51,13 @@ namespace UnityJam.Core
         /// </summary>
         public void RegisterDayResult(int score, Dictionary<ItemMaster, int> items)
         {
+            // 重複登録チェック: 既に今日のスコアが登録済みなら無視
+            if (DayScores.Count > CurrentDayIndex)
+            {
+                Debug.LogWarning($"[GameSessionManager] Day {CurrentDayIndex + 1} result already registered. Ignoring duplicate call.");
+                return;
+            }
+            
             Debug.Log($"[GameSessionManager] Registering Day {CurrentDayIndex + 1} Result. Score: {score}");
 
             // スコア記録
@@ -121,6 +128,10 @@ namespace UnityJam.Core
             CurrentFloor = 1;
             DayScores.Clear();
             TotalItems.Clear();
+            
+            // ショップのコストもリセット
+            ShopUI.ResetCost();
+            
             Debug.Log("[GameSessionManager] Session Reset");
         }
 
@@ -145,6 +156,65 @@ namespace UnityJam.Core
                 return DayScores[index];
             }
             return 0;
+        }
+
+        /// <summary>
+        /// 指定日のスコアから消費する（ショップ購入用）
+        /// </summary>
+        public bool SpendFromDayScore(int dayNumber, int amount)
+        {
+            int index = dayNumber - 1;
+            if (index >= 0 && index < DayScores.Count)
+            {
+                if (DayScores[index] >= amount)
+                {
+                    DayScores[index] -= amount;
+                    Debug.Log($"[GameSessionManager] Spent {amount} from Day {dayNumber}. Remaining: {DayScores[index]}");
+                    return true;
+                }
+                Debug.Log($"[GameSessionManager] Not enough score to spend. Have: {DayScores[index]}, Need: {amount}");
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// 全日程の合計スコアから消費する（最新の日から順に遡って消費）
+        /// </summary>
+        /// <param name="amount">消費額</param>
+        /// <returns>消費に成功したらtrue</returns>
+        public bool SpendTotalScore(int amount)
+        {
+            int total = GetTotalScore();
+            if (total < amount)
+            {
+                Debug.Log($"[GameSessionManager] Not enough total score. Have: {total}, Need: {amount}");
+                return false;
+            }
+
+            Debug.Log($"[GameSessionManager] Spending {amount} from total score...");
+
+            int remainingToSpend = amount;
+
+            // 最新の日（後ろ）から順に消費
+            for (int i = DayScores.Count - 1; i >= 0; i--)
+            {
+                if (remainingToSpend <= 0) break;
+
+                if (DayScores[i] >= remainingToSpend)
+                {
+                    // この日のスコアだけで足りる場合
+                    DayScores[i] -= remainingToSpend;
+                    remainingToSpend = 0;
+                }
+                else
+                {
+                    // この日のスコアすべて使っても足りない場合 -> 全額没収して次へ
+                    remainingToSpend -= DayScores[i];
+                    DayScores[i] = 0;
+                }
+            }
+
+            return remainingToSpend == 0;
         }
 
         // 互換性維持のためのエイリアス（必要なら）

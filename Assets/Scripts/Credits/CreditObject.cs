@@ -617,7 +617,12 @@ namespace UnityJam.Credits
 
             if (CreditGameManager.Instance != null) CreditGameManager.Instance.AddScore(50000);
 
-            if (fixedEffect != null) Instantiate(fixedEffect, transform.position, Quaternion.identity);
+            if (fixedEffect != null)
+            {
+                var effect = Instantiate(fixedEffect, transform.position, Quaternion.identity);
+                float destroyTime = effect.main.duration + effect.main.startLifetime.constantMax;
+                Destroy(effect.gameObject, destroyTime);
+            }
 
             if (isMonolith)
             {
