@@ -39,19 +39,19 @@ namespace UnityJam.UI
             if (GameSessionManager.Instance != null)
             {
                 // スコア表示
-                SetScoreText(day1ScoreText, "Day 1 Score : ", GameSessionManager.Instance.GetDayScore(1));
-                SetScoreText(day2ScoreText, "Day 2 Score : ", GameSessionManager.Instance.GetDayScore(2));
-                SetScoreText(day3ScoreText, "Day 3 Score : ", GameSessionManager.Instance.GetDayScore(3));
-                
+                SetScoreText(day1ScoreText, "Day 1 : ", GameSessionManager.Instance.GetDayScore(1), true);
+                SetScoreText(day2ScoreText, "Day 2 : ", GameSessionManager.Instance.GetDayScore(2), true);
+                SetScoreText(day3ScoreText, "Day 3 : ", GameSessionManager.Instance.GetDayScore(3), true);
+
                 int totalScore = GameSessionManager.Instance.GetTotalScore();
-                SetScoreText(totalScoreText, "Total Score : ", totalScore);
+                SetScoreText(totalScoreText, "Total Score : ", totalScore, false);
 
 
-                 // unityroomへスコア送信
-                 if (UnityroomApiClient.Instance != null)
-                 {
-                     UnityroomApiClient.Instance.SendScore(boardNo, totalScore, writeMode);
-                 }
+                // unityroomへスコア送信
+                if (UnityroomApiClient.Instance != null)
+                {
+                    UnityroomApiClient.Instance.SendScore(boardNo, totalScore, writeMode);
+                }
             }
 
             if (quitButton != null)
@@ -65,11 +65,20 @@ namespace UnityJam.UI
             }
         }
 
-        private void SetScoreText(TMP_Text text, string label, int score)
+        private void SetScoreText(TMP_Text text, string label, int score, bool hideIfZero)
         {
             if (text != null)
             {
-                text.text = $"{label}{score:N0}";
+                if (hideIfZero && score <= 0)
+                {
+                    // スコアが0の場合表示しない（失敗によるスキップ含む）
+                    text.gameObject.SetActive(false);
+                }
+                else
+                {
+                    text.gameObject.SetActive(true);
+                    text.text = $"{label}{score:N0}";
+                }
             }
         }
 

@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 3202001310366366213}
   - component: {fileID: 1950818459197922718}
   - component: {fileID: 5989893639598100532}
-  - component: {fileID: 1434354928725844228}
   m_Layer: 0
   m_Name: ScoreText
   m_TagString: Untagged
@@ -156,21 +155,6 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
---- !u!114 &1434354928725844228
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 387390740885845503}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d7f5bcc2ac1cd9d4b83b6ecadc4d0780, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  scoreText: {fileID: 1950818459197922718}
-  displayType: 0
-  highScoreKey: HighScore
 --- !u!1 &414544470008741768
 GameObject:
   m_ObjectHideFlags: 0
@@ -280,7 +264,6 @@ GameObject:
   - component: {fileID: 5244624423147140462}
   - component: {fileID: 7711830703634557501}
   - component: {fileID: 8638742984521277422}
-  - component: {fileID: 3918413361140269955}
   m_Layer: 0
   m_Name: ScoreText (1)
   m_TagString: Untagged
@@ -424,21 +407,6 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
---- !u!114 &3918413361140269955
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1804712648064034210}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d7f5bcc2ac1cd9d4b83b6ecadc4d0780, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  scoreText: {fileID: 7711830703634557501}
-  displayType: 0
-  highScoreKey: HighScore
 --- !u!1 &2035886331553325490
 GameObject:
   m_ObjectHideFlags: 0
@@ -929,7 +897,6 @@ GameObject:
   - component: {fileID: 5430308072053260206}
   - component: {fileID: 6167970385265973956}
   - component: {fileID: 9204992044371682792}
-  - component: {fileID: 1753579417826734212}
   m_Layer: 0
   m_Name: ScoreText (3)
   m_TagString: Untagged
@@ -1073,21 +1040,6 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
---- !u!114 &1753579417826734212
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3749484323448897879}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d7f5bcc2ac1cd9d4b83b6ecadc4d0780, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  scoreText: {fileID: 6167970385265973956}
-  displayType: 0
-  highScoreKey: HighScore
 --- !u!1 &4163214114731062351
 GameObject:
   m_ObjectHideFlags: 0
@@ -1794,7 +1746,6 @@ GameObject:
   - component: {fileID: 1193011501340355928}
   - component: {fileID: 1396397543896623807}
   - component: {fileID: 1310303728202694524}
-  - component: {fileID: 8079178915058885764}
   m_Layer: 0
   m_Name: ScoreText (2)
   m_TagString: Untagged
@@ -1938,21 +1889,6 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
---- !u!114 &8079178915058885764
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7843078233370946176}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d7f5bcc2ac1cd9d4b83b6ecadc4d0780, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  scoreText: {fileID: 1396397543896623807}
-  displayType: 0
-  highScoreKey: HighScore
 --- !u!1 &9171278436257275084
 GameObject:
   m_ObjectHideFlags: 0
