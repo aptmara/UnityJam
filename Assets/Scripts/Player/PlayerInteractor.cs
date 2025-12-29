@@ -22,6 +22,10 @@ namespace UnityJam.Player
         [Tooltip("俺が勝手にAnimatorをいじるために受け取ってるけど後でPlayer側にやらせたいby越智")]
         [SerializeField] private Animator playerAnimator;
 
+        [Header("--- Ray設定 ---")]
+        [Tooltip("左右に振るRayの角度（度）")]
+        [SerializeField] private float sideRayAngle = 20f;
+
         [Header("--- デバッグ ---")]
         [SerializeField] private InteractableBase currentTarget; // 今見ている対象
 
@@ -62,28 +66,38 @@ namespace UnityJam.Player
 
         void FindTarget()
         {
-            // 起点が設定されてなければ自分の位置+少し上
-            Vector3 origin = rayOrigin != null ? rayOrigin.position : transform.position + Vector3.up;
-            Vector3 direction = rayOrigin != null ? rayOrigin.forward : transform.forward;
+            Vector3 origin = GetOrigin();
+            Vector3 forward = GetDirection();
 
-            Ray ray = new Ray(origin, direction);
-
-            // レイキャストで探す (LayerMaskを設定するとより良いですが、一旦すべて)
-            if (Physics.Raycast(ray, out RaycastHit hit, interactRange))
+            // 左斜め前・正面・右斜め前 の順でRayを飛ばす
+            Vector3[] directions =
             {
-                // 当たった相手が InteractableBase を持っているか？
-                InteractableBase interactable = hit.collider.GetComponent<InteractableBase>();
+                Quaternion.AngleAxis(-sideRayAngle, Vector3.up) * forward, // 左斜め前
+                forward,                                                    // 正面
+                Quaternion.AngleAxis( sideRayAngle, Vector3.up) * forward  // 右斜め前
+            };
 
-                // 見つかったらターゲットにする
-                if (interactable != null)
+            foreach (var dir in directions)
+            {
+                Ray ray = new Ray(origin, dir);
+
+                // レイキャストで探す (LayerMaskを設定するとより良いですが、一旦すべて)
+                if (Physics.Raycast(ray, out RaycastHit hit, interactRange))
                 {
-                    currentTarget = interactable;
-                    Debug.Log("Found interactable target: " + currentTarget.name);
-                    return;
-                }
-                else
-                {
-                    Debug.Log("Hit something, but it's not interactable.");
+                    // 当たった相手が InteractableBase を持っているか？
+                    InteractableBase interactable = hit.collider.GetComponent<InteractableBase>();
+
+                    // 見つかったらターゲットにする
+                    if (interactable != null)
+                    {
+                        currentTarget = interactable;
+                        Debug.Log("Found interactable target: " + currentTarget.name);
+                        return;
+                    }
+                    else
+                    {
+                        Debug.Log("Hit something, but it's not interactable.");
+                    }
                 }
             }
 
@@ -99,23 +113,32 @@ namespace UnityJam.Player
         private void OnDrawGizmos()
         {
             Vector3 origin = GetOrigin();
-            Vector3 direction = GetDirection();
+            Vector3 forward = GetDirection();
 
-            // 1. レイの直線を引く
-            // ヒットしているかチェック
-            bool isHit = Physics.Raycast(origin, direction, out RaycastHit hit, interactRange);
+            Vector3[] directions =
+            {
+                Quaternion.AngleAxis(-sideRayAngle, Vector3.up) * forward, // 左斜め前
+                forward,                                                    // 正面
+                Quaternion.AngleAxis( sideRayAngle, Vector3.up) * forward  // 右斜め前
+            };
 
-            // 色の決定：ターゲットを捉えていれば赤、そうでなければ緑
-            if (isHit && hit.collider.GetComponent<InteractableBase>() != null)
+            foreach (var dir in directions)
             {
-                Gizmos.color = Color.red; // ヒット！
-                Gizmos.DrawLine(origin, hit.point);
-                Gizmos.DrawWireSphere(hit.point, 0.2f); // 当たった場所に球を表示
-            }
-            else
-            {
-                Gizmos.color = Color.green; // 探索中
-                Gizmos.DrawLine(origin, origin + direction * interactRange);
+                // ヒットしているかチェック
+                bool isHit = Physics.Raycast(origin, dir, out RaycastHit hit, interactRange);
+
+                // 色の決定：ターゲットを捉えていれば赤、そうでなければ緑
+                if (isHit && hit.collider.GetComponent<InteractableBase>() != null)
+                {
+                    Gizmos.color = Color.red; // ヒット！
+                    Gizmos.DrawLine(origin, hit.point);
+                    Gizmos.DrawWireSphere(hit.point, 0.2f); // 当たった場所に球を表示
+                }
+                else
+                {
+                    Gizmos.color = Color.green; // 探索中
+                    Gizmos.DrawLine(origin, origin + dir * interactRange);
+                }
             }
         }
     }
