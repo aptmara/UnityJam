@@ -383,6 +383,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dayDisplayPrefab: {fileID: 7935442144091252700, guid: d7075046e06da1b49a4abde6d2adb8e2, type: 3}
+  interactionUIPrefab: {fileID: 6147556500555426037, guid: 651d6d8ff70aa2d4a91e4996c47f947b, type: 3}
 --- !u!114 &1076204836
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -812,7 +813,6 @@ MonoBehaviour:
   - {fileID: 3337786056072642545, guid: a425eaaeba17e5349a791330e5a81a86, type: 3}
   finalResultPrefabs:
   - {fileID: 9163720632882021436, guid: 67bc46aa01d227a41862050a70abf298, type: 3}
-  - {fileID: 8692850089851600028, guid: cf50682583981fc48ac0495c5c3e7c62, type: 3}
   gameOverPrefabs:
   - {fileID: 3526281422501800132, guid: c4171cc03b247654a94c1a77c11b6fd0, type: 3}
 --- !u!1660057539 &9223372036854775807

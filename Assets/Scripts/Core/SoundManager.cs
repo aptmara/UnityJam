@@ -18,6 +18,15 @@ namespace UnityJam.Core
         [SerializeField] private AudioSource seSource;
         [SerializeField] private AudioClip uiClickSE;
 
+        [Header("BGM Loop Setting (Game BGM Only)")]
+        // 00:06:21.10 = 6 + 21/30 + 10/(30*80) = 6.704166f
+        [SerializeField] private float gameLoopStartTime = 6.704166f;
+        // 01:00:00.00 = 60.0f
+        [SerializeField] private float gameLoopEndTime = 60.0f;
+        [SerializeField] private float gameBGMFadeDuration = 2.0f;
+
+        private Coroutine fadeCoroutine;
+
         private void Awake()
         {
             if (Instance == null)
@@ -60,6 +69,18 @@ namespace UnityJam.Core
             }
         }
 
+        private void Update()
+        {
+            // BGMのループ制御 (Ingame BGMのみ)
+            if (bgmSource != null && bgmSource.isPlaying && bgmSource.clip == gameBGM)
+            {
+                if (bgmSource.time >= gameLoopEndTime)
+                {
+                    bgmSource.time = gameLoopStartTime;
+                }
+            }
+        }
+
         private void OnDestroy()
         {
             if (GameManager.Instance != null)
@@ -78,15 +99,24 @@ namespace UnityJam.Core
             {
                 PlayBGM(creditBGM);
             }
+            else if (state == GameState.Loading)
+            {
+                // ロード中は止めない、あるいはそのまま
+            }
             else
             {
                 // For all other states (Gameplay, Result, Shop, GameOver, etc.), play Game BGM
                 // This ensures continuity during result/shop transitions
-                PlayBGM(gameBGM);
+
+                // もし既に再生中でないならフェードインで開始
+                if (bgmSource.clip != gameBGM)
+                {
+                    PlayBGM(gameBGM, gameBGMFadeDuration);
+                }
             }
         }
 
-        public void PlayBGM(AudioClip clip)
+        public void PlayBGM(AudioClip clip, float fadeDuration = 0f)
         {
             if (clip == null) return;
 
@@ -96,9 +126,35 @@ namespace UnityJam.Core
                 return;
             }
 
+            if (fadeCoroutine != null) StopCoroutine(fadeCoroutine);
+
             bgmSource.Stop();
             bgmSource.clip = clip;
-            bgmSource.Play();
+
+            if (fadeDuration > 0f)
+            {
+                bgmSource.volume = 0f;
+                bgmSource.Play();
+                fadeCoroutine = StartCoroutine(FadeInRoutine(fadeDuration));
+            }
+            else
+            {
+                bgmSource.volume = 1f; // デフォルトボリューム（必要なら変数化）
+                bgmSource.Play();
+            }
+        }
+
+        private System.Collections.IEnumerator FadeInRoutine(float duration)
+        {
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                bgmSource.volume = Mathf.Clamp01(elapsed / duration);
+                yield return null;
+            }
+            bgmSource.volume = 1f;
+            fadeCoroutine = null;
         }
 
         public void PlayUIClick()
