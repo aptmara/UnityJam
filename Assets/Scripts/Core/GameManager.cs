@@ -30,9 +30,42 @@ public class GameManager : MonoBehaviour
 
     // 重複呼び出し防止フラグ
     private bool isProcessingDayEnd = false;
-    
+
     // 日の失敗フラグ（ペナルティ適用用）
     private bool isDayFailed = false;
+
+    [Header("--- Interaction UI ---")]
+    [Tooltip("インタラクト進行度を表示するUIプレハブ")]
+    [SerializeField] private GameObject interactionUIPrefab;
+
+    private UnityJam.UI.InteractionUI interactionUIInstance;
+
+    public void SetInteractionProgress(float progress)
+    {
+        // インスタンスがなければ生成
+        if (interactionUIInstance == null && interactionUIPrefab != null)
+        {
+            GameObject canvasObj = GameObject.Find("SystemUICanvas");
+            if (canvasObj != null)
+            {
+                GameObject uiObj = Instantiate(interactionUIPrefab, canvasObj.transform, false);
+                interactionUIInstance = uiObj.GetComponent<UnityJam.UI.InteractionUI>();
+            }
+        }
+
+        if (interactionUIInstance != null)
+        {
+            interactionUIInstance.SetProgress(progress);
+        }
+    }
+
+    public void HideInteractionUI()
+    {
+        if (interactionUIInstance != null)
+        {
+            interactionUIInstance.Hide();
+        }
+    }
 
     private void Awake()
     {
@@ -56,7 +89,7 @@ public class GameManager : MonoBehaviour
         if (Instance == this)
         {
             Debug.LogWarning("[GameManager] Instance is being destroyed! This should only happen on application quit.");
-             // Instance = null; // Usually Unity handles this, but good to know.
+            // Instance = null; // Usually Unity handles this, but good to know.
         }
 
         // 脱出イベント購読解除
@@ -88,18 +121,18 @@ public class GameManager : MonoBehaviour
         // Startでも念のため購読試行（OnEnableで済んでいるはずだが）
         SubscribeToEscapeEvent();
     }
-    
+
     private void OnSceneLoaded(UnityEngine.SceneManagement.Scene scene, UnityEngine.SceneManagement.LoadSceneMode mode)
     {
         Debug.Log($"[GameManager] Scene Loaded: {scene.name}");
         SubscribeToEscapeEvent();
         CleanupAudioListeners();
-        
+
         // Gameplay状態なら日数を表示
         if (CurrentState == GameState.Gameplay)
         {
-             // シーンリロード後などはここを通る可能性がある
-             // ただしHandleStateEnterで処理されている場合もあるので注意
+            // シーンリロード後などはここを通る可能性がある
+            // ただしHandleStateEnterで処理されている場合もあるので注意
         }
     }
 
@@ -139,7 +172,7 @@ public class GameManager : MonoBehaviour
             return;
         }
         isProcessingDayEnd = true;
-        
+
         Debug.Log("Escape triggered! Transitioning to DayResult with current score.");
 
         if (ScreenFader.Instance != null)
@@ -189,14 +222,14 @@ public class GameManager : MonoBehaviour
             case GameState.Gameplay:
                 // 新しい日の開始時にフラグリセット
                 isProcessingDayEnd = false;
-                
+
                 // Gameplay - 日数表示付きフェードイン
                 int currentDay = 1;
                 if (UnityJam.Core.GameSessionManager.Instance != null)
                 {
                     currentDay = UnityJam.Core.GameSessionManager.Instance.CurrentDayIndex + 1;
                 }
-                if (ScreenFader.Instance != null) 
+                if (ScreenFader.Instance != null)
                 {
                     ScreenFader.Instance.FadeInWithDayText(currentDay, dayDisplayPrefab, 1f, 2f);
                 }
@@ -213,7 +246,7 @@ public class GameManager : MonoBehaviour
             case GameState.Shop:
                 // Shop Entry
                 Debug.Log("Entered Shop State");
-                 if (ScreenFader.Instance != null) ScreenFader.Instance.FadeIn();
+                if (ScreenFader.Instance != null) ScreenFader.Instance.FadeIn();
                 break;
             case GameState.FinalResult:
                 // Final Result (Session End)
@@ -252,7 +285,7 @@ public class GameManager : MonoBehaviour
                 return;
             }
             isProcessingDayEnd = true;
-            
+
             // 1日の終了（5階層クリア）
             ChangeState(GameState.Result);
         }
@@ -268,13 +301,13 @@ public class GameManager : MonoBehaviour
     {
         // 1. Loadingへ遷移（これでStageManager等のGameplayPrefabが破棄される）
         ChangeState(GameState.Loading);
-        
+
         // 2. シーンリロード
         if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "Main")
         {
-             // Asyncでロードせずとも、1フレーム待つなどでタイミングをずらす
-             var op = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
-             while (!op.isDone) yield return null;
+            // Asyncでロードせずとも、1フレーム待つなどでタイミングをずらす
+            var op = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+            while (!op.isDone) yield return null;
         }
         else
         {
@@ -295,7 +328,7 @@ public class GameManager : MonoBehaviour
             {
                 int score;
                 System.Collections.Generic.Dictionary<UnityJam.Items.ItemMaster, int> items;
-                
+
                 if (isDayFailed)
                 {
                     // 失敗時はスコア0、アイテムなし
@@ -307,11 +340,11 @@ public class GameManager : MonoBehaviour
                 {
                     // 通常成功時は現在のスコアとアイテム
                     score = UnityJam.Core.Inventory.Instance != null ? UnityJam.Core.Inventory.Instance.TotalScore : 0;
-                    items = UnityJam.Core.Inventory.Instance != null 
-                        ? UnityJam.Core.Inventory.Instance.GetAllItems() 
+                    items = UnityJam.Core.Inventory.Instance != null
+                        ? UnityJam.Core.Inventory.Instance.GetAllItems()
                         : new System.Collections.Generic.Dictionary<UnityJam.Items.ItemMaster, int>();
                 }
-                
+
                 // 1日の結果として登録
                 UnityJam.Core.GameSessionManager.Instance.RegisterDayResult(score, items);
 
@@ -338,7 +371,7 @@ public class GameManager : MonoBehaviour
         }
         isProcessingDayEnd = true;
         isDayFailed = true; // ペナルティフラグを立てる (が、今回は当日分は確保する方針)
-        
+
         Debug.Log("Day Failed! Penalty applied (Future days zeroed out).");
 
         // 1. 当日分のスコアを確保して登録
@@ -371,7 +404,7 @@ public class GameManager : MonoBehaviour
         {
             Debug.LogError("[GameManager] GameSessionManager is null! Cannot proceed with fail sequence correctly.");
             // フォールバック
-             ChangeState(GameState.Result);
+            ChangeState(GameState.Result);
         }
     }
 
@@ -398,10 +431,10 @@ public class GameManager : MonoBehaviour
 
         // プレイヤーやステージのリセット
         ChangeState(GameState.Gameplay);
-        
+
         if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "Main")
         {
-             UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+            UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
         }
     }
 }

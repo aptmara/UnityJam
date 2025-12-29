@@ -35,17 +35,27 @@ namespace UnityJam.Player
             {
                 if (Input.GetKey(interactKey))
                 {
-
                     // ここで時間を進める関数を呼ぶ！
                     bool isInteract = currentTarget.AddInteractTime();
 
-                    if(isInteract)
+                    if (isInteract)
                     {
                         playerAnimator.SetTrigger("Interact");
                     }
+                }
 
-                    // ログで進行度確認（完成したら消してOK）
-                    // Debug.Log($"Opening... {currentTarget.Progress:P0}");
+                // キーを押しているかに関わらず、ターゲットがいればUIを表示する
+                if (GameManager.Instance != null)
+                {
+                    GameManager.Instance.SetInteractionProgress(currentTarget.Progress);
+                }
+            }
+            else
+            {
+                // ターゲットなし
+                if (GameManager.Instance != null)
+                {
+                    GameManager.Instance.HideInteractionUI();
                 }
             }
         }
