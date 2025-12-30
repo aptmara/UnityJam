@@ -737,8 +737,12 @@ MonoBehaviour:
   titleBGM: {fileID: 8300000, guid: 7febabafde8f9a44eaaedd0553f3acd4, type: 3}
   creditBGM: {fileID: 8300000, guid: f4031527d702f4f459e488cd3bb8b4c0, type: 3}
   gameBGM: {fileID: 8300000, guid: 13854885788cbad458b0ad94a9884dee, type: 3}
+  volumeSliderPrefab: {fileID: 8983686542579336929, guid: d5a519feb4db18241ab4046863ef3556, type: 3}
   seSource: {fileID: 1585847916}
   uiClickSE: {fileID: 8300000, guid: 812465645312f064dba9f4a7e46c2792, type: 3}
+  gameLoopStartTime: 6.704166
+  gameLoopEndTime: 60
+  gameBGMFadeDuration: 2
 --- !u!4 &1585847918
 Transform:
   m_ObjectHideFlags: 0
