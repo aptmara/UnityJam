@@ -659,6 +659,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnPointsRoot: {fileID: 7203956960923679757}
+  spawnCount: 2
   exitPrefab: {fileID: 8149300836266845958, guid: 74e60895c4bdcd94a87abc0655c2d43c, type: 3}
   positionOffset: {x: 0, y: 0, z: 0}
   useDeterministicSeed: 0

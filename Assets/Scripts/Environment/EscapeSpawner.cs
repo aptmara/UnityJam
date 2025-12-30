@@ -14,6 +14,10 @@ namespace UnityJam.Environment
         [Tooltip("EscapeSpawnPoint を子に持つ Transform")]
         [SerializeField] private Transform spawnPointsRoot;
 
+        [Header("Spawn Count")]
+        [Tooltip("生成する脱出地点の数")]
+        [SerializeField] private int spawnCount = 2;
+
         [Header("Prefab")]
         [Tooltip("脱出地点のPrefab")]
         [SerializeField] private GameObject exitPrefab;
@@ -63,17 +67,42 @@ namespace UnityJam.Environment
                 return;
             }
 
+            if (spawnCount <= 0)
+            {
+                Debug.LogWarning("EscapeSpawner: spawnCount が 0 以下です。", this);
+                return;
+            }
+
+            if (spawnCount > spawnPoints.Count)
+            {
+                Debug.LogWarning(
+                    $"EscapeSpawner: spawnCount({spawnCount}) が SpawnPoint 数({spawnPoints.Count}) を超えています。全て使用します。",
+                    this
+                );
+                spawnCount = spawnPoints.Count;
+            }
+
             System.Random rng = useDeterministicSeed
                 ? new System.Random(seed)
-                : new System.Random(System.Environment.TickCount); // ★ 修正点
+                : new System.Random(System.Environment.TickCount);
 
-            int index = rng.Next(0, spawnPoints.Count);
-            Transform point = spawnPoints[index];
+            // Fisher–Yates シャッフル
+            for (int i = spawnPoints.Count - 1; i > 0; i--)
+            {
+                int j = rng.Next(0, i + 1);
+                (spawnPoints[i], spawnPoints[j]) = (spawnPoints[j], spawnPoints[i]);
+            }
 
-            Instantiate(exitPrefab, point.position + positionOffset, point.rotation);
+            // 先頭から spawnCount 個生成
+            for (int i = 0; i < spawnCount; i++)
+            {
+                Transform point = spawnPoints[i];
+                Instantiate(exitPrefab, point.position + positionOffset, point.rotation);
+            }
 
             spawnedOnce = true;
         }
+
 
         private static void CollectSpawnPoints(Transform root, List<Transform> outList)
         {
