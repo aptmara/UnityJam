@@ -18,7 +18,8 @@ namespace UnityJam.Environment
         {
             if (interactVfxPrefab != null)
             {
-                Instantiate(interactVfxPrefab, transform.position, Quaternion.identity);
+                // Parent to this object
+                Instantiate(interactVfxPrefab, transform.position, Quaternion.identity, transform);
             }
 
             if (EscapeState.Instance != null)

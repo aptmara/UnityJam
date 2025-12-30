@@ -67,7 +67,7 @@ namespace UnityJam.Gimmicks
         // Startでマネージャーに登録
         private void Start()
         {
-            if(TreasureManager.Instance != null)
+            if (TreasureManager.Instance != null)
             {
                 TreasureManager.Instance.RegisterChest(this.gameObject);
             }
@@ -110,12 +110,12 @@ namespace UnityJam.Gimmicks
                 {
                     floor = GameSessionManager.Instance.CurrentFloor;
                 }
-                
+
                 // floorは1始まり、リストは0始まり
                 // 階層がリスト数より多い場合は最後の要素を使う
                 int index = Mathf.Clamp(floor - 1, 0, floorDropTables.Count - 1);
                 selectedTable = floorDropTables[index];
-                
+
                 // もし万が一nullならデフォルトに戻す
                 if (selectedTable == null) selectedTable = dropTable;
             }
@@ -138,7 +138,7 @@ namespace UnityJam.Gimmicks
             }
 
             // バッテリー減少処理
-            if(selectedTable.batteryPenaltyPercent > 0)
+            if (selectedTable.batteryPenaltyPercent > 0)
             {
                 // バッテリー管理スクリプトを探す
                 // ※ "PlayerBattery" の部分は実際のクラス名に合わせてください。
@@ -193,7 +193,8 @@ namespace UnityJam.Gimmicks
             // ベースエフェクト再生
             if (baseVfxPrefab != null)
             {
-                Instantiate(baseVfxPrefab, transform.position, Quaternion.identity);
+                // Parent to this chest to clean up when stage is destroyed
+                Instantiate(baseVfxPrefab, transform.position, Quaternion.identity, transform);
             }
 
             // D. レアリティに応じたVFXを再生
@@ -202,7 +203,8 @@ namespace UnityJam.Gimmicks
             // Light Burst
             if (burstLightPrefab != null)
             {
-                GameObject lightObj = Instantiate(burstLightPrefab, transform.position + burstLightOffset, Quaternion.identity);
+                // Parent to this chest
+                GameObject lightObj = Instantiate(burstLightPrefab, transform.position + burstLightOffset, Quaternion.identity, transform);
                 StartCoroutine(FadeOutLight(lightObj, burstLightLifeTime));
             }
 
@@ -284,7 +286,8 @@ namespace UnityJam.Gimmicks
             if (popupEffectPrefab != null)
             {
                 // 少し上に出現させる
-                GameObject effectObj = Instantiate(popupEffectPrefab, transform.position + Vector3.up, Quaternion.identity);
+                // Parent to this chest
+                GameObject effectObj = Instantiate(popupEffectPrefab, transform.position + Vector3.up, Quaternion.identity, transform);
                 ItemPopupEffect popupScript = effectObj.GetComponent<ItemPopupEffect>();
                 if (popupScript != null) popupScript.Initialize(item.icon);
             }
@@ -305,14 +308,14 @@ namespace UnityJam.Gimmicks
                 GameObject vfxToPlay = rarityVfxPrefabs[index];
                 if (vfxToPlay != null)
                 {
-                    Instantiate(vfxToPlay, transform.position, Quaternion.identity);
+                    Instantiate(vfxToPlay, transform.position, Quaternion.identity, transform);
                 }
             }
             else
             {
                 // 該当するレアリティのエフェクトがない場合、とりあえず一番下のレアリティを再生しておく（保険）
                 if (rarityVfxPrefabs[0] != null)
-                    Instantiate(rarityVfxPrefabs[0], transform.position, Quaternion.identity);
+                    Instantiate(rarityVfxPrefabs[0], transform.position, Quaternion.identity, transform);
             }
         }
     }

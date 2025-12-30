@@ -9,9 +9,18 @@ public class ResultPanel : MonoBehaviour
 
     private void OnEnable()
     {
-        if (PlayerDataManager.Instance != null && finalScoreText != null)
+        if (finalScoreText != null)
         {
-            finalScoreText.text = $"Final Score: {PlayerDataManager.Instance.CurrentScore}";
+            int score = 0;
+            if (UnityJam.Core.GameSessionManager.Instance != null)
+            {
+                score = UnityJam.Core.GameSessionManager.Instance.GetTotalScore();
+            }
+            else if (PlayerDataManager.Instance != null)
+            {
+                score = PlayerDataManager.Instance.CurrentScore;
+            }
+            finalScoreText.text = $"Final Score: {score}";
         }
     }
 
