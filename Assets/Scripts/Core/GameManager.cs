@@ -34,6 +34,14 @@ public class GameManager : MonoBehaviour
     // 日の失敗フラグ（ペナルティ適用用）
     private bool isDayFailed = false;
 
+    [Header("--- UI ---")]
+    [SerializeField] private GameObject menuPrefab;
+    private GameObject menuInstance;
+    private bool isMenuOpen = false;
+
+    // Sensitivity Settings (Default 180f)
+    public float CurrentSensitivity { get; private set; } = 180f;
+
     [Header("--- Interaction UI ---")]
     [Tooltip("インタラクト進行度を表示するUIプレハブ")]
     [SerializeField] private GameObject interactionUIPrefab;
@@ -111,6 +119,83 @@ public class GameManager : MonoBehaviour
         if (UnityJam.Core.EscapeState.Instance != null)
         {
             UnityJam.Core.EscapeState.Instance.OnEscaped -= HandleEscape;
+        }
+    }
+
+
+    private void Update()
+    {
+        // Toggle Menu
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            ToggleMenu();
+        }
+    }
+
+    public void ToggleMenu()
+    {
+        if (CurrentState != GameState.Gameplay && CurrentState != GameState.Shop && CurrentState != GameState.Title)
+        {
+            // Allow menu mainly in Gameplay/Shop. Maybe Title if needed, but Title usually has its own UI.
+            // For now, let's limit to typical controllable states.
+            // If checking Title is needed, add it.
+            // Assuming Title has its own start screen, maybe we don't need this overlay there.
+            // But user asked for "in-game menu", usually Gameplay.
+            if (CurrentState != GameState.Gameplay && CurrentState != GameState.Shop) return;
+        }
+
+        isMenuOpen = !isMenuOpen;
+
+        if (menuInstance == null && menuPrefab != null)
+        {
+            // Instantiate if not exists
+            GameObject canvasObj = GameObject.Find("SystemUICanvas");
+            Transform parent = (canvasObj != null) ? canvasObj.transform : null; // Fallback to root or find a generic canvas
+            if (parent == null)
+            {
+                // Try finding ANY canvas if SystemUICanvas is missing
+                Canvas anyCanvas = FindObjectOfType<Canvas>();
+                if (anyCanvas != null) parent = anyCanvas.transform;
+            }
+
+            menuInstance = Instantiate(menuPrefab, parent);
+        }
+
+        if (menuInstance != null)
+        {
+            menuInstance.SetActive(isMenuOpen);
+
+            if (isMenuOpen)
+            {
+                // Show Cursor
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+                // Pause time?
+                // Time.timeScale = 0f; 
+            }
+            else
+            {
+                // Hide Cursor logic
+                // If we are in Gameplay, we usually want locked cursor.
+                if (CurrentState == GameState.Gameplay || CurrentState == GameState.Shop)
+                {
+                    Cursor.lockState = CursorLockMode.Locked;
+                    Cursor.visible = false;
+                }
+                // Resume time?
+                // Time.timeScale = 1f;
+            }
+        }
+    }
+
+    public void SetSensitivity(float val)
+    {
+        CurrentSensitivity = val;
+        // Find Rig and apply
+        var rig = FindObjectOfType<UnityJam.CameraRigController>();
+        if (rig != null)
+        {
+            rig.SetSensitivity(val);
         }
     }
 

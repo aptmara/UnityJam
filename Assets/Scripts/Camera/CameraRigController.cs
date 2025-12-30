@@ -17,7 +17,17 @@ namespace UnityJam
         [SerializeField] Transform useCamera;
 
         [Header("Rotation")]
-        [SerializeField] float sensitivity = 180f;
+        [SerializeField] float _sensitivity = 180f;
+        public float Sensitivity
+        {
+            get => _sensitivity;
+            set => _sensitivity = value;
+        }
+
+        public void SetSensitivity(float value)
+        {
+            _sensitivity = value;
+        }
         [SerializeField] float minPitch = -30f;
         [SerializeField] float maxPitch = 60f;
 
@@ -45,7 +55,7 @@ namespace UnityJam
         private void Update()
         {
             float dt = Time.deltaTime;
-            
+
             // カーソルロック時のみカメラ操作可能
             if (Cursor.lockState != CursorLockMode.Locked) return;
 
@@ -55,8 +65,8 @@ namespace UnityJam
             float mouseX = Input.GetAxisRaw("Mouse X");
             float mouseY = Input.GetAxisRaw("Mouse Y");
 
-            yaw += mouseX * sensitivity * dt;
-            pitch -= mouseY * sensitivity * dt;
+            yaw += mouseX * _sensitivity * dt;
+            pitch -= mouseY * _sensitivity * dt;
             pitch = Mathf.Clamp(pitch, minPitch, maxPitch);
 
             Quaternion rotation = Quaternion.Euler(pitch, yaw, 0f);

@@ -57,4 +57,19 @@ public class PlayerDataManager : MonoBehaviour
     {
         BatteryLife = Mathf.Max(0, BatteryLife - amount);
     }
+
+    /// <summary>
+    /// データをリセットする（タイトルに戻る時など）
+    /// </summary>
+    public void ResetData()
+    {
+        ResetScore();
+        // Inspectorで設定されている初期値に戻すため、-1にする
+        BatteryPieces = -1;
+        BatteryAdditionPieces = 0;
+        LightBattery = 1.0f;
+
+        // 進行度もリセット
+        CurrentStageIndex = 0;
+    }
 }
