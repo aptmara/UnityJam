@@ -383,6 +383,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dayDisplayPrefab: {fileID: 7935442144091252700, guid: d7075046e06da1b49a4abde6d2adb8e2, type: 3}
+  menuPrefab: {fileID: 9012180151735272577, guid: ea4eaae4a135ef0409adb0baea6da8fd, type: 3}
   interactionUIPrefab: {fileID: 6147556500555426037, guid: 651d6d8ff70aa2d4a91e4996c47f947b, type: 3}
 --- !u!114 &1076204836
 MonoBehaviour:

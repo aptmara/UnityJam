@@ -57,7 +57,7 @@ namespace UnityJam.Core
                 Debug.LogWarning($"[GameSessionManager] Day {CurrentDayIndex + 1} result already registered. Ignoring duplicate call.");
                 return;
             }
-            
+
             Debug.Log($"[GameSessionManager] Registering Day {CurrentDayIndex + 1} Result. Score: {score}");
 
             // スコア記録
@@ -82,15 +82,15 @@ namespace UnityJam.Core
             // もしCurrentFloorが5で、ProceedToNextFloorが呼ばれる前にここに来るなら5。
             // MaxFloorsでキャップする。
             LastReachedFloor = Mathf.Min(CurrentFloor, MaxFloors);
-            
+
             // 次の日へ
             CurrentDayIndex++;
-            
+
             // 階層リセットは StartNextDay で NextDayStartFloor を使うため、ここでは一旦1に戻すか、
             // あるいは StartNextDay で上書きされるので気にしないか。
             // デフォルトは1
             NextDayStartFloor = 1;
-            CurrentFloor = 1; 
+            CurrentFloor = 1;
         }
 
         /// <summary>
@@ -128,10 +128,22 @@ namespace UnityJam.Core
             CurrentFloor = 1;
             DayScores.Clear();
             TotalItems.Clear();
-            
+
             // ショップのコストもリセット
             ShopUI.ResetCost();
-            
+
+            // インベントリのクリア
+            if (Inventory.Instance != null)
+            {
+                Inventory.Instance.Clear();
+            }
+
+            // プレイヤーデータのクリア
+            if (PlayerDataManager.Instance != null)
+            {
+                PlayerDataManager.Instance.ResetData();
+            }
+
             Debug.Log("[GameSessionManager] Session Reset");
         }
 

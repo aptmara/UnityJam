@@ -66,7 +66,8 @@ namespace UnityJam.Core
             }
 
             // Set initial master volume
-            AudioListener.volume = MaxVolumeRatio;
+            // Set initial master volume (50% start)
+            AudioListener.volume = MaxVolumeRatio * 0.5f;
 
             // Subscribe to state changes
             if (GameManager.Instance != null)
