@@ -526,6 +526,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: PF_Player_PlayerLoot
       objectReference: {fileID: 0}
+    - target: {fileID: 4972304098419178497, guid: 02021e2ee4397ff4ab4881449f848753, type: 3}
+      propertyPath: sensitivity
+      value: 50
+      objectReference: {fileID: 0}
     - target: {fileID: 7963690259765723326, guid: 02021e2ee4397ff4ab4881449f848753, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -671,6 +675,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dayDisplayPrefab: {fileID: 0}
+  interactionUIPrefab: {fileID: 0}
 --- !u!4 &1893870214
 Transform:
   m_ObjectHideFlags: 0

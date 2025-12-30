@@ -2225,7 +2225,7 @@ MonoBehaviour:
   player: {fileID: 1636903149006292319}
   mapChange: {fileID: 5772812158569332606}
   useCamera: {fileID: 745020526972773127}
-  sensitivity: 100
+  sensitivity: 50
   minPitch: -30
   maxPitch: 60
   distance: 4
