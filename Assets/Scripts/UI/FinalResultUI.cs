@@ -20,6 +20,7 @@ namespace UnityJam.UI
         [Header("Buttons")]
         [SerializeField] private Button quitButton;
         [SerializeField] private Button tweetButton; // Tweetボタン
+        [SerializeField] private Button returnTitleButton; // Added: Return to Title
 
         [Header("Unityroom")]
         [Tooltip("unityroomのスコアボードNo")]
@@ -63,6 +64,11 @@ namespace UnityJam.UI
             {
                 tweetButton.onClick.AddListener(OnTweetClicked);
             }
+
+            if (returnTitleButton != null)
+            {
+                returnTitleButton.onClick.AddListener(OnReturnTitleClicked);
+            }
         }
 
         private void SetScoreText(TMP_Text text, string label, int score, bool hideIfZero)
@@ -97,6 +103,34 @@ namespace UnityJam.UI
 
             string text = $"コレクライトで {totalScore:N0} 点を獲得しました！";
             UnityRoomTweet.Tweet(gameId, text, "unityroom", "unity1week");
+        }
+
+        private void OnReturnTitleClicked()
+        {
+            // Reset Session
+            if (GameSessionManager.Instance != null)
+            {
+                GameSessionManager.Instance.ResetSession();
+            }
+
+            // Transition to Title
+            if (ScreenFader.Instance != null)
+            {
+                ScreenFader.Instance.FadeOut(-1f, () =>
+                {
+                    if (GameManager.Instance != null)
+                    {
+                        GameManager.Instance.ChangeState(GameState.Title);
+                    }
+                });
+            }
+            else
+            {
+                if (GameManager.Instance != null)
+                {
+                    GameManager.Instance.ChangeState(GameState.Title);
+                }
+            }
         }
     }
 }

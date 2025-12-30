@@ -14,6 +14,9 @@ namespace UnityJam.Core
         [SerializeField] private AudioClip titleBGM;
         [SerializeField] private AudioClip creditBGM; // Added for Credits
         [SerializeField] private AudioClip gameBGM;   // Restored
+
+        [Header("UI Prefabs")]
+        [SerializeField] public GameObject volumeSliderPrefab;
         [Header("SE")]
         [SerializeField] private AudioSource seSource;
         [SerializeField] private AudioClip uiClickSE;
@@ -24,6 +27,8 @@ namespace UnityJam.Core
         // 01:00:00.00 = 60.0f
         [SerializeField] private float gameLoopEndTime = 60.0f;
         [SerializeField] private float gameBGMFadeDuration = 2.0f;
+
+        private const float MaxVolumeRatio = 0.7f; // Max volume limited to 70%
 
         private Coroutine fadeCoroutine;
 
@@ -59,6 +64,9 @@ namespace UnityJam.Core
                 childObj.transform.parent = transform;
                 seSource = childObj.AddComponent<AudioSource>();
             }
+
+            // Set initial master volume
+            AudioListener.volume = MaxVolumeRatio;
 
             // Subscribe to state changes
             if (GameManager.Instance != null)
@@ -163,6 +171,19 @@ namespace UnityJam.Core
             {
                 seSource.PlayOneShot(uiClickSE);
             }
+        }
+
+        public void SetMasterVolume(float volume)
+        {
+            // Input volume (0.0 to 1.0) is scaled to (0.0 to MaxVolumeRatio)
+            AudioListener.volume = Mathf.Clamp01(volume) * MaxVolumeRatio;
+        }
+
+        public float GetMasterVolume()
+        {
+            // Return scaled volume so slider shows correct position relative to Max
+            if (MaxVolumeRatio <= 0f) return 0f;
+            return AudioListener.volume / MaxVolumeRatio;
         }
     }
 }

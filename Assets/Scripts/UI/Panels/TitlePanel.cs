@@ -5,6 +5,7 @@ public class TitlePanel : MonoBehaviour
 {
     [SerializeField] public Button startButton;
     [SerializeField] public Button creditsButton;
+    [SerializeField] private Transform volumeSliderContainer; // Container for the slider
 
     private void Start()
     {
@@ -12,6 +13,21 @@ public class TitlePanel : MonoBehaviour
             startButton.onClick.AddListener(OnStartClicked);
         if (creditsButton != null)
             creditsButton.onClick.AddListener(OnCreditsClicked);
+
+        // Instantiate Volume Slider
+        if (UnityJam.Core.SoundManager.Instance != null && 
+            UnityJam.Core.SoundManager.Instance.volumeSliderPrefab != null)
+        {
+            if (volumeSliderContainer != null)
+            {
+                Instantiate(UnityJam.Core.SoundManager.Instance.volumeSliderPrefab, volumeSliderContainer);
+            }
+            else
+            {
+                // Fallback: Instantiate as child of this panel if no container specified
+                Instantiate(UnityJam.Core.SoundManager.Instance.volumeSliderPrefab, transform);
+            }
+        }
     }
 
     private void OnStartClicked()
