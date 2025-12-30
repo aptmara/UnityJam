@@ -26,22 +26,17 @@ namespace UnityJam.UI
         [SerializeField] private Color successColor = Color.cyan;
         [SerializeField] private Color failColor = Color.red;
 
-        private void Start()
+        private void OnEnable()
         {
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
-
             if (feedbackText != null) feedbackText.text = "";
 
             // スコア表示
             if (GameSessionManager.Instance != null)
             {
-                int currentDay = GameSessionManager.Instance.CurrentDayIndex; 
+                int currentDay = GameSessionManager.Instance.CurrentDayIndex;
                 // CurrentDayIndexはRoundEndでインクリメント済みなので、
                 // 表示したいのは「終わったばかりの日」= CurrentDayIndex (1始まりなら CurrentDayIndex)
-                // 例: Day1終了 -> Index=1. 表示はDay1の結果。
-                // GetDayScore(1) -> Index 0.
-                
+
                 int finishedDay = currentDay; // 1始まりの日数
                 if (finishedDay < 1) finishedDay = 1;
 
@@ -55,6 +50,12 @@ namespace UnityJam.UI
 
                 UpdateShortcutUI();
             }
+        }
+
+        private void Start()
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
 
             if (shortcutButton != null)
             {
@@ -117,7 +118,7 @@ namespace UnityJam.UI
                     StartCoroutine(ShowErrorFeedback("スコアが足りません！"));
                     return;
                 }
-                
+
                 // Set Start Floor
                 GameSessionManager.Instance.NextDayStartFloor = lastReached;
 
@@ -125,16 +126,16 @@ namespace UnityJam.UI
                 if (shortcutButton != null)
                 {
                     shortcutButton.interactable = false;
-                    if(shortcutButtonText != null) shortcutButtonText.text = "購入済み";
+                    if (shortcutButtonText != null) shortcutButtonText.text = "購入済み";
                 }
-                
+
                 // Update Score Display (remaining after purchase)
                 if (dayScoreText != null)
                 {
                     int remainingScore = GameSessionManager.Instance.GetDayScore(currentDayIndex);
                     dayScoreText.text = $"{currentDayIndex}日目 スコア: {remainingScore:N0}";
                 }
-                
+
                 if (totalScoreText != null)
                 {
                     totalScoreText.text = $"合計スコア: {GameSessionManager.Instance.GetTotalScore():N0}";

@@ -97,7 +97,8 @@ namespace UnityJam.Environment
             for (int i = 0; i < spawnCount; i++)
             {
                 Transform point = spawnPoints[i];
-                Instantiate(exitPrefab, point.position + positionOffset, point.rotation);
+                // Parent to this spawner to ensure cleanup
+                Instantiate(exitPrefab, point.position + positionOffset, point.rotation, transform);
             }
 
             spawnedOnce = true;
